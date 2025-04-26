@@ -1,0 +1,34 @@
+import { z } from "zod";
+
+const restAPIErrorSchema = z.object({
+  statusText: z.string(),
+  status: z.coerce.number(),
+});
+
+type RESTAPIError = z.infer<typeof restAPIErrorSchema>;
+
+function isRESTAPIError(maybeError: unknown): maybeError is RESTAPIError {
+  return restAPIErrorSchema.safeParse(maybeError).success;
+}
+
+export const hasError = (maybeError: unknown): boolean =>
+  isRESTAPIError(maybeError);
+
+export const getErrorMessage = (
+  error: unknown,
+  defaultMessage = "Unknown Error. Refresh page and try again.",
+): string => {
+  if (isRESTAPIError(error)) {
+    return error.statusText;
+  }
+
+  return defaultMessage;
+};
+
+export const getErrorStatus = (maybeError: unknown): string | null => {
+  if (isRESTAPIError(maybeError)) {
+    return maybeError.statusText;
+  }
+
+  return null;
+};

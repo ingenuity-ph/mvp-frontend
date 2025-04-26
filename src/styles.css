@@ -1,0 +1,46 @@
+@import "tailwindcss";
+@plugin "tailwindcss-react-aria-components";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  [type="search"]::-webkit-search-cancel-button,
+  [type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  :root {
+  }
+}
+
+@theme {
+  --font-sans:
+    "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --color-surface-background: theme("colors.white");
+  --color-surface-foreground: theme("colors.white");
+  --radius-surface: theme("borderRadius.md");
+  --spacing-surface: theme("spacing.4");
+  --spacing-surface-gutter: theme("spacing.4");
+
+  --radius-control: theme("borderRadius.md");
+
+  --color-brand-border: theme("colors.zinc.950/0.1");
+  --btn-radius: theme("borderRadius.md");
+  /*Core  */
+
+  --color-brand-primary-50: oklch(0.98 0.016 73.684);
+  --color-brand-primary-100: oklch(0.954 0.038 75.164);
+  --color-brand-primary-200: oklch(0.901 0.076 70.697);
+  --color-brand-primary-300: oklch(0.837 0.128 66.29);
+  --color-brand-primary-400: oklch(0.75 0.183 55.934);
+  --color-brand-primary-500: oklch(0.705 0.213 47.604);
+  --color-brand-primary-600: oklch(0.646 0.222 41.116);
+  --color-brand-primary-700: oklch(0.553 0.195 38.402);
+  --color-brand-primary-800: oklch(0.47 0.157 37.304);
+  --color-brand-primary-900: oklch(0.408 0.123 38.172);
+  --color-brand-primary-950: oklch(0.266 0.079 36.259);
+  --color-brand-primary: var(--color-brand-primary-500);
+}

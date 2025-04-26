@@ -1,0 +1,58 @@
+import { sheriff, tseslint } from "eslint-config-sheriff";
+
+const sheriffOptions = {
+  react: true,
+  lodash: false,
+  remeda: false,
+  next: false,
+  astro: false,
+  playwright: false,
+  storybook: false,
+  jest: false,
+  vitest: true,
+  pathsOverrides: {
+    tsconfigLocation: ["./tsconfig.json"],
+  },
+};
+
+export default tseslint.config(sheriff(sheriffOptions), {
+  extends: [
+    ...pluginQuery.configs["flat/recommended"],
+    ...pluginRouter.configs["flat/recommended"],
+  ],
+  rules: {
+    "fsecond/prefer-destructured-optionals": "off",
+    "no-void": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "sonarjs/no-duplicate-string": "off",
+    "unicorn/no-array-reduce": "off",
+    "@typescript-eslint/no-misused-promises": "off",
+    "react-refresh/only-export-components": "off",
+    "unicorn/prefer-top-level-await": "off",
+    "prefer-arrow-callback": "off",
+    "func-style": "off",
+    "no-use-before-define": "off",
+    "no-console": "warn",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        default: "generic",
+        readonly: "generic",
+      },
+    ],
+    "@typescript-eslint/restrict-template-expressions": [
+      "error",
+      {
+        /** Whether to allow `number` typed values in template expressions. */
+        allowNumber: true,
+      },
+    ],
+    "react/no-multi-comp": [0],
+    "react/function-component-definition": [
+      2,
+      { namedComponents: "function-declaration" },
+    ],
+  },
+});
