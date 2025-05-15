@@ -16,10 +16,13 @@ export const hasError = (maybeError: unknown): boolean =>
 
 export const getErrorMessage = (
   error: unknown,
-  defaultMessage = "Unknown Error. Refresh page and try again.",
+  defaultMessage = "Unknown Error. Refresh page and try again."
 ): string => {
   if (isRESTAPIError(error)) {
     return error.statusText;
+  }
+  if (error instanceof Error && "message" in error) {
+    return error.message;
   }
 
   return defaultMessage;

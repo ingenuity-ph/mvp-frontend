@@ -1,4 +1,6 @@
 import { sheriff, tseslint } from "eslint-config-sheriff";
+import pluginQuery from "@tanstack/eslint-plugin-query";
+import pluginRouter from "@tanstack/eslint-plugin-router";
 
 const sheriffOptions = {
   react: true,
