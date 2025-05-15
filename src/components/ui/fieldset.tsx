@@ -39,7 +39,7 @@ export function Fieldset({
       data-slot="fieldset"
       className={cn(
         className,
-        "[&>*+[data-slot=control]]:mt-3 [&>[data-slot=description]]:mt-1 [&>[data-slot=text]]:mt-1",
+        "[&>*+[data-slot=control]]:mt-3 [&>[data-slot=description]]:mt-1 [&>[data-slot=text]]:mt-1"
       )}
     />
   );
@@ -56,7 +56,7 @@ export function Legend({
       className={cn(
         className,
         textStyles({ level: "label-sm", colors: "dark" }),
-        "font-semibold data-[disabled]:opacity-50",
+        "font-semibold data-[disabled]:opacity-50"
       )}
     />
   );
@@ -156,7 +156,7 @@ export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
         />
       </Provider>
     );
-  },
+  }
 );
 
 export const fieldLayoutStyles = [
@@ -249,7 +249,7 @@ export function FieldControl<
             "[&>[data-slot=control]+[data-slot=description]]:mt-1.5",
             "[&>[data-slot=control]+[data-slot=error]]:mt-1.5",
             "[&>[data-slot=label]]:font-medium",
-          ],
+          ]
         )}
       >
         {children}
@@ -267,8 +267,14 @@ export const HeadlessLabel = forwardRef<HTMLLabelElement, AriaLabelProps>(
     // eslint-disable-next-line no-param-reassign, no-useless-assignment
     [props, ref] = useContextProps(props, _ref, AriaLabelContext);
 
-    return <AriaLabel {...props} data-slot="label" />;
-  },
+    return (
+      <AriaLabel
+        {...props}
+        elementType={props.elementType ?? "span"}
+        data-slot="label"
+      />
+    );
+  }
 );
 
 export const Label = forwardRef<HTMLLabelElement, AriaLabelProps>(
@@ -280,11 +286,11 @@ export const Label = forwardRef<HTMLLabelElement, AriaLabelProps>(
         data-slot="label"
         className={cn(
           props.className,
-          "text-base/6 text-zinc-950 select-none data-[disabled]:opacity-50 sm:text-sm/6 dark:text-white",
+          "text-base/6 text-zinc-950 select-none data-[disabled]:opacity-50 sm:text-sm/6 dark:text-white"
         )}
       />
     );
-  },
+  }
 );
 
 export function Description({ className, ...props }: AriaTextProps) {
@@ -295,7 +301,7 @@ export function Description({ className, ...props }: AriaTextProps) {
       {...props}
       className={cn(
         className,
-        "block text-base/6 text-zinc-500 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-zinc-400",
+        "block text-base/6 text-zinc-500 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-zinc-400"
       )}
     />
   );
@@ -312,7 +318,7 @@ export function ErrorMessage({
       {...props}
       className={cn(
         className,
-        "inline-block text-base/6 text-red-600 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-red-500",
+        "inline-block text-base/6 text-red-600 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-red-500"
       )}
     />
   );

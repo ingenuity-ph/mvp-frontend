@@ -352,7 +352,7 @@ export const Button = React.forwardRef(function Button(
     onClick,
     ...props
   }: ButtonProps,
-  ref: React.ForwardedRef<HTMLElement>,
+  ref: React.ForwardedRef<HTMLElement>
 ) {
   const matchingInset = Array.isArray(inset)
     ? inset.map((item) => baseButton.variants.inset[item]).join(" ")

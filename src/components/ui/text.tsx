@@ -146,7 +146,7 @@ export function Text({
           /**
            * Text color will inherit styles applied to parent.
            */
-          inheritColor ? "" : colorStyle,
+          inheritColor ? "" : colorStyle
         )}
       />
     </_TextNestedContext.Provider>
@@ -172,7 +172,7 @@ export function TextLink({
         "underline",
         textStyles({ level }),
         "text-[color:var(--text-color)]",
-        colorStyle,
+        colorStyle
       )}
     />
   );
@@ -201,7 +201,7 @@ export function TextButton({
         // Text
         "text-[color:var(--text-color)]",
         textStyles({ level }),
-        colorStyle,
+        colorStyle
       )}
     />
   );
@@ -228,7 +228,7 @@ export function Code({
       {...props}
       className={clsx(
         className,
-        "rounded border border-zinc-950/10 bg-zinc-950/[2.5%] px-0.5 text-sm font-medium text-zinc-950 sm:text-[0.8125rem] dark:border-white/20 dark:bg-white/5 dark:text-white",
+        "rounded border border-zinc-950/10 bg-zinc-950/[2.5%] px-0.5 text-sm font-medium text-zinc-950 sm:text-[0.8125rem] dark:border-white/20 dark:bg-white/5 dark:text-white"
       )}
     />
   );
@@ -241,7 +241,7 @@ export function Title({ className, ...props }: HeadingProps) {
       className={clsx(
         className,
         "font-semibold text-balance",
-        textStyles({ level: "label-md", colors: "dark" }),
+        textStyles({ level: "label-md", colors: "dark" })
       )}
     />
   );

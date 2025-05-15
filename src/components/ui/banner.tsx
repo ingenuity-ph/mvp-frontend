@@ -22,7 +22,7 @@ const bannerStyles = tv({
     } satisfies Record<Density, Array<string>>,
   },
   defaultVariants: {
-    density: "compact",
+    density: "default",
   },
 });
 
