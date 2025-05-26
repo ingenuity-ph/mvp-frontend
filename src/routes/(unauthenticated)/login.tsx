@@ -1,5 +1,10 @@
 import { Amplify } from "aws-amplify";
-import { getCurrentUser, resendSignUpCode, signIn } from "aws-amplify/auth";
+import {
+  fetchAuthSession,
+  getCurrentUser,
+  resendSignUpCode,
+  signIn,
+} from "aws-amplify/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Description, FieldControl, Label } from "@/components/ui/fieldset";
 import { InputField, PasswordInput } from "@/components/ui/input";
 import { Strong, Text, TextLink, Title } from "@/components/ui/text";
+import { toaster } from "@/components/ui/toast";
+import { CognitoAuthService } from "@/features/auth/cognito/api/endpoints";
 import { getErrorMessage } from "@/libs/query/query-error";
 
 /**
@@ -46,6 +53,7 @@ function App() {
     resolver: zodResolver(schema),
   });
 
+  const validateToken = CognitoAuthService.validateToken.useMutation();
   const onSubmitHandler = form.handleSubmit(async (data) => {
     const result = await signIn({
       username: data.username,
@@ -68,7 +76,25 @@ function App() {
         search: { email: data.username },
       });
     } else if (nextStep === "DONE") {
-      void navigate({ to: "/home" });
+      // send to BE to validate and return as cookie
+      const session = await fetchAuthSession();
+
+      const token = session.tokens?.accessToken.toString();
+
+      if (token) {
+        await validateToken.mutateAsync(
+          { token },
+          {
+            onSuccess() {
+              void navigate({ to: "/home" });
+            },
+            onError(error) {
+              toaster.error(getErrorMessage(error));
+              form.setError("root", { message: getErrorMessage(error) });
+            },
+          }
+        );
+      }
     }
   });
 

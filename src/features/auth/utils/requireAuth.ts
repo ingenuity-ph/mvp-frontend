@@ -12,6 +12,7 @@ export async function requireAuth({
 
     return await fetchAuthSession();
   } catch {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw redirect({ to: redirectTo });
   }
 }
