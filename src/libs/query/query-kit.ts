@@ -19,12 +19,12 @@ import {
   type RouterQuery,
   type RouterQueryOptions,
 } from "react-query-kit";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { QueryKey } from "@tanstack/react-query";
 import { stripNull, stripUndefined } from "../helpers";
 
 // Endpoint Builder
-interface EndpointSchema<Schema extends z.ZodTypeAny> {
+interface EndpointSchema<Schema extends z.ZodType> {
   payload: Schema;
   response: Schema;
 }
@@ -89,7 +89,7 @@ const buildEndpoints = (keys: QueryKey, config: EndpointConfig) => {
     },
     {
       getKey: () => keys,
-    },
+    }
   );
 };
 
@@ -136,21 +136,21 @@ type CreatEndpoints<TConfig extends EndpointConfig> = {
 
 export const builder = <TConfig extends EndpointConfig>(
   key: string | QueryKey,
-  config: TConfig,
+  config: TConfig
 ): CreatEndpoints<TConfig> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return buildEndpoints(Array.isArray(key) ? key : [key], config);
 };
 
 function query<
-  Shape extends z.ZodTypeAny,
+  Shape extends z.ZodType,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
 >(
   schema: Schema,
   options:
     | ((
-        args: Schema,
+        args: Schema
       ) => RouterQueryOptions<
         z.infer<Schema["response"]>,
         z.input<Schema["payload"]>,
@@ -160,7 +160,7 @@ function query<
         z.infer<Schema["response"]>,
         z.input<Schema["payload"]>,
         TError
-      >,
+      >
 ) {
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
@@ -177,7 +177,7 @@ function query<
 }
 
 function infiniteQuery<
-  Shape extends z.ZodTypeAny,
+  Shape extends z.ZodType,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
   TPageParam = number,
@@ -185,7 +185,7 @@ function infiniteQuery<
   schema: Schema,
   options:
     | ((
-        args: Schema,
+        args: Schema
       ) => RouterInfiniteQueryOptions<
         z.infer<Schema["response"]>,
         z.input<Schema["payload"]>,
@@ -197,7 +197,7 @@ function infiniteQuery<
         z.input<Schema["payload"]>,
         TError,
         TPageParam
-      >,
+      >
 ) {
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
@@ -211,7 +211,7 @@ function infiniteQuery<
 }
 
 function mutation<
-  Shape extends z.ZodTypeAny,
+  Shape extends z.ZodType,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
   TContext = unknown,
@@ -219,7 +219,7 @@ function mutation<
   schema: Schema,
   options:
     | ((
-        args: Schema,
+        args: Schema
       ) => RouterMutationOptions<
         z.infer<Schema["response"]>,
         z.input<Schema["payload"]>,
@@ -231,7 +231,7 @@ function mutation<
         z.input<Schema["payload"]>,
         TError,
         TContext
-      >,
+      >
 ) {
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
@@ -255,7 +255,7 @@ export const toQueryParams = (
   rawParams: Record<string, any>,
   options?: {
     stripNull?: boolean;
-  },
+  }
 ) => {
   const { stripNull: shouldStripNull = true } = options ?? {};
   let parsed = stripUndefined(rawParams);
@@ -276,8 +276,8 @@ export const paginationMetaSchema = z.object({
   hasPrevious: z.boolean().optional().default(false),
 });
 
-export const withPaginationSchema = <Schema extends z.ZodTypeAny>(
-  schema: Schema,
+export const withPaginationSchema = <Schema extends z.ZodType>(
+  schema: Schema
 ) => {
   return paginationMetaSchema
     .transform((values) => {
@@ -290,9 +290,9 @@ export const withPaginationSchema = <Schema extends z.ZodTypeAny>(
     .and(z.object({ results: schema.array() }));
 };
 
-export const parsePaginatedResponse = <Schema extends z.ZodTypeAny>(
+export const parsePaginatedResponse = <Schema extends z.ZodType>(
   schema: Schema,
-  data: unknown,
+  data: unknown
 ) => {
   return withPaginationSchema(schema).parse(data);
 };
