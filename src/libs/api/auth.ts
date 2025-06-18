@@ -1,4 +1,4 @@
-import type { Config, ConfiguredMiddleware, Wretch, WretchAddon } from "wretch";
+import type { Wretch, WretchAddon } from "wretch";
 
 export interface AuthenticatedRequestAddon {
   /**
@@ -8,18 +8,6 @@ export interface AuthenticatedRequestAddon {
     this: T & Wretch<T, C, R>
   ) => this;
 }
-
-const makeAuthenticatedAuthMiddleware: (
-  config: Config
-) => ConfiguredMiddleware = () => {
-  return (next) => {
-    return (url, opts) => {
-      opts.credentials = "include";
-
-      return next(url, opts);
-    };
-  };
-};
 
 /**
  * Adds the ability to use basic auth with the `Authorization` header.
@@ -31,13 +19,9 @@ const makeAuthenticatedAuthMiddleware: (
  * ```
  */
 export const authenticatedRequest: WretchAddon<AuthenticatedRequestAddon> = {
-  beforeRequest(wr) {
-    // eslint-disable-next-line sonarjs/no-extra-arguments
-    return wr.middlewares([makeAuthenticatedAuthMiddleware(wr._config)]);
-  },
   wretch: {
     authenticate() {
-      return this.authenticate();
+      return this.options({ credentials: "include" });
     },
   },
 };

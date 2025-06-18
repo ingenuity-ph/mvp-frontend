@@ -8,11 +8,6 @@ export const toPaginatedResponse = <Data extends z.ZodTypeAny>(data: Data) => {
     total_pages: z.number().catch(0),
     current_page: z.number().catch(1),
     records_per_page: z.number().catch(0),
-    // For backwards compat
-    // TODO: Remove when API is consistent
-    totalRecords: z.number().nullish(),
-    totalPages: z.number().nullish(),
-    page: z.number().nullish(),
   });
 };
 

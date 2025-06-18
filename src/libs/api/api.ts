@@ -11,9 +11,7 @@ export const API_URL = env.VITE_API_URL || "http://localhost:9000";
 // Instantiate and configure wretch base
 export const baseAPI = wretch(API_URL)
   .addon(QueryStringAddon)
-  .addon(FormDataAddon);
+  .addon(FormDataAddon)
+  .addon(authenticatedRequest);
 
-export const api = baseAPI
-  .addon(authenticatedRequest)
-  .authenticate()
-  .resolve(async (r) => r.json());
+export const api = baseAPI.authenticate().resolve(async (r) => r.json());
