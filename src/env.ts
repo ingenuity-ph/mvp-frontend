@@ -13,6 +13,8 @@ export const env = createEnv({
     VITE_COGNITO_POOL_ID: z.string().min(1),
     VITE_COGNITO_CLIENT_ID: z.string().min(1),
     VITE_COGNITO_DOMAIN: z.string().min(1),
+    VITE_PUBLIC_POSTHOG_KEY: z.string().min(1),
+    VITE_PUBLIC_POSTHOG_HOST: z.string().min(1),
   },
 
   /**
