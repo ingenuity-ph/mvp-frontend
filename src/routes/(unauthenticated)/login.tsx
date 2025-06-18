@@ -82,7 +82,7 @@ function App() {
       const token = session.tokens?.accessToken.toString();
 
       if (token) {
-        await validateToken.mutateAsync(
+        validateToken.mutate(
           { token },
           {
             onSuccess() {
@@ -99,6 +99,7 @@ function App() {
   });
 
   const rootError = form.formState.errors.root?.message;
+  const isLoading = validateToken.isPending || form.formState.isSubmitting;
 
   return (
     <AuthLayout>
@@ -139,11 +140,7 @@ function App() {
             </TextLink>
           </Text>
         </div>
-        <Button
-          type="submit"
-          className="w-full"
-          isPending={form.formState.isSubmitting}
-        >
+        <Button type="submit" className="w-full" isPending={isLoading}>
           Login
         </Button>
         <Text>
