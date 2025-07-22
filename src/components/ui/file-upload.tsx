@@ -15,7 +15,7 @@ import {
   Provider,
   useSlottedContext,
 } from "react-aria-components";
-import { FilePdf, UploadSimple } from "@phosphor-icons/react";
+import { FilePdfIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 import * as fileUpload from "@zag-js/file-upload";
 import {
   normalizeProps,
@@ -77,10 +77,10 @@ export function FileUpload({
     >
       <div
         data-slot="upload-container"
-        className="rounded-surface border-brand-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-red-500"
+        className="rounded-surface border-brand-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-danger-500"
       >
         <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-200 p-1">
-          <UploadSimple className="size-5" />
+          <UploadSimpleIcon className="size-5" />
         </span>
         <div className="flex items-baseline gap-1.5">
           <div {...api.getDropzoneProps()}>
@@ -90,7 +90,7 @@ export function FileUpload({
               aria-describedby={field?.["aria-describedby"]}
               aria-labelledby={field?.["aria-labelledby"]}
             />
-            <Text level="label-sm" className="font-medium">
+            <Text size="sm" className="font-medium">
               Drag your file(s) here or
             </Text>
           </div>
@@ -187,7 +187,7 @@ export function HeadlessFileUpload({
         const maxFiles = props.maxFiles ?? 1;
         const shouldAcceptMultiple = maxFiles > 1;
         const isAlreadySelected = details.acceptedFiles.some(
-          (f) => f.name === file.name,
+          (f) => f.name === file.name
         );
 
         if (isAlreadySelected && shouldAcceptMultiple) {
@@ -267,7 +267,7 @@ export function Dropzone({
     <div
       data-slot="upload-container"
       className={cn([
-        "rounded-surface border-brand-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-red-500",
+        "rounded-surface border-brand-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-danger-500",
         //
         className,
       ])}
@@ -325,12 +325,12 @@ function DefaultItem({ api, ...props }: ItemDetails & { api: Api }) {
     >
       <div className="flex items-center gap-2">
         <span className="bg-brand-primary-50 text-brand-primary-800 size-8 rounded p-1">
-          <FilePdf />
+          <FilePdfIcon />
         </span>
         <div
           {...api.getItemNameProps({ file: props.file })}
           className={cn([
-            textStyles({ level: "label-sm", className: "font-medium" }),
+            textStyles({ label: "sm", className: "font-medium" }),
           ])}
         >
           {props.file.name}

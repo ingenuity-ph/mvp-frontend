@@ -14,9 +14,20 @@ import {
   SelectValue,
   useSlottedContext,
 } from "react-aria-components";
+import type { FieldPath, FieldValues } from "react-hook-form";
 import { tv } from "tailwind-variants";
 import type { Adjoined } from "./constants";
-import { FieldContext, FieldControllerContext } from "./fieldset";
+import {
+  type ComposedFieldProps,
+  Description,
+  Field,
+  FieldContext,
+  FieldControl,
+  FieldControllerContext,
+  Label,
+  type WithFieldControlProps,
+} from "./fieldset";
+import { textStyles } from "./text";
 import type { forwardRefType } from "./utils";
 
 const adjoinedStyles = tv({
@@ -59,30 +70,34 @@ const adjoinedStyles = tv({
   },
 });
 
+export type SelectProps<T extends object> = {
+  className?: string;
+  disabled?: boolean;
+  adjoined?: Adjoined;
+  items?: Iterable<T>;
+  children: React.ReactNode | ((item: T) => React.ReactNode);
+} & Omit<AriaSelectProps<T>, "className" | "children" | "isDisabled">;
+
 function Select<T extends object>(
   {
     className,
     children,
     adjoined = "none",
+    disabled = false,
     items,
     ...props
-  }: {
-    className?: string;
-    adjoined?: Adjoined;
-    items?: Iterable<T>;
-    children: React.ReactNode | ((item: T) => React.ReactNode);
-  } & Omit<AriaSelectProps<T>, "className" | "children">,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  }: SelectProps<T>,
+  ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const field = useSlottedContext(FieldContext);
   const fieldControl = useSlottedContext(FieldControllerContext)?.field;
 
   return (
-    <span data-slot="control" className="block">
+    <div data-slot="control">
       <AriaSelect
         ref={ref}
         {...field}
-        {...mergeProps(props, field, {
+        {...mergeProps(props, { isDisabled: disabled }, field, {
           onSelectionChange: fieldControl?.onChange,
           onBlur: fieldControl?.onBlur,
           selectedKey: fieldControl?.value,
@@ -100,11 +115,11 @@ function Select<T extends object>(
           // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
           "dark:before:hidden",
           // Focus ring
-          "after:pointer-events-none after:absolute after:inset-0 after:ring-transparent after:ring-inset after:has-[[data-focused]]:ring-2 after:has-[[data-focused]]:ring-blue-500",
+          "after:pointer-events-none after:absolute after:inset-0 after:ring-transparent after:ring-inset after:has-[[data-focused]]:ring-2 after:has-[[data-focused]]:ring-info-500",
           // Disabled state
-          "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
+          "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-neutral-950/5 before:has-[[data-disabled]]:shadow-none",
           // Invalid state
-          "before:has-[[data-invalid]]:shadow-red-500/10",
+          "before:has-[[data-invalid]]:shadow-danger-500/10",
         ])}
       >
         <Button
@@ -112,21 +127,23 @@ function Select<T extends object>(
           data-component="select"
           className={clsx([
             // Basic layout
-            "relative block w-full rounded-[var(--radius-control)] py-[calc(theme(spacing[2.5])-1px)] sm:py-[calc(theme(spacing[1.5])-1px)]",
+            "relative block w-full rounded-[var(--radius-control)] py-[calc(theme(spacing[2.5])-1px)]",
             // Horizontal padding
-            "pr-[calc(theme(spacing.10)-1px)] pl-[calc(theme(spacing[3.5])-1px)] sm:pr-[calc(theme(spacing.9)-1px)] sm:pl-[calc(theme(spacing.3)-1px)]",
+            "pr-[calc(--spacing(9)-1px)] pl-[calc(--spacing(3)-1px)]",
             // Typography
-            "text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white dark:*:text-white [&_[data-placeholder]]:text-zinc-500",
+            "text-neutral-950 placeholder:text-neutral-500 dark:text-white dark:*:text-white [&_[data-placeholder]]:text-neutral-500",
+            // Inherit text styles
+            textStyles({ color: "none", label: "sm" }),
             // Border
-            "border-brand-border border data-[hovered]:border-zinc-950/20 dark:data-[hovered]:border-white/20",
+            "border-control-border border hover:border-neutral-950/20 dark:hover:border-white/20",
             // Background color
             "bg-transparent dark:bg-white/5",
             // Hide default focus styles
             "focus:outline-none",
             // Invalid state
-            "group-data-[invalid]/field:border-red-500 group-data-[invalid]/field:data-[hovered]:border-red-500 group-data-[invalid]/field:dark:border-red-600 group-data-[invalid]/field:hover:dark:border-red-600",
+            "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:data-[hovered]:border-danger-500 group-data-[invalid]/field:dark:border-danger-600 group-data-[invalid]/field:hover:dark:border-danger-600",
             // Disabled state
-            "data-[disabled]:border-zinc-950/20 data-[disabled]:opacity-100 data-[disabled]:dark:border-white/15 data-[disabled]:dark:bg-white/[2.5%] dark:data-[hovered]:data-[disabled]:border-white/15",
+            "data-[disabled]:border-neutral-950/20 data-[disabled]:opacity-100 data-[disabled]:dark:border-white/15 data-[disabled]:dark:bg-white/[2.5%] dark:data-[hovered]:data-[disabled]:border-white/15",
           ])}
         >
           <div className="truncate text-left">
@@ -134,7 +151,7 @@ function Select<T extends object>(
           </div>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
             <svg
-              className="size-5 stroke-zinc-500 group-has-[[data-disabled]]:stroke-zinc-600 sm:size-4 dark:stroke-zinc-400 forced-colors:stroke-[CanvasText]"
+              className="size-5 stroke-neutral-500 group-has-[[data-disabled]]:stroke-neutral-600 sm:size-4 dark:stroke-neutral-400 forced-colors:stroke-[CanvasText]"
               viewBox="0 0 16 16"
               aria-hidden="true"
               fill="none"
@@ -159,22 +176,68 @@ function Select<T extends object>(
             items={items}
             className={clsx([
               // Base styles
-              "sm:max-w-auto isolate max-h-64 w-full max-w-(--trigger-width) min-w-[var(--trigger-width)] scroll-py-1 rounded-[var(--radius-control)] py-1 select-none",
+              // TODO: Fix the max-width calculation to handle the case where the width is too small
+              "isolate max-h-64 w-max min-w-[var(--trigger-width)] scroll-py-1 rounded-[var(--radius-control)] py-1 select-none",
               // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
               "outline outline-transparent focus:outline-none",
               // Handle scrolling when menu won't fit in viewport
               "overflow-y-auto overscroll-contain",
               // Popover background
-              "bg-white/95 backdrop-blur-xl dark:bg-zinc-800/75",
+              "bg-white/95 backdrop-blur-xl dark:bg-neutral-800/75",
               // Shadows
-              "shadow-lg ring-1 ring-zinc-950/10 dark:ring-white/10 dark:ring-inset",
+              "shadow-lg ring-1 ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
             ])}
           >
             {children}
           </ListBox>
         </Popover>
       </AriaSelect>
-    </span>
+    </div>
+  );
+}
+
+export function SelectField<
+  T extends object,
+  TControl extends FieldValues = FieldValues,
+  TFieldName extends FieldPath<TControl> = FieldPath<TControl>,
+>({
+  label,
+  description,
+  control,
+  field,
+  defaultSelectedKey,
+  disabled,
+  ...props
+}: SelectProps<T> &
+  ComposedFieldProps &
+  Partial<WithFieldControlProps<TControl, TFieldName>>) {
+  if (control && field) {
+    return (
+      <FieldControl
+        control={control}
+        field={field}
+        disabled={disabled}
+        defaultValue={defaultSelectedKey}
+      >
+        <Field>
+          {label ? <Label>{label}</Label> : null}
+          <_Select
+            {...props}
+            disabled={disabled}
+            defaultSelectedKey={defaultSelectedKey}
+          />
+          {description ? <Description>{description}</Description> : null}
+        </Field>
+      </FieldControl>
+    );
+  }
+
+  return (
+    <Field isDisabled={disabled}>
+      {label ? <Label>{label}</Label> : null}
+      <_Select disabled={disabled} {...props} />
+      {description ? <Description>{description}</Description> : null}
+    </Field>
   );
 }
 
@@ -184,67 +247,34 @@ const _Select = (forwardRef as forwardRefType)(Select);
 export { _Select as Select };
 
 export function Option({ className, ...props }: ListBoxItemProps) {
-  const sharedClasses = clsx(
-    // Base
-    "flex min-w-0 items-center",
-    // Icons
-    "[&>[data-slot=icon]]:size-5 [&>[data-slot=icon]]:shrink-0 sm:[&>[data-slot=icon]]:size-4",
-    "[&>[data-slot=icon]]:text-zinc-500 [&>[data-slot=icon]]:group-data-[focused]/option:text-white [&>[data-slot=icon]]:dark:text-zinc-400",
-    "forced-colors:[&>[data-slot=icon]]:text-[CanvasText] forced-colors:[&>[data-slot=icon]]:group-data-[focused]/option:text-[Canvas]",
-    // Avatars
-    "[&>[data-slot=avatar]]:-mx-0.5 [&>[data-slot=avatar]]:size-6 sm:[&>[data-slot=avatar]]:size-5",
-  );
-
   return (
     <Provider values={[[LabelContext, { elementType: "span" }]]}>
       <ListBoxItem
         {...props}
         className={clsx([
           className,
-          // Basic layout
-          "group/option grid cursor-default grid-cols-[1fr_--spacing(5)] items-baseline gap-x-2 rounded-[calc(var(--radius-control)/2)] px-3.5 py-2.5 sm:grid-cols-[1fr_--spacing(4)] sm:px-3 sm:py-1.5",
-          // Typography
-          "text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white forced-colors:text-[CanvasText]",
+          // Base styles
+          "group cursor-default gap-2 focus:outline-hidden px-3 py-2",
+          // Text styles
+          // TODO: Think about if we want to set the text styles here or we require to explicitly use a <Label> component
+          "text-left text-base/6 text-brand-neutral-text sm:text-sm/6 dark:text-white forced-colors:text-[CanvasText]",
           // Focus
-          "outline-none data-[focused]:bg-zinc-100 data-[focused]:text-zinc-700",
+          "focus:bg-brand-neutral-muted",
+          // Disabled state
+          "disabled:opacity-50",
           // Forced colors mode
-          "forced-color-adjust-none forced-colors:data-[focused]:bg-[Highlight] forced-colors:data-[focused]:text-[HighlightText]",
-          // Disabled
-          "data-[disabled]:opacity-50",
+          "forced-color-adjust-none forced-colors:data-focused:bg-[Highlight] forced-colors:data-focused:text-[HighlightText] forced-colors:data-focused:*:data-[slot=icon]:text-[HighlightText]",
+          // Icons
+          "*:data-[slot=icon]:size-4 &>[data-slot=icon]]:-mx-0.5 [&>[data-slot=icon]]:my-0.5 [&>[data-slot=icon]]:shrink-0",
+          "*:data-[slot=icon]:text-neutral-500 data-focus:*:data-[slot=icon]:text-white dark:*:data-[slot=icon]:text-neutral-400 dark:data-focus:*:data-[slot=icon]:text-white",
+          // Avatar
+          "*:data-[slot=avatar]:mr-2.5 *:data-[slot=avatar]:-ml-1 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:mr-2 sm:*:data-[slot=avatar]:size-5",
+          // Label
+          "[&>[data-slot=label]]:col-start-2 [&>[data-slot=label]]:row-start-1",
+          // Description
+          "[&>[data-slot=description]]:col-start-2 [&>[data-slot=description]]:row-start-2 [&>[data-slot=description]]:col-span-2",
         ])}
-      >
-        {(renderProps) => {
-          return (
-            <>
-              <span
-                className={clsx([
-                  className,
-                  sharedClasses,
-                  // Label
-                  "[&>[data-slot=label]]:ml-2.5 [&>[data-slot=label]]:truncate sm:[&>[data-slot=label]]:ml-2",
-                ])}
-              >
-                {typeof props.children === "function"
-                  ? props.children(renderProps)
-                  : props.children}
-              </span>
-              <svg
-                className="relative hidden size-5 self-center stroke-current text-zinc-950 group-data-[selected]/option:inline sm:size-4"
-                viewBox="0 0 16 16"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M4 8.5l3 3L12 4"
-                  strokeWidth={1.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </>
-          );
-        }}
-      </ListBoxItem>
+      />
     </Provider>
   );
 }

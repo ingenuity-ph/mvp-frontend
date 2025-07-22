@@ -12,7 +12,7 @@ export function Navbar({
       {...props}
       className={cn(
         className,
-        "flex flex-1 items-center gap-4 bg-white py-2.5",
+        "flex flex-1 items-center gap-4 bg-white py-2.5"
       )}
     />
   );
@@ -62,7 +62,7 @@ export const NavbarItem = React.forwardRef(function NavbarItem(
   }: {
     current?: boolean;
   } & ButtonProps,
-  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>,
+  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>
 ) {
   const matchRoute = useMatchRoute();
 
@@ -82,7 +82,7 @@ export const NavbarItem = React.forwardRef(function NavbarItem(
     // Dark mode
     "dark:text-white dark:*:data-[slot=icon]:fill-zinc-400",
     "dark:hover:bg-white/5 dark:hover:*:data-[slot=icon]:fill-white",
-    "dark:pressed:bg-white/5 dark:pressed:*:data-[slot=icon]:fill-white",
+    "dark:pressed:bg-white/5 dark:pressed:*:data-[slot=icon]:fill-white"
   );
 
   const isActive =

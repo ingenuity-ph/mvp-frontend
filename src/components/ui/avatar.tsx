@@ -1,19 +1,39 @@
-import clsx from "clsx";
-import React, { type Ref } from "react";
-import { type BaseButtonProps, TouchTarget } from "./button";
-import { Link, Button as AriaButton } from "react-aria-components";
+import React from "react";
+import type { Link } from "react-aria-components";
+import { tv } from "tailwind-variants";
+import { type BaseButtonProps, Button } from "./button";
+import type { Shape, VariantConfigMap } from "./constants";
+import { cn } from "./utils";
 
-type AvatarProps = {
+interface AvatarProps {
   src?: string | null;
-  square?: boolean;
   initials?: string;
   alt?: string;
   className?: string;
-};
+  shape?: Shape;
+}
+
+const avatar = tv({
+  base: [
+    // Basic layout
+    "inline-grid shrink-0 align-middle [--avatar-radius:20%] [--ring-opacity:20%] *:col-start-1 *:row-start-1",
+    "outline -outline-offset-1 outline-black/[--ring-opacity] dark:outline-white/[--ring-opacity]",
+  ],
+  variants: {
+    // Add the correct border radius
+    shape: {
+      square: "rounded-[--avatar-radius] *:rounded-[--avatar-radius]",
+      circle: "rounded-full *:rounded-full",
+    } satisfies VariantConfigMap<Shape>,
+  },
+  defaultVariants: {
+    shape: "circle",
+  },
+});
 
 export function Avatar({
   src = null,
-  square = false,
+  shape = "circle",
   initials,
   alt = "",
   className,
@@ -23,16 +43,7 @@ export function Avatar({
     <span
       data-slot="avatar"
       {...props}
-      className={clsx(
-        className,
-        // Basic layout
-        "inline-grid shrink-0 align-middle [--avatar-radius:20%] [--ring-opacity:20%] *:col-start-1 *:row-start-1",
-        "outline -outline-offset-1 outline-black/[--ring-opacity] dark:outline-white/[--ring-opacity]",
-        // Add the correct border radius
-        square
-          ? "rounded-[--avatar-radius] *:rounded-[--avatar-radius]"
-          : "rounded-full *:rounded-full"
-      )}
+      className={avatar({ shape, className })}
     >
       {initials && (
         <svg
@@ -61,44 +72,25 @@ export function Avatar({
 export const AvatarButton = React.forwardRef(function AvatarButton(
   {
     src,
-    square = false,
+    shape = "circle",
     initials,
     alt,
     className,
-    ...props
   }: AvatarProps &
     (
       | Omit<BaseButtonProps, "className">
       | Omit<React.ComponentPropsWithoutRef<typeof Link>, "className">
     ),
-  ref: React.ForwardedRef<HTMLElement>
+  ref: React.ForwardedRef<HTMLButtonElement>
 ) {
-  const classes = clsx(
+  const classes = cn(
     className,
-    square ? "rounded-[20%]" : "rounded-full",
-    "relative inline-grid focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-blue-500"
+    "relative inline-grid focus:outline-none focus:outline-offset-2 focus:outline-blue-500"
   );
 
-  return "href" in props ? (
-    <Link
-      {...props}
-      className={classes}
-      ref={ref as React.ForwardedRef<HTMLAnchorElement>}
-    >
-      <TouchTarget>
-        <Avatar src={src} square={square} initials={initials} alt={alt} />
-      </TouchTarget>
-    </Link>
-  ) : (
-    <AriaButton
-      {...props}
-      className={classes}
-      style={undefined}
-      ref={ref as Ref<HTMLButtonElement>}
-    >
-      <TouchTarget>
-        <Avatar src={src} square={square} initials={initials} alt={alt} />
-      </TouchTarget>
-    </AriaButton>
+  return (
+    <Button variant="unstyled" className={classes} ref={ref}>
+      <Avatar src={src} shape={shape} initials={initials} alt={alt} />
+    </Button>
   );
 });

@@ -1,6 +1,7 @@
 import type React from "react";
 import { LabelContext, Provider } from "react-aria-components";
 import { tv, type VariantProps } from "tailwind-variants";
+import type { ThemeColors } from "./constants";
 import { surfaceStyles, type SurfaceVariants } from "./surface";
 import { cn } from "./utils";
 
@@ -12,17 +13,173 @@ const DENSITY = Object.freeze({
 } as const);
 
 type Density = keyof typeof DENSITY;
+type OptionalThemeColors = ThemeColors | "none";
 
 const bannerStyles = tv({
+  base: [
+    // Define grid at the root level if subgrid is supported
+    "supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_auto]",
+    //
+    "[--spacing-surface-gap:--spacing(2)]",
+    // Icons
+    "[&>[data-slot=icon]]:col-start-1 [&>[data-slot=icon]]:row-start-1 [&>[data-slot=icon]]:size-5",
+    "[&>[data-slot=icon]]:text-[color:var(--banner-color-text)]",
+    // Emphasis
+    "bg-[color:var(--banner-color-background)] text-[color:var(--banner-color-text)]",
+    // Footer
+    "[&>[data-slot=footer]]:col-start-2 [&>[data-slot=footer]]:row-start-2",
+  ],
   variants: {
-    density: {
-      default: ["[--gutter:theme(spacing.4)]"],
-      compact: ["[--gutter:theme(spacing.2)]"],
-      spacious: ["[--gutter:theme(spacing.8)]"],
-    } satisfies Record<Density, Array<string>>,
+    color: {
+      none: [],
+      primary: [],
+      neutral: [],
+      warning: [],
+      success: [],
+      danger: [],
+      info: [],
+    } satisfies Record<OptionalThemeColors, Array<string>>,
+    emphasis: {
+      muted: [],
+      subtle: [],
+      bold: [],
+    },
   },
+  compoundVariants: [
+    {
+      emphasis: "muted",
+      color: "primary",
+      className: [
+        "[--banner-color-background:var(--color-brand-primary-muted)] [--banner-color-text:var(--color-brand-primary-text)]",
+      ],
+    },
+    {
+      emphasis: "subtle",
+      color: "primary",
+      className: [
+        "[--banner-color-background:var(--color-brand-primary-subtle)] [--banner-color-text:var(--color-brand-warning-text)]",
+      ],
+    },
+    {
+      emphasis: "bold",
+      color: "primary",
+      className: [
+        "[--banner-color-background:var(--color-brand-primary-bold)] [--banner-color-text:var(--color-brand-primary-inverse)]",
+      ],
+    },
+    {
+      emphasis: "muted",
+      color: "warning",
+      className: [
+        "[--banner-color-background:var(--color-brand-warning-muted)] [--banner-color-text:var(--color-brand-warning-text)]",
+      ],
+    },
+    {
+      emphasis: "subtle",
+      color: "warning",
+      className: [
+        "[--banner-color-background:var(--color-brand-warning-subtle)] [--banner-color-text:var(--color-brand-warning-text)]",
+      ],
+    },
+    {
+      emphasis: "bold",
+      color: "warning",
+      className: [
+        "[--banner-color-background:var(--color-brand-warning-bold)] [--banner-color-text:var(--color-brand-warning-inverse)]",
+      ],
+    },
+    {
+      emphasis: "muted",
+      color: "danger",
+      className: [
+        "[--banner-color-background:var(--color-brand-danger-muted)] [--banner-color-text:var(--color-brand-danger-text)]",
+      ],
+    },
+    {
+      emphasis: "subtle",
+      color: "danger",
+      className: [
+        "[--banner-color-background:var(--color-brand-danger-subtle)] [--banner-color-text:var(--color-brand-danger-text)]",
+      ],
+    },
+    {
+      emphasis: "bold",
+      color: "danger",
+      className: [
+        "[--banner-color-background:var(--color-brand-danger-bold)] [--banner-color-text:var(--color-brand-danger-inverse)]",
+      ],
+    },
+    // Success
+    {
+      emphasis: "muted",
+      color: "success",
+      className: [
+        "[--banner-color-background:var(--color-brand-success-muted)] [--banner-color-text:var(--color-brand-success-text)]",
+      ],
+    },
+    {
+      emphasis: "subtle",
+      color: "success",
+      className: [
+        "[--banner-color-background:var(--color-brand-success-subtle)] [--banner-color-text:var(--color-brand-success-text)]",
+      ],
+    },
+    {
+      emphasis: "bold",
+      color: "success",
+      className: [
+        "[--banner-color-background:var(--color-brand-success-bold)] [--banner-color-text:var(--color-brand-success-inverse)]",
+      ],
+    },
+    // Neutral
+    {
+      emphasis: "muted",
+      color: "neutral",
+      className: [
+        "[--banner-color-background:var(--color-brand-neutral-muted)] [--banner-color-text:var(--color-brand-neutral-text)]",
+      ],
+    },
+    {
+      emphasis: "subtle",
+      color: "neutral",
+      className: [
+        "[--banner-color-background:var(--color-brand-neutral-subtle)] [--banner-color-text:var(--color-brand-neutral-text)]",
+      ],
+    },
+    {
+      emphasis: "bold",
+      color: "neutral",
+      className: [
+        "[--banner-color-background:var(--color-brand-neutral-bold)] [--banner-color-text:var(--color-brand-neutral-inverse)]",
+      ],
+    },
+    //Info
+    {
+      emphasis: "muted",
+      color: "info",
+      className: [
+        "[--banner-color-background:var(--color-brand-info-muted)] [--banner-color-text:var(--color-brand-info-text)]",
+      ],
+    },
+    {
+      emphasis: "subtle",
+      color: "info",
+      className: [
+        "[--banner-color-background:var(--color-brand-info-subtle)] [--banner-color-text:var(--color-brand-info-text)]",
+      ],
+    },
+    {
+      emphasis: "bold",
+      color: "info",
+      className: [
+        "[--banner-color-background:var(--color-brand-info-bold)] [--banner-color-text:var(--color-brand-info-inverse)]",
+      ],
+    },
+  ],
   defaultVariants: {
     density: "default",
+    color: "primary",
+    emphasis: "muted",
   },
 });
 
@@ -30,61 +187,25 @@ type BannerStyles = VariantProps<typeof bannerStyles>;
 
 export function Banner({
   orientation,
-  density,
+  color = "info",
+  emphasis = "muted",
   ...props
 }: React.ComponentPropsWithoutRef<"section"> &
-  SurfaceVariants &
-  Pick<BannerStyles, "density">) {
+  Omit<SurfaceVariants, "color"> &
+  BannerStyles) {
   return (
     <Provider values={[[LabelContext, { elementType: "span" }]]}>
       <section
         {...props}
-        className={cn(props.className, surfaceStyles({ orientation }), [
-          // Default variables
-          bannerStyles({ density }),
-          // Define grid at the root level if subgrid is supported
-          "supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_auto]",
-          // Icons
-          "[&>[data-slot=icon]]:col-start-1 [&>[data-slot=icon]]:row-start-1 [&>[data-slot=icon]]:mt-1 [&>[data-slot=icon]]:size-5 [&>[data-slot=icon]]:sm:size-4",
-          "[&>[data-slot=icon]]:text-zinc-500 [&>[data-slot=icon]]:data-[focus]:text-white [&>[data-slot=icon]]:dark:text-zinc-400 [&>[data-slot=icon]]:data-[focus]:dark:text-white",
+        className={cn([
+          props.className,
+          surfaceStyles({ orientation, color: "none" }),
+          bannerStyles({ color, emphasis }),
+          // Override surface border color
+          "[--surface-border-color:var(--banner-color-text)]",
+          //
         ])}
       />
     </Provider>
-  );
-}
-
-export function BannerContent({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
-  return (
-    <div
-      {...props}
-      className={cn([
-        className,
-        // Use subgrid when available but fallback to an explicit grid layout if not
-        "col-span-1 grid grid-cols-[auto_1fr_auto] items-center supports-[grid-template-columns:subgrid]:grid-cols-subgrid",
-        // Label layout
-        "[&>[data-slot=label]]:col-start-1 [&>[data-slot=label]]:row-start-1",
-        // Description layout
-        "[&>[data-slot=description]]:col-span-2 [&>[data-slot=description]]:col-start-1",
-      ])}
-    />
-  );
-}
-
-export function BannerFooter({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
-  return (
-    <div
-      {...props}
-      className={cn([
-        className,
-        // Use subgrid when available but fallback to an explicit grid layout if not
-        "col-span-2 col-start-2 grid grid-cols-[auto_1fr_auto] items-center supports-[grid-template-columns:subgrid]:grid-cols-subgrid",
-      ])}
-    />
   );
 }

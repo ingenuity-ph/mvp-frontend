@@ -5,13 +5,27 @@ import { cn } from "./utils";
 const card = tv({
   base: [
     // Base
-    "rounded-surface p-[var(--gutter,var(--spacing-surface))] shadow-sm forced-colors:outline",
+    "rounded-surface overflow-hidden shadow-sm forced-colors:outline",
     // Layout
     "flex gap-[var(--gutter,var(--spacing-surface))]",
     // Border
-    "ring-1 ring-brand-border",
+    "ring-1 ring-brand-neutral-border",
+    // Variables
+    "[--inset-padding-top:calc(var(--card-padding-top)-var(--card-border-width))]",
+    "[--inset-padding-right:calc(var(--card-padding-right)-var(--card-border-width))]",
+    "[--inset-padding-bottom:calc(var(--card-padding-bottom)-var(--card-border-width))]",
+    "[--inset-padding-left:calc(var(--card-padding-left)-var(--card-border-width))]",
+    "[--inset-border-width:var(--card-border-width)]",
+    "[--inset-border-radius: var(--radius-surface)]",
   ],
   variants: {
+    gutter: {
+      none: "",
+      default: [
+        // Padding
+        "pt-(--surface-padding-top) pr-(--surface-padding-right) pb-(--surface-padding-bottom) pl-(--surface-padding-left)",
+      ],
+    },
     orientation: {
       vertical: "flex-col",
       horizontal: "flex-row",
@@ -24,6 +38,7 @@ const card = tv({
   defaultVariants: {
     orientation: "vertical",
     color: "default",
+    gutter: "default",
   },
 });
 
@@ -33,56 +48,44 @@ export type CardStyles = VariantProps<typeof card>;
 type CardProps = React.ComponentPropsWithoutRef<"section"> & CardStyles;
 
 export const Card = React.forwardRef<HTMLElement, CardProps>(function Card(
-  { orientation = "vertical", ...props }: CardProps,
-  ref,
+  { orientation = "vertical", gutter, color, ...props }: CardProps,
+  ref
 ) {
   return (
     <section
       ref={ref}
       {...props}
-      className={cn([props.className, card({ orientation })])}
+      className={cn([props.className, card({ orientation, gutter, color })])}
     />
   );
 });
 
-export function CardHeader(props: React.ComponentPropsWithoutRef<"div">) {
-  return <div {...props} />;
-}
+const inset = tv({
+  base: [
+    "[--inset-border-radius-calc:calc(var(--inset-border-radius,0px)-var(--inset-border-width,0px))]",
+    "[--inset-padding-top-calc:var(--inset-padding-top,0px)]",
+    "[--inset-padding-right-calc:var(--inset-padding-right,0px)]",
+    "[--inset-padding-bottom-calc:var(--inset-padding-bottom,0px)]",
+    "[--inset-padding-left-calc:var(--inset-padding-left,0px)]",
+    //
+    "[--margin-top-override:calc(var(--margin-top)-var(--inset-padding-top-calc))]",
+    "[--margin-right-override:calc(var(--margin-right)-var(--inset-padding-right-calc))]",
+    "[--margin-bottom-override:calc(var(--margin-bottom)-var(--inset-padding-bottom-calc))]",
+    "[--margin-left-override:calc(var(--margin-left)-var(--inset-padding-left-calc))]",
+  ],
+  variants: {
+    side: {
+      top: [""],
+      right: [""],
+      bottom: [""],
+      left: [""],
+    },
+  },
+  defaultVariants: {
+    side: "top",
+  },
+});
 
-// TODO: Improve API Naming
-type InsetDirection = "x" | "y" | "xy" | "none";
-const insetStyles: Record<InsetDirection, string> = {
-  x: "[margin-inline:calc(var(--gutter,theme(spacing.4))*-1)]",
-  y: "[margin-block:calc(var(--gutter,theme(spacing.4))*-1)]",
-  xy: "[margin-block:calc(var(--gutter,theme(spacing.4))*-1)] [margin-inline:calc(var(--gutter,theme(spacing.4))*-1)]",
-  none: "",
-};
-
-type OffsetDirection = "x" | "y" | "xy" | "none";
-const offsetStyles: Record<OffsetDirection, string> = {
-  x: "px-[var(--gutter,theme(spacing.4))]",
-  y: "py-[var(--gutter,theme(spacing.4))]",
-  xy: "p-[var(--gutter,theme(spacing.4))]",
-  none: "",
-};
-
-export function CardOverflow({
-  inset = "x",
-  offset = "x",
-  ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
-  inset?: InsetDirection;
-  offset?: OffsetDirection;
-}) {
-  return (
-    <div
-      {...props}
-      className={cn([
-        "[unicode-bidi:isolate]",
-        insetStyles[inset],
-        offsetStyles[offset],
-        props.className,
-      ])}
-    ></div>
-  );
+export function Inset(props: React.ComponentPropsWithoutRef<"div">) {
+  return <div {...props} className={cn([inset(), "surface-inset"])} />;
 }

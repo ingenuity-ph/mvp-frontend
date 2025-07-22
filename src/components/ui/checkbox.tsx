@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-useless-assignment */
 /* eslint-disable no-param-reassign */
-/* eslint-disable no-negated-condition */
+
 /* eslint-disable unicorn/consistent-destructuring */
 import { clsx } from "clsx";
 import {
@@ -9,7 +9,6 @@ import {
   type ForwardedRef,
   forwardRef,
   useContext,
-  useState,
 } from "react";
 import {
   mergeProps,
@@ -17,8 +16,6 @@ import {
   useCheckboxGroupItem,
   useFocusRing,
   useHover,
-  useLabel,
-  VisuallyHidden,
 } from "react-aria";
 import {
   CheckboxContext as AriaCheckboxContext,
@@ -26,145 +23,21 @@ import {
   type CheckboxGroupProps as AriaCheckboxGroupProps,
   CheckboxGroupStateContext,
   type CheckboxProps as AriaCheckboxProps,
-  DEFAULT_SLOT,
-  LabelContext as AriaLabelContext,
-  TextContext as AriaTextContext,
+  Provider,
   useContextProps,
   useSlottedContext,
 } from "react-aria-components";
 import { useToggleState } from "react-stately";
-import {
-  filterDOMProps,
-  mergeRefs,
-  useObjectRef,
-  useSlotId,
-} from "@react-aria/utils";
+import { filterDOMProps, mergeRefs, useObjectRef } from "@react-aria/utils";
 import type { ColorMap, ThemeColors } from "./constants";
 import {
+  type ComposedFieldProps,
   Description,
   FieldContext,
   FieldControllerContext,
+  HeadlessField,
   Label,
 } from "./fieldset";
-import { useSlot } from "./utils";
-
-export function CheckboxGroup({ className, ...props }: AriaCheckboxGroupProps) {
-  return (
-    <AriaCheckboxGroup
-      data-slot="control"
-      {...props}
-      className={clsx(
-        className,
-        // Basic groups
-        "space-y-3",
-        // With descriptions
-        "has-[[data-slot=description]]:space-y-6 [&_[data-slot=label]]:has-[[data-slot=description]]:font-medium",
-      )}
-    />
-  );
-}
-
-export const checkboxLayoutStyles = [
-  // Base layout
-  "grid grid-cols-[1.125rem_1fr] items-center gap-x-4 gap-y-1 sm:grid-cols-[1rem_1fr] relative",
-  // Control layout
-  "[&>[data-slot=control]]:col-start-1 [&>[data-slot=control]]:row-start-1 [&>[data-slot=control]]:justify-self-center",
-  // Label layout
-  "[&>[data-slot=label]]:col-start-2 [&>[data-slot=label]]:row-start-1 [&>[data-slot=label]]:justify-self-start",
-  // Description layout
-  "[&>[data-slot=description]]:col-start-2 [&>[data-slot=description]]:row-start-2",
-  // With description
-  "[&_[data-slot=label]]:has-[[data-slot=description]]:font-medium",
-];
-
-type FieldProps = Omit<AriaCheckboxProps, "isDisabled" | "isIndeterminate"> & {
-  disabled?: boolean;
-  indeterminate?: boolean;
-};
-
-export function HeadlessCheckboxField({
-  children,
-  disabled,
-  indeterminate,
-  className,
-  ...props
-}: FieldProps) {
-  const [isSelected, setIsSelected] = useState(props.defaultSelected);
-
-  const [labelRef, label] = useSlot();
-  const fieldLabel = useLabel({ label });
-  const descriptionId = useSlotId();
-  const { labelProps } = fieldLabel;
-
-  let { fieldProps } = fieldLabel;
-
-  fieldProps = mergeProps(fieldProps, {
-    "aria-describedby":
-      [descriptionId, props["aria-describedby"]].filter(Boolean).join(" ") ||
-      undefined,
-  });
-
-  return (
-    <AriaLabelContext.Provider
-      value={{
-        ...labelProps,
-        ref: labelRef,
-        ...(disabled ? { "data-disabled": true } : {}),
-      }}
-    >
-      <AriaCheckboxContext.Provider
-        value={{
-          ...mergeProps(props, fieldProps),
-          onChange: setIsSelected,
-          isSelected,
-          isDisabled: disabled,
-          isIndeterminate: indeterminate,
-        }}
-      >
-        <AriaTextContext.Provider
-          value={{
-            slots: {
-              [DEFAULT_SLOT]: {},
-              description: {
-                id: descriptionId,
-                ...(disabled ? { "data-disabled": true } : {}),
-              },
-            },
-          }}
-        >
-          <div
-            data-slot="field"
-            {...(disabled ? { "data-disabled": true } : {})}
-            className={String(className)}
-          >
-            {typeof children !== "function" ? children : null}
-          </div>
-        </AriaTextContext.Provider>
-      </AriaCheckboxContext.Provider>
-    </AriaLabelContext.Provider>
-  );
-}
-
-export function CheckboxField(
-  props: Omit<FieldProps, "children"> & {
-    label?: React.ReactNode;
-    description?: React.ReactNode;
-  },
-) {
-  const { disabled, label, description, className } = props;
-
-  return (
-    <HeadlessCheckboxField
-      {...props}
-      disabled={disabled}
-      className={clsx(className, checkboxLayoutStyles)}
-    >
-      <Checkbox />
-      {label ? <Label>{label}</Label> : null}
-      {description ? <Description>{description}</Description> : null}
-    </HeadlessCheckboxField>
-  );
-}
 
 const base = [
   // Basic layout
@@ -178,7 +51,7 @@ const base = [
   // Background color applied to control in dark mode
   "dark:bg-white/5 dark:group-data-selected:bg-(--checkbox-checked-bg)",
   // Border
-  "border border-zinc-950/15 group-data-[selected]:border-transparent group-data-[selected]:group-data-[hovered]:border-transparent group-data-[hovered]:border-zinc-950/30 group-data-[selected]:bg-(--checkbox-checked-border)",
+  "border border-neutral-950/15 group-data-[selected]:border-transparent group-data-[selected]:group-data-[hovered]:border-transparent group-data-[hovered]:border-neutral-950/30 group-data-selected:bg-(--checkbox-checked-border)",
   "dark:border-white/15 dark:group-data-[selected]:border-white/5 dark:group-data-[selected]:group-data-[hovered]:border-white/5 dark:group-data-[hovered]:border-white/30",
   // Inner highlight shadow
   "after:absolute after:inset-0 after:rounded-[calc(0.3125rem-1px)] after:shadow-[inset_0_1px_theme(colors.white/15%)]",
@@ -187,34 +60,95 @@ const base = [
   "group-data-[focused]:outline group-data-[focused]:outline-2 group-data-[focused]:outline-offset-2 group-data-[focused]:outline-blue-500",
   // Disabled state
   "group-data-[disabled]:opacity-50",
-  "group-data-[disabled]:border-zinc-950/25 group-data-[disabled]:bg-zinc-950/5 group-data-[disabled]:[--checkbox-check:theme(colors.zinc.950/50%)] group-data-[disabled]:before:bg-transparent",
-  "dark:group-data-[disabled]:border-white/20 dark:group-data-[disabled]:bg-white/[2.5%] dark:group-data-[disabled]:[--checkbox-check:theme(colors.white/50%)] dark:group-data-[disabled]:group-data-[selected]:after:hidden",
+  "group-data-[disabled]:border-neutral-950/25 group-data-[disabled]:bg-neutral-950/5 group-data-[disabled]:[--checkbox-check:var(--color-neutral-950)]/50 group-data-[disabled]:before:bg-transparent",
+  "dark:group-data-[disabled]:border-white/20 dark:group-data-[disabled]:bg-white/[2.5%] dark:group-data-[disabled]:[--checkbox-check:var(--color-white)]/50 dark:group-data-[disabled]:group-data-[selected]:after:hidden",
   // Forced colors mode
   "forced-colors:[--checkbox-check:HighlightText] forced-colors:[--checkbox-checked-bg:Highlight] forced-colors:group-data-[disabled]:[--checkbox-check:Highlight]",
   "dark:forced-colors:[--checkbox-check:HighlightText] dark:forced-colors:[--checkbox-checked-bg:Highlight] dark:forced-colors:group-data-[disabled]:[--checkbox-check:Highlight]",
 ];
 
 const colors = {
-  primary: "",
-  secondary: "",
-  light:
-    "[--checkbox-check:theme(colors.zinc.900)] [--checkbox-checked-bg:theme(colors.white)] [--checkbox-checked-border:theme(colors.zinc.950/15%)]",
-  dark: [
-    "[--checkbox-check:theme(colors.white)] [--checkbox-checked-bg:theme(colors.zinc.900)] [--checkbox-checked-border:theme(colors.zinc.950/90%)]",
-    "dark:[--checkbox-checked-bg:theme(colors.zinc.600)]",
-  ],
+  primary:
+    "[--checkbox-check:var(--color-brand-primary-inverse)] [--checkbox-checked-bg:var(--color-brand-primary)] [--checkbox-checked-border:var(--color-brand-primary-border)]",
   neutral:
-    "[--checkbox-check:theme(colors.white)] [--checkbox-checked-bg:theme(colors.zinc.600)] [--checkbox-checked-border:theme(colors.zinc.700/90%)]",
+    "[--checkbox-check:var(--color-brand-neutral-inverse)] [--checkbox-checked-bg:var(--color-brand-neutral)] [--checkbox-checked-border:var(--color-brand-neutral-border)]",
   danger:
-    "[--checkbox-check:theme(colors.white)] [--checkbox-checked-bg:theme(colors.red.600)] [--checkbox-checked-border:theme(colors.red.700/90%)]",
+    "[--checkbox-check:var(--color-brand-danger-inverse)] [--checkbox-checked-bg:var(--color-brand-danger)] [--checkbox-checked-border:var(--color-brand-danger-border)]",
   warning:
-    "[--checkbox-check:theme(colors.yellow.950)] [--checkbox-checked-bg:theme(colors.yellow.300)] [--checkbox-checked-border:theme(colors.yellow.400/80%)]",
+    "[--checkbox-check:var(--color-brand-warning-inverse)] [--checkbox-checked-bg:var(--color-brand-warning)] [--checkbox-checked-border:var(--color-brand-warning-border)]",
   success:
-    "[--checkbox-check:theme(colors.white)] [--checkbox-checked-bg:theme(colors.green.600)] [--checkbox-checked-border:theme(colors.green.700/90%)]",
-  info: "[--checkbox-check:theme(colors.white)] [--checkbox-checked-bg:theme(colors.sky.500)] [--checkbox-checked-border:theme(colors.sky.600/80%)]",
+    "[--checkbox-check:var(--color-brand-success-inverse)] [--checkbox-checked-bg:var(--color-brand-success)] [--checkbox-checked-border:var(--color-brand-success-border)]",
+  info: "[--checkbox-check:var(--color-brand-info-inverse)] [--checkbox-checked-bg:var(--color-brand-info)] [--checkbox-checked-border:var(--color-brand-info-border)]",
 } as ColorMap;
 
 type Color = ThemeColors;
+
+export function CheckboxGroup({ className, ...props }: AriaCheckboxGroupProps) {
+  return (
+    <AriaCheckboxGroup
+      data-slot="control"
+      {...props}
+      className={clsx(
+        className,
+        // Basic groups
+        "space-y-3 group",
+        // With descriptions
+        "has-[[data-slot=description]]:space-y-6 has-data-[slot=description]:**:data-[slot=label]:font-medium"
+      )}
+    />
+  );
+}
+
+export const checkboxLayoutStyles = [
+  // Base layout
+  "group grid grid-cols-[1.125rem_1fr] items-center gap-x-4 gap-y-2 sm:grid-cols-[1rem_1fr] relative",
+  // Control layout
+  "[&>[data-slot=control]]:col-start-1 [&>[data-slot=control]]:row-start-1 [&>[data-slot=control]]:justify-self-center",
+  // Label layout
+  "[&>[data-slot=label]]:col-start-2 [&>[data-slot=label]]:row-start-1 [&>[data-slot=label]]:justify-self-start",
+  // Description layout
+  "[&>[data-slot=description]]:col-start-2 [&>[data-slot=description]]:row-start-2",
+  // With description
+  "has-data-[slot=description]:**:data-[slot=label]:font-medium",
+];
+
+type FieldProps = Omit<AriaCheckboxProps, "isDisabled" | "isIndeterminate">;
+
+export function HeadlessCheckboxField({
+  children,
+  className,
+  ...props
+}: { children: React.ReactNode; className?: string } & Omit<
+  AriaCheckboxProps,
+  "children" | "className"
+>) {
+  return (
+    <Provider values={[[AriaCheckboxContext, props]]}>
+      <HeadlessField className={className}>{children}</HeadlessField>
+    </Provider>
+  );
+}
+
+export function CheckboxField({
+  color,
+  label,
+  description,
+  className,
+  ...props
+}: Omit<AriaCheckboxProps, "children" | "className"> &
+  Omit<FieldProps, "children"> &
+  ComposedFieldProps & { color?: Color }) {
+  return (
+    <HeadlessCheckboxField
+      {...props}
+      className={clsx(className, checkboxLayoutStyles)}
+    >
+      <Checkbox color={color} />
+      {label ? <Label>{label}</Label> : null}
+      {description ? <Description>{description}</Description> : null}
+    </HeadlessCheckboxField>
+  );
+}
 
 export function CheckboxMark({
   color,
@@ -229,7 +163,7 @@ export function CheckboxMark({
       >
         {/* Checkmark icon */}
         <path
-          className="opacity-100 group-data-[indeterminate]:opacity-0"
+          className="opacity-100 group-data-indeterminate:opacity-0"
           d="M3 8L6 11L11 3.5"
           strokeWidth={2}
           strokeLinecap="round"
@@ -237,7 +171,7 @@ export function CheckboxMark({
         />
         {/* Indeterminate icon */}
         <path
-          className="opacity-0 group-data-[indeterminate]:opacity-100"
+          className="opacity-0 group-data-indeterminate:opacity-100"
           d="M3 7H11"
           strokeWidth={2}
           strokeLinecap="round"
@@ -254,27 +188,25 @@ export function CheckboxMark({
  */
 export const Checkbox = forwardRef(function Checkbox(
   props: AriaCheckboxProps & { color?: Color },
-  ref: ForwardedRef<HTMLLabelElement>,
+  ref: ForwardedRef<HTMLLabelElement>
 ) {
   const { color = "neutral", ...racProps } = props;
   const { inputRef: userProvidedInputRef = null } = props;
 
   // Merge the local props and ref with the ones provided via context.
   [props, ref] = useContextProps(racProps, ref, AriaCheckboxContext);
-
   // Get field props to wire this input to a label
   const field = useSlottedContext(FieldContext);
   // Get controller to control field value via RHF
   const fieldControl = useSlottedContext(FieldControllerContext)?.field;
 
   const inputRef = useObjectRef(
-    mergeRefs(userProvidedInputRef, props.inputRef ?? null),
+    mergeRefs(userProvidedInputRef, props.inputRef ?? null)
   );
   const groupState = useContext(CheckboxGroupStateContext);
 
   const {
     inputProps,
-    labelProps,
     isSelected,
     isDisabled,
     isReadOnly,
@@ -302,11 +234,12 @@ export const Checkbox = forwardRef(function Checkbox(
             typeof props.children === "function" ? true : props.children,
         },
         groupState,
-        inputRef,
+        inputRef
       )
     : // eslint-disable-next-line react-hooks/rules-of-hooks
       useCheckbox(
         {
+          ...field,
           ...mergeProps(props, {
             onChange: fieldControl?.onChange,
             onBlur: fieldControl?.onBlur,
@@ -318,7 +251,7 @@ export const Checkbox = forwardRef(function Checkbox(
         },
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useToggleState(props),
-        inputRef,
+        inputRef
       );
 
   const { isFocused, isFocusVisible, focusProps } = useFocusRing();
@@ -336,7 +269,7 @@ export const Checkbox = forwardRef(function Checkbox(
 
   return (
     <div
-      {...mergeProps(DOMProps, labelProps, hoverProps)}
+      {...mergeProps(DOMProps, hoverProps)}
       slot={props.slot || undefined}
       data-selected={isSelected || props.isIndeterminate || undefined}
       data-indeterminate={props.isIndeterminate || undefined}
@@ -348,26 +281,26 @@ export const Checkbox = forwardRef(function Checkbox(
       data-readonly={isReadOnly || undefined}
       data-invalid={isInvalid || undefined}
       data-required={props.isRequired || undefined}
-      role="checkbox"
       aria-checked={isSelected || undefined}
-      tabIndex={0}
       data-rac=""
       className={clsx(
         props.className,
-        "group relative inline-flex focus:outline-none",
+        "group relative inline-flex focus:outline-none"
       )}
     >
       <CheckboxMark color={color} />
-      <VisuallyHidden>
-        <input ref={inputRef} {...mergeProps(inputProps, focusProps)} />
-      </VisuallyHidden>
+      <input
+        className="opacity-0 absolute inset-0 size-full"
+        {...mergeProps(inputProps, focusProps)}
+        ref={inputRef}
+      />
     </div>
   );
 });
 
 export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
   props: AriaCheckboxProps,
-  ref: ForwardedRef<HTMLLabelElement>,
+  ref: ForwardedRef<HTMLLabelElement>
 ) {
   const { inputRef: userProvidedInputRef = null } = props;
 
@@ -380,7 +313,7 @@ export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
   const controller = useSlottedContext(FieldControllerContext);
 
   const inputRef = useObjectRef(
-    mergeRefs(userProvidedInputRef, props.inputRef ?? null),
+    mergeRefs(userProvidedInputRef, props.inputRef ?? null)
   );
   const groupState = useContext(CheckboxGroupStateContext);
 
@@ -412,7 +345,7 @@ export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
             typeof props.children === "function" ? true : props.children,
         },
         groupState,
-        inputRef,
+        inputRef
       )
     : // eslint-disable-next-line react-hooks/rules-of-hooks
       useCheckbox(
@@ -434,10 +367,10 @@ export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
                   onChange: controller.field.onChange,
                   isSelected: controller.field.value,
                 } satisfies AriaCheckboxProps)
-              : Object.freeze({}),
-          ),
+              : Object.freeze({})
+          )
         ),
-        inputRef,
+        inputRef
       );
 
   const { isFocused, isFocusVisible, focusProps } = useFocusRing();

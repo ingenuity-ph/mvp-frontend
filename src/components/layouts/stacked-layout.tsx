@@ -1,32 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useResizeObserver } from "@react-aria/utils";
+import { useState } from "react";
+import { useViewportSize } from "@react-aria/utils";
 import { Drawer } from "../ui/drawer";
 import { NavbarItem } from "../ui/navbar";
 import { SurfaceOverflow } from "../ui/surface";
-
-const useElementDimensions = () => {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [contentSize, setContentSize] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    setContentSize(
-      contentRef.current?.getBoundingClientRect() ?? { width: 0, height: 0 }
-    );
-  }, []);
-
-  const onResize = useCallback(() => {
-    if (contentRef.current) {
-      setContentSize(contentRef.current.getBoundingClientRect());
-    }
-  }, [contentRef]);
-
-  useResizeObserver({
-    ref: contentRef,
-    onResize,
-  });
-
-  return { dimensions: contentSize, elementRef: contentRef };
-};
 
 function OpenMenuIcon() {
   return (
@@ -68,13 +44,10 @@ export function StackedLayout({
   sidebar: React.ReactNode;
 }>) {
   const [shouldShowSidebar, setShouldShowSidebar] = useState(false);
-  const { dimensions, elementRef } = useElementDimensions();
+  const { height } = useViewportSize();
 
   return (
-    <div
-      ref={elementRef}
-      className="relative isolate flex w-full flex-col bg-white md:h-screen dark:bg-zinc-900 dark:lg:bg-zinc-950"
-    >
+    <div className="relative isolate flex w-full flex-col bg-white md:h-screen dark:bg-neutral-900 dark:lg:bg-neutral-950">
       {/* Sidebar on mobile */}
       <MobileSidebar
         open={shouldShowSidebar}
@@ -104,14 +77,12 @@ export function StackedLayout({
       {/* <Divider inset="none" /> */}
       <main className="flex flex-1 flex-col">
         <div
-          className="relative flex grow flex-col p-6 lg:bg-white lg:p-7 lg:shadow-xs lg:ring-1 lg:ring-zinc-950/5 dark:lg:bg-zinc-900 dark:lg:ring-white/10"
+          className="relative flex grow flex-col lg:bg-white lg:shadow-xs lg:ring-1 lg:ring-neutral-950/5 dark:lg:bg-neutral-900 dark:lg:ring-white/10"
           style={{
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            "--available-content-height":
-              // FIXME: Technically, 58 should not be hardcoded and be a computation along with the dimensions
-              // 56 is for vertical padding
-              `${dimensions.height - 58 - 56}px`,
+            "--layout-content-top-offset": "56px",
+            "--layout-available-content-height": `calc(${height}px - var(--layout-content-top-offset))`,
           }}
         >
           {children}

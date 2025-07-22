@@ -13,7 +13,7 @@ import {
   useSlottedContext,
 } from "react-aria-components";
 import { useListData } from "react-stately";
-import { X } from "@phosphor-icons/react";
+import { X, XIcon } from "@phosphor-icons/react";
 import { Button } from "./button";
 import { Description, FieldContext, FieldControllerContext } from "./fieldset";
 import { cn } from "./utils";
@@ -66,7 +66,7 @@ export function MultipleSelect<T extends SelectedKey>({
    * Might cause unstability by wrapping in ref.
    */
   const fieldControl = useRef(
-    useSlottedContext(FieldControllerContext)?.field,
+    useSlottedContext(FieldControllerContext)?.field
   ).current;
 
   const tagGroupIdentifier = useId();
@@ -76,7 +76,7 @@ export function MultipleSelect<T extends SelectedKey>({
   const initialSelectedKeys =
     props.defaultSelectedKeys ?? fieldControl?.value ?? [];
   const initialSelectedItems = items.filter((item) =>
-    initialSelectedKeys.includes(item.id),
+    initialSelectedKeys.includes(item.id)
   );
 
   const selectedItems = useListData<T>({
@@ -108,7 +108,7 @@ export function MultipleSelect<T extends SelectedKey>({
     (item: T, filterText: string) => {
       return !selectedKeys.includes(item.id) && contains(item.name, filterText);
     },
-    [contains, selectedKeys],
+    [contains, selectedKeys]
   );
 
   const accessibleList = useListData({
@@ -135,7 +135,7 @@ export function MultipleSelect<T extends SelectedKey>({
         fieldControl?.onChange(selectedItems.items.map((i) => i.id)); // 🔥 Ensure field updates
       }
     },
-    [selectedItems, onItemCleared, fieldControl],
+    [selectedItems, onItemCleared, fieldControl]
   );
 
   const onSelectionChange = (id: Key | null) => {
@@ -195,7 +195,7 @@ export function MultipleSelect<T extends SelectedKey>({
         popLast();
       }
     },
-    [popLast, fieldState.inputValue],
+    [popLast, fieldState.inputValue]
   );
 
   useEffect(() => {
@@ -235,7 +235,7 @@ export function MultipleSelect<T extends SelectedKey>({
         // Disabled state
         "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
         // Invalid state
-        "before:has-[[data-invalid]]:shadow-red-500/10",
+        "before:has-[[data-invalid]]:shadow-danger-500/10",
       ])}
     >
       <div className={props.isDisabled ? "opacity-50" : ""}>
@@ -251,9 +251,9 @@ export function MultipleSelect<T extends SelectedKey>({
             // Background color
             "bg-transparent dark:bg-white/5",
             // Invalid state
-            "group-data-[invalid]/field:border-red-500 group-data-[invalid]/field:hover:border-red-500 group-data-[invalid]/field:dark:border-red-500 group-data-[invalid]/field:hover:dark:border-red-500",
+            "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
             // Disabled state
-            "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
+            "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15"
           )}
         >
           <TagGroup
@@ -268,7 +268,7 @@ export function MultipleSelect<T extends SelectedKey>({
                 //
                 "inline-flex flex-wrap gap-2 pr-2 empty:hidden",
                 //
-                "my-[calc(theme(spacing[2.5])-1px)] sm:my-[calc(theme(spacing[1.5])-1px)]",
+                "my-[calc(theme(spacing[2.5])-1px)] sm:my-[calc(theme(spacing[1.5])-1px)]"
               )}
             >
               {(item) => {
@@ -287,7 +287,7 @@ export function MultipleSelect<T extends SelectedKey>({
                       slot="remove"
                       className="size-3 hover:opacity-50"
                     >
-                      <X data-slot="icon" />
+                      <XIcon data-slot="icon" />
                     </Button>
                   </AriaTag>
                 );
@@ -310,7 +310,7 @@ export function MultipleSelect<T extends SelectedKey>({
             <div
               className={cn(
                 "inline-flex flex-1 flex-wrap items-center",
-                className,
+                className
               )}
             >
               <Input
@@ -344,7 +344,7 @@ export function MultipleSelect<T extends SelectedKey>({
                   aria-label="Remove"
                   ref={triggerButtonRef}
                 >
-                  <X />
+                  <XIcon />
                 </Button>
               </VisuallyHidden>
               <button

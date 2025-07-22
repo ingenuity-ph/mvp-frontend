@@ -1,9 +1,10 @@
-import clsx from "clsx";
 import { Children } from "react";
+import { cn } from "./utils";
+
 type Inset = "none" | "context";
 const insetStyle: Record<Inset, string> = {
   none: "",
-  context: clsx([
+  context: cn([
     "[--inset:calc(var(--gutter,theme(spacing.4))*-1)] [margin-inline:var(--inset)]",
   ]),
 };
@@ -26,7 +27,7 @@ export function Divider({
       <div
         {...props}
         role="separator"
-        className={clsx(
+        className={cn(
           className,
           hasChildren
             ? [
@@ -42,7 +43,7 @@ export function Divider({
                 soft &&
                   "before:border-zinc-950/5 after:border-zinc-950/5 before:dark:border-white/5 after:dark:border-white/5",
                 !soft &&
-                  "before:border-zinc-950/10 after:border-zinc-950/10 before:dark:border-white/10 after:dark:border-white/10",
+                  "before:border-surface-border after:border-surface-border before:dark:border-white/10 after:dark:border-white/10",
               ]
             : [
                 // Base
@@ -51,7 +52,7 @@ export function Divider({
                 insetStyle[inset],
               ],
           soft && "border-zinc-950/5 dark:border-white/5",
-          !soft && "border-zinc-950/10 dark:border-white/10",
+          !soft && "border-surface-border dark:border-white/10"
         )}
       />
     );
@@ -64,7 +65,7 @@ export function Divider({
       style={{
         unicodeBidi: "isolate",
       }}
-      className={clsx(
+      className={cn(
         className,
         // Base
         "relative shrink-0 self-stretch",
@@ -83,7 +84,7 @@ export function Divider({
               soft &&
                 "before:border-zinc-950/5 after:border-zinc-950/5 before:dark:border-white/5 after:dark:border-white/5",
               !soft &&
-                "before:border-zinc-950/10 after:border-zinc-950/10 before:dark:border-white/10 after:dark:border-white/10",
+                "before:border-surface-border after:border-surface-border before:dark:border-white/10 after:dark:border-white/10",
             ]
           : [
               // Base
@@ -92,8 +93,8 @@ export function Divider({
               insetStyle[inset],
               // Colors
               soft && "border-zinc-950/5 dark:border-white/5",
-              !soft && "border-brand-border",
-            ],
+              !soft && "border-surface-border",
+            ]
       )}
     />
   );

@@ -37,7 +37,7 @@ export function Toast({ ...props }: ToasterProps) {
             // Base
             "min-w-[22rem] items-center",
             // Icon
-            "[&>[data-icon]]:-mx-0.5 [&>[data-icon]]:my-0.5 [&>[data-icon]]:size-5 [&>[data-icon]]:shrink-0 [&>[data-icon]]:text-[--btn-icon] [&>[data-icon]]:sm:my-1 [&>[data-icon]]:sm:size-4 forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]",
+            "[&>[data-icon]]:-mx-0.5 [&>[data-icon]]:my-0.5 [&>[data-icon]]:size-5 [&>[data-icon]]:shrink-0 [&>[data-icon]]:text-[--btn-icon] [&>[data-icon]]:sm:my-1 [&>[data-icon]]:sm:size-4 forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]"
           ),
           content: textStyles({ level: "paragraph-sm", colors: "dark" }),
           error:

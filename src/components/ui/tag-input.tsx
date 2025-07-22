@@ -43,7 +43,7 @@ export function TagInput(props: Partial<TagInputProps>) {
         // Disabled state
         "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
         // Invalid state
-        "before:has-[[data-invalid]]:shadow-red-500/10",
+        "before:has-[[data-invalid]]:shadow-danger-500/10",
       ])}
     >
       <div
@@ -59,7 +59,7 @@ export function TagInput(props: Partial<TagInputProps>) {
           // Background color
           "bg-transparent dark:bg-white/5",
           // Invalid state
-          "group-data-[invalid]/field:border-red-500 group-data-[invalid]/field:hover:border-red-500 group-data-[invalid]/field:dark:border-red-500 group-data-[invalid]/field:hover:dark:border-red-500",
+          "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
           // Disabled state
           "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
         ])}

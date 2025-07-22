@@ -6,11 +6,14 @@ import { cn } from "./utils";
 const surfaceStyles = tv({
   base: [
     // Base
-    "rounded-[var(--radius-surface)] p-[var(--gutter,var(--spacing-surface))] shadow-sm forced-colors:outline",
+    "rounded-[var(--radius-surface)] p-[var(--gutter,var(--spacing-surface))] forced-colors:outline",
     // Layout
-    "flex gap-[var(--gutter,var(--spacing-surface))]",
+    "flex gap-[var(--spacing-surface-gap,var(--spacing-surface))]",
     // Border
-    "ring-1 ring-brand-border",
+    "ring-1 ring-[var(--surface-border-color,var(--color-surface-border))]",
+    //
+    "[&>[data-slot=header]+[data-slot=content]]:mt-4",
+    "[&>[data-slot=content]+[data-slot=footer]]:mt-4",
   ],
   variants: {
     orientation: {
@@ -18,7 +21,7 @@ const surfaceStyles = tv({
       horizontal: "flex-row",
     },
     color: {
-      default: "bg-surface-background dark:bg-zinc-800/75",
+      default: "bg-surface-background dark:bg-neutral-800/75",
       none: "",
     },
     inset: {
@@ -86,7 +89,7 @@ export function SurfaceActions({
       {...props}
       className={cn(
         className,
-        "flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto",
+        "flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto"
       )}
     />
   );

@@ -10,7 +10,7 @@ import {
 } from "react-aria-components";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { tv, type VariantProps } from "tailwind-variants";
-import { Eye, MagnifyingGlass, X } from "@phosphor-icons/react";
+import { EyeIcon, MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
 import { mergeProps, mergeRefs, useObjectRef } from "@react-aria/utils";
 import { Button } from "./button";
 import type { Adjoined } from "./constants";
@@ -30,13 +30,13 @@ export const inputGroupStyles = tv({
   slots: {
     start: [
       // Base
-      "relative flex justify-center items-center pr-1.5 *:text-zinc-500 dark:*:text-zinc-400",
+      "relative flex justify-center items-center pr-1.5 *:text-neutral-500 dark:*:text-neutral-400",
       // Icon
       "[&>[data-slot=icon]]:pointer-events-none [&>[data-slot=icon]]:z-10 [&>[data-slot=icon]]:size-5 sm:[&>[data-slot=icon]]:size-4",
     ],
     end: [
       // Base
-      "relative flex justify-center items-center pl-1.5 *:text-zinc-500 dark:*:text-zinc-400",
+      "relative flex justify-center items-center pl-1.5 *:text-neutral-500 dark:*:text-neutral-400",
       // Icon
       "[&>[data-slot=icon]]:pointer-events-none [&>[data-slot=icon]]:z-10 [&>[data-slot=icon]]:size-5 sm:[&>[data-slot=icon]]:size-4",
     ],
@@ -55,9 +55,9 @@ export const inputSlots = tv({
       // Focus ring
       "after:pointer-events-none after:absolute after:inset-0 after:rounded-[var(--radius-control)] after:ring-inset after:ring-transparent sm:has-[[data-focus-visible]]:after:ring-2 sm:has-[[data-focus-visible]]:after:ring-blue-500",
       // Disabled state
-      "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
+      "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-neutral-950/5 before:has-[[data-disabled]]:shadow-none",
       // Invalid state
-      "before:has-[[data-invalid]]:shadow-red-500/10",
+      "before:has-[[data-invalid]]:shadow-danger-500/10",
     ],
   },
 });
@@ -107,7 +107,7 @@ export const inputStyles = tv({
 
 type AdjoinedVariants = VariantProps<typeof inputStyles>;
 export const matchMultipleAdjoined = (
-  insets: Array<AdjoinedVariants["adjoined"]>,
+  insets: Array<AdjoinedVariants["adjoined"]>
 ) => {
   return cn(insets.map((v) => (v ? inputStyles.variants.adjoined[v] : "")));
 };
@@ -124,15 +124,15 @@ export function InputGroup({
         // Horizontal Padding - moved the horizontal padding here to handle enhancers
         "px-[calc(theme(spacing[3.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)]",
         // Typography
-        "text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white",
+        "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
         // Border
-        "border-brand-border border has-[[data-hovered]]:border-zinc-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
+        "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
         // Background color
         "bg-transparent dark:bg-white/5",
         // Invalid state
-        "group-data-[invalid]/field:border-red-500 group-data-[invalid]/field:hover:border-red-500 group-data-[invalid]/field:dark:border-red-500 group-data-[invalid]/field:hover:dark:border-red-500",
+        "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
         // Disabled state
-        "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
+        "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15"
       )}
     >
       {children}
@@ -156,7 +156,7 @@ const Input = forwardRef(function Input(
     adjoined,
     ...props
   }: InputProps,
-  ref: React.ForwardedRef<HTMLInputElement>,
+  ref: React.ForwardedRef<HTMLInputElement>
 ) {
   const adjoinedStyles = Array.isArray(adjoined)
     ? matchMultipleAdjoined(adjoined)
@@ -176,13 +176,13 @@ const Input = forwardRef(function Input(
         // Horizontal Padding - moved the horizontal padding here to handle enhancers
         "px-[calc(theme(spacing[3.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)]",
         // Border
-        "border-brand-border border has-[[data-hovered]]:border-zinc-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
+        "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
         // Background color
         "bg-transparent dark:bg-white/5",
         // Invalid state
-        "group-data-[invalid]/field:border-red-500 group-data-[invalid]/field:hover:border-red-500 group-data-[invalid]/field:dark:border-red-500 group-data-[invalid]/field:hover:dark:border-red-500",
+        "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
         // Disabled state
-        "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
+        "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
         // Adjoined
         adjoinedStyles,
       ])}
@@ -200,7 +200,7 @@ const Input = forwardRef(function Input(
           // Layout
           "block w-full appearance-none bg-transparent",
           // Typography
-          "text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white",
+          "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
           // Hide default focus styles
           "focus-within:outline-none focus:outline-none focus-visible:outline-none",
           // Vertical Padding - we only apply the vertical padding to the input itself to have consistent dimensions
@@ -235,7 +235,7 @@ function ClearButton({ onClick }: { onClick?: () => void }) {
       inset="right"
       onPress={onClick}
     >
-      <X />
+      <XIcon />
     </Button>
   );
 }
@@ -243,7 +243,7 @@ function ClearButton({ onClick }: { onClick?: () => void }) {
 type TextInputProps = InputProps & { adjoined?: Adjoined };
 export const TextInput = forwardRef(function TextInput(
   { className, adjoined = "none", ...props }: TextInputProps,
-  ref: React.ForwardedRef<HTMLInputElement>,
+  ref: React.ForwardedRef<HTMLInputElement>
 ) {
   const objectRef = useObjectRef(ref);
   const field = useSlottedContext(FieldContext);
@@ -290,17 +290,15 @@ export function InputField<
         disabled={disabled}
         defaultValue={defaultValue}
       >
-        <Field>
-          {label ? <Label>{label}</Label> : null}
-          <TextInput disabled={disabled} {...props} />
-          {description ? <Description>{description}</Description> : null}
-        </Field>
+        {label ? <Label>{label}</Label> : null}
+        <TextInput disabled={disabled} {...props} />
+        {description ? <Description>{description}</Description> : null}
       </FieldControl>
     );
   }
 
   return (
-    <Field disabled={disabled}>
+    <Field isDisabled={disabled}>
       {label ? <Label>{label}</Label> : null}
       <TextInput disabled={disabled} {...props} />
       {description ? <Description>{description}</Description> : null}
@@ -310,7 +308,7 @@ export function InputField<
 
 export const PasswordInput = forwardRef(function PasswordInput(
   props: TextInputProps,
-  ref: React.ForwardedRef<HTMLInputElement>,
+  ref: React.ForwardedRef<HTMLInputElement>
 ) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -329,7 +327,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
             setIsVisible((prev) => !prev);
           }}
         >
-          <Eye />
+          <EyeIcon />
         </Button>
       }
     />
@@ -348,7 +346,7 @@ export const SearchInput = forwardRef(function SearchInput(
     Pick<AriaSearchFieldProps, "onSubmit" | "onClear" | "onChange"> & {
       adjoined?: Array<Adjoined> | Adjoined;
     },
-  ref: React.ForwardedRef<HTMLInputElement>,
+  ref: React.ForwardedRef<HTMLInputElement>
 ) {
   const objectRef = useObjectRef(ref);
   const field = useSlottedContext(FieldContext);
@@ -380,11 +378,11 @@ export const SearchInput = forwardRef(function SearchInput(
             }
             fieldControl.onChange("");
           },
-        },
+        }
       )}
     >
       <Input
-        startEnhancer={<MagnifyingGlass />}
+        startEnhancer={<MagnifyingGlassIcon />}
         ref={mergedRef}
         {...props}
         {...mergeProps(props, {

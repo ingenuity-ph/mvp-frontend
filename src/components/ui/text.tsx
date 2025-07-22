@@ -1,89 +1,78 @@
 import { clsx } from "clsx";
 import { createContext, useContext } from "react";
+import { mergeProps } from "react-aria";
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
   Heading,
   type HeadingProps,
   Text as AriaText,
+  TextContext,
   type TextProps as AriaTextProps,
 } from "react-aria-components";
 import { tv, type VariantProps } from "tailwind-variants";
 import type { ColorMap, ThemeColors } from "./constants";
 import { Link, type LinkProps } from "./link";
+import { useSlottedContextExists } from "./utils";
 
 export const textStyles = tv({
   base: "text-[color:var(--text-color)]",
   variants: {
-    level: {
-      // Display
-      "display-lg": "text-[6rem] leading-[7rem]",
-      "display-md": "text-[3.25rem] leading-[4rem]",
-      "display-sm": "text-[2.75rem] leading-[3.25]",
-      "display-xs": "text-[2.25rem] leading-[2.74]",
-      // Heading
-      h1: "text-[2.5rem] leading-[3.25rem]",
-      h2: "text-[2.25rem] leading-[2.75rem]",
-      h3: "text-[2rem] leading-[2.5rem]",
-      h4: "text-[1.75rem] leading-[2.25rem]",
-      h5: "text-[1.5rem] leading-[2rem]",
-      h6: "text-[1.25rem] leading-[1.75rem]",
-      // Labels
-      "label-lg": "sm:text-[1.125rem] sm:leading-[1.5rem]",
-      "label-md": "sm:text-[1rem] sm:leading-[1.25rem]",
-      "label-sm": "sm:text-[0.875rem] sm:leading-[1rem]",
-      "label-xs": "sm:text-[0.75rem] sm:leading-[1rem]",
-      // Paragraph
-      "paragraph-lg": "text-[1.125rem] leading-[1.75rem]",
-      "paragraph-md": "text-[1rem] leading-[1.5rem]",
-      "paragraph-sm": "text-[0.875rem] leading-[1.25rem]",
-      "paragraph-xs": "text-[0.75rem] leading-[1.25rem]",
-
+    metric: {
+      lg: "text-metric-lg",
+      md: "text-metric-md",
+      sm: "text-metric-sm",
       // using inherit means we want to "inherit" the styles from parent
       inherit: "",
     },
-    colors: {
-      primary: [
-        "[--text-color:theme(colors.brand.primary.500)]",
-        "dark:[--text-color:theme(colors.brand.primary.100)]",
-      ],
-      secondary: [
-        "[--text-color:theme(colors.brand.secondary.600)]",
-        "dark:[--text-color:theme(colors.brand.secondary.500)]",
-      ],
-      light: [
-        "[--text-color:white]",
-        "dark:[--text-color:theme(colors.zinc.800)]",
-      ],
-      dark: [
-        "[--text-color:theme(colors.zinc.900)]",
-        "dark:[--text-color:theme(colors.zinc.50)]",
-      ],
-      neutral: [
-        "[--text-color:theme(colors.zinc.500)]",
-        "dark:[--text-color:theme(colors.zinc.400)]",
-      ],
-      danger: [
-        "[--text-color:theme(colors.red.500)]",
-        "dark:[--text-color:theme(colors.red.400)]",
-      ],
-      success: [
-        "[--text-color:theme(colors.green.500)]",
-        "dark:[--text-color:theme(colors.green.400)]",
-      ],
-      warning: [
-        "[--text-color:theme(colors.amber.500)]",
-        "dark:[--text-color:theme(colors.amber.400)]",
-      ],
-      info: [
-        "[--text-color:theme(colors.sky.500)]",
-        "dark:[--text-color:theme(colors.sky.400)]",
-      ],
+    title: {
+      xxl: "text-title-xxl",
+      xl: "text-title-xl",
+      lg: "text-title-lg",
+      md: "text-title-md",
+      sm: "text-title-sm",
+      xs: "text-title-xs",
+      // using inherit means we want to "inherit" the styles from parent
+      inherit: "",
+    },
+    heading: {
+      // Display
+      lg: "text-heading-lg",
+      md: "text-heading-md",
+      sm: "text-heading-sm",
+      xs: "text-heading-xs",
+      // using inherit means we want to "inherit" the styles from parent
+      inherit: "",
+    },
+    label: {
+      // Labels
+      lg: "text-label-lg",
+      md: "text-label-md",
+      sm: "text-label-sm",
+      xs: "text-label-xs",
+      // using inherit means we want to "inherit" the styles from parent
+      inherit: "",
+    },
+    paragraph: {
+      // Paragraph
+      lg: "text-paragraph-lg",
+      md: "text-paragraph-md",
+      sm: "text-paragraph-sm",
+      xs: "text-paragraph-xs",
+      // using inherit means we want to "inherit" the styles from parent
+      inherit: "",
+    },
+    color: {
+      none: "",
+      primary: ["[--text-color:var(--color-brand-primary-text)]"],
+      neutral: ["[--text-color:var(--color-brand-neutral-text)]"],
+      danger: ["[--text-color:var(--color-brand-danger-text)]"],
+      success: ["[--text-color:var(--color-brand-success-text)]"],
+      warning: ["[--text-color:var(--color-brand-warning-text)]"],
+      info: ["[--text-color:var(--color-brand-info-text)]"],
     } satisfies ColorMap,
   },
-  defaultVariants: {
-    level: "paragraph-md",
-  },
+  defaultVariants: {},
 });
 
 /**
@@ -104,27 +93,26 @@ const _TextNestedContext = createContext(false);
  */
 export const TypographyInheritContext = createContext(false);
 
-type TextStyles = VariantProps<typeof textStyles>;
-type CustomColor = `text-${string} dark:text-${string}`;
+export type TextVariants = VariantProps<typeof textStyles>;
+
 interface OwnTextProps {
-  color?: TextStyles["colors"] | CustomColor | "inherit";
-  level?: TextStyles["level"];
+  color?: TextVariants["color"] | "inherit";
+  size?: TextVariants["paragraph"];
 }
 
 export type TextProps = AriaTextProps & OwnTextProps;
 export function Text({
   className,
-  level = "paragraph-md",
-  color = "dark",
+  size = "sm",
+  color = "neutral",
   ...props
 }: TextProps) {
   const isNested = useContext(_TextNestedContext);
 
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const inheritColor = color === "inherit";
-  const isThemeColor = Object.keys(textStyles.variants.colors).includes(color);
+  const shouldInheritColor = color === "inherit";
+  const isThemeColor = Object.keys(textStyles.variants.color).includes(color);
   const colorStyle = isThemeColor
-    ? textStyles.variants.colors[color as ThemeColors]
+    ? textStyles.variants.color[color as ThemeColors]
     : color;
 
   return (
@@ -142,11 +130,11 @@ export function Text({
         {...props}
         className={clsx(
           className,
-          textStyles({ level }),
+          textStyles({ paragraph: size }),
           /**
            * Text color will inherit styles applied to parent.
            */
-          inheritColor ? "" : colorStyle
+          shouldInheritColor ? "" : colorStyle
         )}
       />
     </_TextNestedContext.Provider>
@@ -156,12 +144,12 @@ export function Text({
 export function TextLink({
   className,
   color = "neutral",
-  level = "paragraph-md",
+  size = "md",
   ...props
 }: LinkProps & OwnTextProps) {
   const isColor = typeof color === "string";
   const colorStyle = isColor
-    ? textStyles.variants.colors[color as ThemeColors]
+    ? textStyles.variants.color[color as ThemeColors]
     : color;
 
   return (
@@ -170,8 +158,11 @@ export function TextLink({
       className={clsx(
         className,
         "underline",
-        textStyles({ level }),
-        "text-[color:var(--text-color)]",
+        textStyles({
+          paragraph: size,
+          color: typeof color === "string" ? "none" : color,
+        }),
+        //
         colorStyle
       )}
     />
@@ -180,28 +171,27 @@ export function TextLink({
 
 export function TextButton({
   className,
-  color = "dark",
-  level = "paragraph-md",
+  color = "inherit",
+  size = "md",
   ...props
 }: Omit<AriaButtonProps, "color"> & OwnTextProps) {
-  const isColor = typeof color === "string";
-  const colorStyle = isColor
-    ? textStyles.variants.colors[color as ThemeColors]
-    : color;
+  const shouldInherit = color === "inherit";
 
   return (
     <AriaButton
       {...props}
       className={clsx(
         className,
+        // Inherit text styles
+        textStyles({
+          paragraph: size,
+          color: shouldInherit ? undefined : color,
+        }),
         // Base
-        "relative isolate inline-flex items-center justify-center gap-x-2 focus:outline-none",
+        "relative isolate gap-x-2 focus:outline-none cursor-pointer ",
         // Icon
-        "forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText] [&>[data-slot=icon]]:-mx-0.5 [&>[data-slot=icon]]:my-0.5 [&>[data-slot=icon]]:size-5 [&>[data-slot=icon]]:shrink-0 [&>[data-slot=icon]]:text-[--btn-icon] [&>[data-slot=icon]]:sm:my-1 [&>[data-slot=icon]]:sm:size-4",
-        // Text
-        "text-[color:var(--text-color)]",
-        textStyles({ level }),
-        colorStyle
+        "forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]"
+        //
       )}
     />
   );
@@ -214,7 +204,10 @@ export function Strong({
   return (
     <strong
       {...props}
-      className={clsx(className, "font-medium text-zinc-950 dark:text-white")}
+      className={clsx(
+        className,
+        "font-medium text-brand-neutral-text dark:text-white"
+      )}
     />
   );
 }
@@ -228,20 +221,60 @@ export function Code({
       {...props}
       className={clsx(
         className,
-        "rounded border border-zinc-950/10 bg-zinc-950/[2.5%] px-0.5 text-sm font-medium text-zinc-950 sm:text-[0.8125rem] dark:border-white/20 dark:bg-white/5 dark:text-white"
+        "rounded border border-brand-neutral-text/10 bg-brand-neutral-text/[2.5%] px-0.5 text-sm font-medium text-brand-neutral-text sm:text-[0.8125rem] dark:border-white/20 dark:bg-white/5 dark:text-white"
       )}
     />
   );
 }
 
-export function Title({ className, ...props }: HeadingProps) {
+export function Title({
+  className,
+  size = "xs",
+  color,
+  ...props
+}: HeadingProps &
+  Partial<{
+    color: TextVariants["color"];
+    size: TextVariants["title"];
+  }>) {
+  const hasSlot = useSlottedContextExists(TextContext, "title");
+
   return (
     <Heading
+      {...props}
+      {...mergeProps(
+        { slot: hasSlot ? "title" : undefined },
+        { slot: props.slot }
+      )}
+      data-slot="title"
+      className={clsx(
+        className,
+        "font-semibold text-balance",
+        //
+        textStyles({ color, title: size })
+      )}
+    />
+  );
+}
+
+export function MetricText({
+  className,
+  size = "sm",
+  color,
+  ...props
+}: Omit<AriaTextProps, keyof TextVariants> &
+  Partial<{
+    size: TextVariants["metric"];
+    color: TextVariants["color"];
+  }>) {
+  return (
+    <AriaText
       {...props}
       className={clsx(
         className,
         "font-semibold text-balance",
-        textStyles({ level: "label-md", colors: "dark" })
+        //
+        textStyles({ color, metric: size })
       )}
     />
   );

@@ -7,6 +7,8 @@ import { type AriaFieldProps, useField, useObjectRef } from "react-aria";
 import {
   type ContextValue,
   DEFAULT_SLOT,
+  Group as AriaGroup,
+  type GroupProps as AriaGroupProps,
   Label as AriaLabel,
   LabelContext as AriaLabelContext,
   LabelContext,
@@ -26,22 +28,46 @@ import {
   type UseControllerReturn,
 } from "react-hook-form";
 import { useId } from "@react-aria/utils";
-import { textStyles } from "./text";
+import { textStyles, type TextVariants } from "./text";
 import { cn } from "./utils";
 
 export function Fieldset({
   className,
   ...props
-}: { className?: string } & ComponentPropsWithoutRef<"div">) {
+}: { className?: string } & Omit<AriaGroupProps, "className">) {
+  const labelId = useId();
+  const descriptionId = useId();
+
   return (
-    <div
-      {...props}
-      data-slot="fieldset"
-      className={cn(
-        className,
-        "[&>*+[data-slot=control]]:mt-3 [&>[data-slot=description]]:mt-1 [&>[data-slot=text]]:mt-1"
-      )}
-    />
+    <Provider
+      values={[
+        [
+          TextContext,
+          {
+            slots: {
+              [DEFAULT_SLOT]: {},
+              legend: {
+                id: labelId,
+                elementType: "span",
+              },
+              description: {
+                id: descriptionId,
+                elementType: "p",
+              },
+            },
+          },
+        ],
+      ]}
+    >
+      <AriaGroup
+        {...props}
+        data-slot="fieldset"
+        className={cn(
+          className,
+          "[&>*+[data-slot=control]]:mt-3 [&>[data-slot=description]]:mt-1"
+        )}
+      />
+    </Provider>
   );
 }
 
@@ -52,10 +78,13 @@ export function Legend({
   return (
     <AriaText
       data-slot="legend"
+      slot="legend"
       {...props}
       className={cn(
         className,
-        textStyles({ level: "label-sm", colors: "dark" }),
+        //
+        textStyles({ label: "sm", color: "neutral" }),
+        //
         "font-semibold data-[disabled]:opacity-50"
       )}
     />
@@ -104,7 +133,7 @@ export type FieldProps = Omit<
   ComponentPropsWithoutRef<"div">,
   keyof PublicAriaFieldProps
 > &
-  PublicAriaFieldProps & { disabled?: boolean; invalid?: boolean };
+  PublicAriaFieldProps & { isDisabled?: boolean; isInvalid?: boolean };
 
 /**
  * Type helper when composing `Field`.
@@ -117,7 +146,7 @@ export interface ComposedFieldProps {
 }
 
 export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
-  function HeadlessField({ disabled, invalid, ...props }, ref) {
+  function HeadlessField({ isDisabled, isInvalid, ...props }, ref) {
     const fieldId = useId(props.id);
     const labelId = useId();
     const descriptionId = useId();
@@ -134,7 +163,7 @@ export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
     return (
       <Provider
         values={[
-          [LabelContext, field.labelProps],
+          [LabelContext, { ...field.labelProps, elementType: "label" }],
           [
             TextContext,
             {
@@ -151,8 +180,8 @@ export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
         <div
           ref={ref}
           {...props}
-          data-disabled={disabled || undefined}
-          data-invalid={invalid || undefined}
+          data-disabled={isDisabled || undefined}
+          data-invalid={isInvalid || undefined}
         />
       </Provider>
     );
@@ -164,19 +193,14 @@ export const fieldLayoutStyles = [
   "group/field",
   "[&>[data-slot=label]+[data-slot=control]]:mt-1.5",
   "[&>[data-slot=label]+[data-slot=description]]:mt-0.5",
-  "[&>[data-slot=description]+[data-slot=control]]:mt-1.5",
-  "[&>[data-slot=control]+[data-slot=description]]:mt-1.5",
+  "[&>[data-slot=description]+[data-slot=control]]:mt-2",
+  "[&>[data-slot=control]+[data-slot=description]]:mt-2",
   "[&>[data-slot=control]+[data-slot=error]]:mt-1.5",
   "[&>[data-slot=label]]:font-medium",
 ];
-export function Field({ className, disabled, invalid, ...props }: FieldProps) {
+export function Field({ className, ...props }: FieldProps) {
   return (
-    <HeadlessField
-      {...props}
-      disabled={disabled}
-      invalid={invalid}
-      className={cn(className, fieldLayoutStyles)}
-    />
+    <HeadlessField {...props} className={cn(className, fieldLayoutStyles)} />
   );
 }
 
@@ -237,20 +261,9 @@ export function FieldControl<
     >
       <HeadlessField
         {...props}
-        disabled={isDisabled}
-        invalid={isInvalid}
-        className={cn(
-          className,
-          "group/field",
-          !unstyled && [
-            "[&>[data-slot=label]+[data-slot=control]]:mt-1.5",
-            "[&>[data-slot=label]+[data-slot=description]]:mt-0.5",
-            "[&>[data-slot=description]+[data-slot=control]]:mt-1.5",
-            "[&>[data-slot=control]+[data-slot=description]]:mt-1.5",
-            "[&>[data-slot=control]+[data-slot=error]]:mt-1.5",
-            "[&>[data-slot=label]]:font-medium",
-          ]
-        )}
+        isDisabled={isDisabled}
+        isInvalid={isInvalid}
+        className={cn(className, "group/field", !unstyled && fieldLayoutStyles)}
       >
         {children}
         {isInvalid && <ErrorMessage>{errorMessage}</ErrorMessage>}
@@ -277,21 +290,29 @@ export const HeadlessLabel = forwardRef<HTMLLabelElement, AriaLabelProps>(
   }
 );
 
-export const Label = forwardRef<HTMLLabelElement, AriaLabelProps>(
-  function Label(props, ref) {
-    return (
-      <HeadlessLabel
-        ref={ref}
-        {...props}
-        data-slot="label"
-        className={cn(
-          props.className,
-          "text-base/6 text-zinc-950 select-none data-[disabled]:opacity-50 sm:text-sm/6 dark:text-white"
-        )}
-      />
-    );
-  }
-);
+export const Label = forwardRef<
+  HTMLLabelElement,
+  AriaLabelProps &
+    Partial<{
+      size: TextVariants["label"];
+      color: TextVariants["color"];
+    }>
+>(function Label({ size = "sm", color = "neutral", ...props }, ref) {
+  return (
+    <HeadlessLabel
+      ref={ref}
+      {...props}
+      data-slot="label"
+      className={cn(
+        props.className,
+        // Base
+        "select-none group-data-disabled:opacity-50",
+        // Inherit text styles
+        textStyles({ color, label: size })
+      )}
+    />
+  );
+});
 
 export function Description({ className, ...props }: AriaTextProps) {
   return (
@@ -300,8 +321,11 @@ export function Description({ className, ...props }: AriaTextProps) {
       slot="description"
       {...props}
       className={cn(
-        className,
-        "block text-base/6 text-zinc-500 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-zinc-400"
+        "block text-brand-neutral group-data-disabled:opacity-50 dark:text-brand-neutral-subtle",
+        // Inherit text styles
+        textStyles({ color: "none", paragraph: "sm" }),
+        //
+        className
       )}
     />
   );
@@ -318,7 +342,7 @@ export function ErrorMessage({
       {...props}
       className={cn(
         className,
-        "inline-block text-base/6 text-red-600 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-red-500"
+        "inline-block text-base/6 text-danger-600 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-danger-500"
       )}
     />
   );

@@ -6,20 +6,28 @@ import {
   TextField as AriaTextField,
   useSlottedContext,
 } from "react-aria-components";
+import type { FieldPath, FieldValues } from "react-hook-form";
 import { mergeRefs, useObjectRef } from "@react-aria/utils";
-import { FieldContext, FieldControllerContext } from "./fieldset";
+import {
+  type ComposedFieldProps,
+  Description,
+  Field,
+  FieldContext,
+  FieldControl,
+  FieldControllerContext,
+  Label,
+  type WithFieldControlProps,
+} from "./fieldset";
 import { cn } from "./utils";
 
+export type TextAreaProps = { className?: string; resizable?: boolean } & Omit<
+  AriaTextAreaProps,
+  "className"
+>;
+
 export const Textarea = forwardRef(function Textarea(
-  {
-    className,
-    resizable = true,
-    ...props
-  }: { className?: string; resizable?: boolean } & Omit<
-    AriaTextAreaProps,
-    "className"
-  >,
-  ref: React.ForwardedRef<HTMLTextAreaElement>,
+  { className, resizable = true, ...props }: TextAreaProps,
+  ref: React.ForwardedRef<HTMLTextAreaElement>
 ) {
   const objectRef = useObjectRef(ref);
   const field = useSlottedContext(FieldContext);
@@ -47,7 +55,7 @@ export const Textarea = forwardRef(function Textarea(
         // Disabled state
         "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
         // Invalid state
-        "before:has-[[data-invalid]]:shadow-red-500/10",
+        "before:has-[[data-invalid]]:shadow-danger-500/10",
       ])}
       onChange={fieldControl?.onChange}
       onBlur={fieldControl?.onBlur}
@@ -63,7 +71,7 @@ export const Textarea = forwardRef(function Textarea(
           // Background color
           "bg-transparent dark:bg-white/5",
           // Invalid state
-          "group-data-[invalid]/field:border-red-500 group-data-[invalid]/field:hover:border-red-500 group-data-[invalid]/field:dark:border-red-500 group-data-[invalid]/field:hover:dark:border-red-500",
+          "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
           // Disabled state
           "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
         ])}
@@ -88,3 +96,45 @@ export const Textarea = forwardRef(function Textarea(
     </AriaTextField>
   );
 });
+
+export function TextareaField<
+  TControl extends FieldValues = FieldValues,
+  TFieldName extends FieldPath<TControl> = FieldPath<TControl>,
+>({
+  label,
+  description,
+  control,
+  field,
+  disabled,
+  defaultValue,
+  className,
+  ...props
+}: TextAreaProps &
+  ComposedFieldProps &
+  Partial<WithFieldControlProps<TControl, TFieldName>>) {
+  if (control && field) {
+    return (
+      <FieldControl
+        control={control}
+        field={field}
+        disabled={disabled}
+        defaultValue={defaultValue}
+        className={className}
+      >
+        <Field>
+          {label ? <Label>{label}</Label> : null}
+          <Textarea disabled={disabled} {...props} />
+          {description ? <Description>{description}</Description> : null}
+        </Field>
+      </FieldControl>
+    );
+  }
+
+  return (
+    <Field isDisabled={disabled} className={className}>
+      {label ? <Label>{label}</Label> : null}
+      <Textarea disabled={disabled} {...props} />
+      {description ? <Description>{description}</Description> : null}
+    </Field>
+  );
+}
