@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import type { MutationHookResult, QueryHookResult } from "react-query-kit";
-import { Info } from "@phosphor-icons/react";
+import { InfoIcon } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/fieldset";
 import { ProgressCircle } from "@/components/ui/progress";
 import { Code, Text } from "@/components/ui/text";
 import { EnhancerGroup } from "@/components/ui/utils";
@@ -71,9 +72,9 @@ export function QueryResolver<
     return (
       <div className="flex items-center justify-center px-4 py-16">
         <div>
-          <Text level="label-md">Error</Text>
+          <Label>Error</Label>
           <Text>Failed to load data. Try again.</Text>
-          <Text level="paragraph-xs">
+          <Text size="xs">
             <Code>ERR:{getErrorMessage(query.error)}</Code>
           </Text>
           <div className="mt-2">
@@ -141,7 +142,7 @@ export function MutationResolver<TData, TError, TVariables>({
     return (
       <div className="flex items-center justify-center px-4 py-16">
         <div>
-          <Text level="label-md">Error</Text>
+          <Label size="md">Error</Label>
           <Text>Failed to load data. Try again.</Text>
         </div>
       </div>
@@ -203,8 +204,8 @@ export function QueryErrorBanner<TData, TError>({
       query={query}
       loadingElement={null}
       errorElement={
-        <EnhancerGroup className="w-full rounded-[var(--surface-radius)] border border-red-700 bg-red-50 p-2">
-          <Info weight="fill" className="text-red-500" />
+        <EnhancerGroup className="w-full rounded-[var(--surface-radius)] border border-danger-700 bg-brand-danger-subtle p-2">
+          <InfoIcon weight="fill" className="text-brand-danger-text" />
         </EnhancerGroup>
       }
     >

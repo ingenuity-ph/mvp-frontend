@@ -18,10 +18,12 @@ export interface AuthenticatedRequestAddon {
  * wretch().addon(BasicAuthAddon)
  * ```
  */
-export const authenticatedRequest: WretchAddon<AuthenticatedRequestAddon> = {
-  wretch: {
-    authenticate() {
-      return this.options({ credentials: "include" });
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const AuthenticatedRequestAddon: WretchAddon<AuthenticatedRequestAddon> =
+  {
+    wretch: {
+      authenticate() {
+        return this.options({ credentials: "include" });
+      },
     },
-  },
-};
+  };

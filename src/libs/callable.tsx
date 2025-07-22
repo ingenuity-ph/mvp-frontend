@@ -6,12 +6,9 @@
  */
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  DialogActions,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { AlertDialog, DialogActions } from "@/components/ui/dialog";
+import { Description } from "@/components/ui/fieldset";
+import { Title } from "@/components/ui/text";
 
 export type PrivateResolve<Response> = (
   value: Response | PromiseLike<Response>
@@ -196,8 +193,8 @@ export const AreyouSure = createCallable<
 >(({ description, confirmText, call }) => {
   return (
     <AlertDialog defaultOpen>
-      <DialogTitle>Confirm Action</DialogTitle>
-      <DialogDescription>{description}</DialogDescription>
+      <Title>Confirm Action</Title>
+      <Description>{description}</Description>
       <DialogActions>
         <Button
           variant="plain"
