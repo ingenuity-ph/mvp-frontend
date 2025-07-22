@@ -42,6 +42,7 @@ if (rootElement && !rootElement.innerHTML) {
           api_host: env.VITE_PUBLIC_POSTHOG_HOST,
           capture_exceptions: true, // This enables capturing exceptions using Error Tracking
           debug: import.meta.env.MODE === "development",
+          enable_recording_console_log: true,
         }}
       >
         <RouterProvider router={router} />
