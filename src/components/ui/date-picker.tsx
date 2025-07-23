@@ -53,6 +53,21 @@ const parseToDate = (value: unknown) => {
   return undefined;
 };
 
+const parseToDateRange = <T extends DateValue>(value: unknown) => {
+  const parsedRange = z
+    .object({ start: z.coerce.date(), end: z.coerce.date() })
+    .safeParse(value);
+
+  if (parsedRange.success) {
+    return {
+      start: parseAbsoluteToLocal(parsedRange.data.start.toISOString()),
+      end: parseAbsoluteToLocal(parsedRange.data.end.toISOString()),
+    } as AriaDateRangePickerProps<T>["value"];
+  }
+
+  return undefined;
+};
+
 type OwnProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -226,19 +241,17 @@ export function DateRangePickerField<
       granularity="day"
       {...mergeProps(props, {
         ...fieldControl,
-        value: parseToDate(fieldControl?.value),
-        onChange: (value: DateValue | null) => {
-          fieldControl?.onChange(
-            value?.toDate(getLocalTimeZone()).toISOString()
-          );
+        value: parseToDateRange(fieldControl?.value),
+        onChange: (value) => {
+          fieldControl?.onChange({
+            start: value?.start.toDate(getLocalTimeZone()).toISOString(),
+            end: value?.end.toDate(getLocalTimeZone()).toISOString(),
+          });
         },
-      })}
+      } satisfies Partial<AriaDateRangePickerProps<T>>)}
       className={cn([className, fieldLayoutStyles])}
     >
-      {
-        // eslint-disable-next-line @eslint-react/no-leaked-conditional-rendering
-        label && <Label>{label}</Label>
-      }
+      {label ? <Label>{label}</Label> : null}
       <div
         data-slot="control"
         className={cn("group", inputSlots().root(), inputStyles({ adjoined }))}
