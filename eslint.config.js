@@ -4,6 +4,7 @@ import storybook from "eslint-plugin-storybook";
 import { sheriff, tseslint } from "eslint-config-sheriff";
 import pluginQuery from "@tanstack/eslint-plugin-query";
 import pluginRouter from "@tanstack/eslint-plugin-router";
+import reactYouMightNotNeedAnEffect from "eslint-plugin-react-you-might-not-need-an-effect";
 
 const sheriffOptions = {
   react: true,
@@ -24,6 +25,7 @@ export default tseslint.config(sheriff(sheriffOptions), {
   extends: [
     ...pluginQuery.configs["flat/recommended"],
     ...pluginRouter.configs["flat/recommended"],
+    ...reactYouMightNotNeedAnEffect,
   ],
   rules: {
     "fsecond/prefer-destructured-optionals": "off",
