@@ -102,7 +102,7 @@ export function Drawer({
       {...props}
       isDismissable={isDismissable}
       className={cn([
-        "fixed inset-0 flex w-screen justify-center overflow-y-auto bg-zinc-950/25 px-2 py-2 focus:outline-0 sm:px-6 sm:py-8 lg:px-8 lg:py-16 dark:bg-zinc-950/65",
+        "fixed inset-0 flex w-screen justify-center overflow-y-auto bg-neutral-950/25 px-2 py-2 focus:outline-0 sm:px-6 sm:py-8 lg:px-8 lg:py-16 dark:bg-neutral-950/65",
         // Enter Animation
         "entering:opacity-100 entering:duration-100 entering:ease-out opacity-0",
         // Exit Animation
@@ -156,7 +156,7 @@ export function Drawer({
                       className,
                       drawerStyles.variants.size[size],
                       // Base
-                      "bg-surface-background sm:rounded-surface rounded-t-surface h-full min-w-0 overflow-y-auto p-[var(--gutter,var(--spacing-surface))] ring-1 shadow-lg ring-zinc-950/10 outline-none sm:mb-auto dark:ring-white/10 forced-colors:outline"
+                      "bg-surface-background sm:rounded-surface rounded-t-surface h-full min-w-0 overflow-y-auto p-[var(--gutter,var(--spacing-surface))] ring-1 shadow-lg ring-neutral-950/10 outline-none sm:mb-auto dark:ring-white/10 forced-colors:outline"
                     )}
                   >
                     {children}

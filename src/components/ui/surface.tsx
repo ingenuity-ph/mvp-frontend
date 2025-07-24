@@ -6,16 +6,21 @@ import { cn } from "./utils";
 const surfaceStyles = tv({
   base: [
     // Base
-    "rounded-[var(--radius-surface)] p-[var(--gutter,var(--spacing-surface))] forced-colors:outline",
+    "rounded-[var(--surface-radius,var(--radius-surface))] p-[var(--gutter,var(--spacing-surface))] forced-colors:outline",
     // Layout
     "flex gap-[var(--spacing-surface-gap,var(--spacing-surface))]",
-    // Border
-    "ring-1 ring-[var(--surface-border-color,var(--color-surface-border))]",
     //
     "[&>[data-slot=header]+[data-slot=content]]:mt-4",
-    "[&>[data-slot=content]+[data-slot=footer]]:mt-4",
+    "[&>[data-slot=content]+[data-slot=footer]]:mt-8",
   ],
   variants: {
+    border: {
+      none: "",
+      default: [
+        // Border
+        "ring-1 ring-[var(--surface-border-color,var(--color-surface-border))]",
+      ],
+    },
     orientation: {
       vertical: "flex-col",
       horizontal: "flex-row",
@@ -46,6 +51,7 @@ const surfaceStyles = tv({
     color: "default",
     inset: "none",
     offset: "none",
+    border: "default",
   },
 });
 

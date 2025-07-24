@@ -13,7 +13,7 @@ import {
   useSlottedContext,
 } from "react-aria-components";
 import { useListData } from "react-stately";
-import { X, XIcon } from "@phosphor-icons/react";
+import { XIcon } from "@phosphor-icons/react";
 import { Button } from "./button";
 import { Description, FieldContext, FieldControllerContext } from "./fieldset";
 import { cn } from "./utils";
@@ -233,7 +233,7 @@ export function MultipleSelect<T extends SelectedKey>({
         // Focus ring
         "after:pointer-events-none after:absolute after:inset-0 after:rounded-[var(--radius-control)] after:ring-transparent after:ring-inset sm:has-[:focus]:after:ring-2 sm:has-[:focus]:after:ring-blue-500",
         // Disabled state
-        "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
+        "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-neutral-950/5 before:has-[[data-disabled]]:shadow-none",
         // Invalid state
         "before:has-[[data-invalid]]:shadow-danger-500/10",
       ])}
@@ -247,13 +247,13 @@ export function MultipleSelect<T extends SelectedKey>({
             // Horizontal padding
             "pl-[calc(theme(spacing[3.5])-1px)] sm:pl-[calc(theme(spacing.3)-1px)]",
             // Border
-            "border-brand-border border has-[[data-hovered]]:border-zinc-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
+            "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
             // Background color
             "bg-transparent dark:bg-white/5",
             // Invalid state
             "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
             // Disabled state
-            "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15"
+            "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15"
           )}
         >
           <TagGroup
@@ -278,7 +278,7 @@ export function MultipleSelect<T extends SelectedKey>({
                       // base
                       "inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-0.5 text-sm/5 font-medium sm:text-xs/5 forced-colors:outline",
                       // Color
-                      "bg-zinc-600/10 text-zinc-700 group-data-[hovered]:bg-zinc-600/20 dark:bg-white/5 dark:text-zinc-400 dark:group-data-[hovered]:bg-white/10",
+                      "bg-neutral-600/10 text-neutral-700 group-data-[hovered]:bg-neutral-600/20 dark:bg-white/5 dark:text-neutral-400 dark:group-data-[hovered]:bg-white/10",
                     ])}
                   >
                     <span>{item.name}</span>
@@ -320,7 +320,7 @@ export function MultipleSelect<T extends SelectedKey>({
                   // Horizontal Padding
                   "pr-[calc(theme(spacing.10)-1px)] sm:pr-[calc(theme(spacing.9)-1px)]",
                   // Typography
-                  "text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white",
+                  "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
                   // Hide default focus styles
                   "outline-none",
                   // Vertical Padding
@@ -354,7 +354,7 @@ export function MultipleSelect<T extends SelectedKey>({
                 onClick={() => triggerButtonRef.current?.click()}
               >
                 <svg
-                  className="size-5 stroke-zinc-500 group-has-[[data-disabled]]:stroke-zinc-600 sm:size-4 dark:stroke-zinc-400 forced-colors:stroke-[CanvasText]"
+                  className="size-5 stroke-neutral-500 group-has-[[data-disabled]]:stroke-neutral-600 sm:size-4 dark:stroke-neutral-400 forced-colors:stroke-[CanvasText]"
                   viewBox="0 0 16 16"
                   aria-hidden="true"
                   fill="none"
@@ -407,9 +407,9 @@ export function MultipleSelect<T extends SelectedKey>({
                   // Handle scrolling when menu won't fit in viewport
                   "overflow-y-auto overscroll-contain",
                   // Popover background
-                  "bg-white/95 backdrop-blur-xl dark:bg-zinc-800/75",
+                  "bg-white/95 backdrop-blur-xl dark:bg-neutral-800/75",
                   // Shadows
-                  "shadow-lg ring-1 ring-zinc-950/10 dark:ring-white/10 dark:ring-inset",
+                  "shadow-lg ring-1 ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
                 ])}
               >
                 {children}

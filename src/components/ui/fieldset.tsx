@@ -64,7 +64,7 @@ export function Fieldset({
         data-slot="fieldset"
         className={cn(
           className,
-          "[&>*+[data-slot=control]]:mt-3 [&>[data-slot=description]]:mt-1"
+          "[&>*+[data-slot=control]]:mt-6 [&>[data-slot=description]]:mt-1"
         )}
       />
     </Provider>

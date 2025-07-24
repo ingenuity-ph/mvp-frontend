@@ -71,6 +71,7 @@ export function RangeCalendar<T extends DateValue>({
       <CalendarHeader />
       <div className="flex snap-x items-start justify-stretch gap-6 overflow-auto sm:gap-10">
         {Array.from({ length: visibleDuration?.months ?? 1 }).map(
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           (_, index) => {
             // FIXME: think of another way to generate key
             const id = index + 1;

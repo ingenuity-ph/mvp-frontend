@@ -41,7 +41,7 @@ export function Divider({
                 "after:relative after:basis-[calc(100%-var(--child-position))] after:[block-size:1px] after:[margin-inline-start:min((100%-var(--child-position))*999,var(--gap))] dark:before:border-white/5",
                 // Colors
                 soft &&
-                  "before:border-zinc-950/5 after:border-zinc-950/5 before:dark:border-white/5 after:dark:border-white/5",
+                  "before:border-neutral-950/5 after:border-neutral-950/5 before:dark:border-white/5 after:dark:border-white/5",
                 !soft &&
                   "before:border-surface-border after:border-surface-border before:dark:border-white/10 after:dark:border-white/10",
               ]
@@ -51,7 +51,7 @@ export function Divider({
                 // Inset
                 insetStyle[inset],
               ],
-          soft && "border-zinc-950/5 dark:border-white/5",
+          soft && "border-neutral-950/5 dark:border-white/5",
           !soft && "border-surface-border dark:border-white/10"
         )}
       />
@@ -82,7 +82,7 @@ export function Divider({
               "after:relative after:basis-[calc(100%-var(--child-position))] after:[block-size:1px] after:[margin-inline-start:min((100%-var(--child-position))*999,var(--gap))] dark:before:border-white/5",
               // Colors
               soft &&
-                "before:border-zinc-950/5 after:border-zinc-950/5 before:dark:border-white/5 after:dark:border-white/5",
+                "before:border-neutral-950/5 after:border-neutral-950/5 before:dark:border-white/5 after:dark:border-white/5",
               !soft &&
                 "before:border-surface-border after:border-surface-border before:dark:border-white/10 after:dark:border-white/10",
             ]
@@ -92,7 +92,7 @@ export function Divider({
               // Inset
               insetStyle[inset],
               // Colors
-              soft && "border-zinc-950/5 dark:border-white/5",
+              soft && "border-neutral-950/5 dark:border-white/5",
               !soft && "border-surface-border",
             ]
       )}

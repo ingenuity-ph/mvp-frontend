@@ -7,7 +7,8 @@ import * as pagination from "@zag-js/pagination";
 import { normalizeProps, useMachine } from "@zag-js/react";
 import { DEFAULT_PAGE_SIZE } from "@/libs/api/constants";
 import { Button, plainButtonStyles } from "./button";
-import { Strong, Text } from "./text";
+import { Description } from "./fieldset";
+import { Strong } from "./text";
 import { cn } from "./utils";
 
 export function Pagination({
@@ -119,7 +120,7 @@ export function PaginationPage({
       className={cn(
         className,
         "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg",
-        current && "before:bg-zinc-950/5 dark:before:bg-white/10"
+        current && "before:bg-neutral-950/5 dark:before:bg-white/10"
       )}
     >
       <span className="-mx-0.5">{children}</span>
@@ -138,7 +139,7 @@ export function PaginationGap({
       {...props}
       className={cn(
         className,
-        "w-[2.25rem] text-center text-sm/6 font-semibold text-zinc-950 select-none dark:text-white"
+        "w-[2.25rem] text-center text-sm/6 font-semibold text-neutral-950 select-none dark:text-white"
       )}
     >
       {children}
@@ -179,9 +180,9 @@ export function DefaultPagination({ count }: { count?: number }) {
   return (
     <div>
       {api.totalPages <= 1 && (
-        <Text level="label-sm">
+        <Description>
           Showing all <Strong>{api.count}</Strong> item/s
-        </Text>
+        </Description>
       )}
       {api.totalPages > 1 && (
         <nav {...api.getRootProps()}>
@@ -196,7 +197,7 @@ export function DefaultPagination({ count }: { count?: number }) {
                   //
                   "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg disabled:opacity-50",
                   //
-                  "data-selected:before:bg-zinc-950/5 dark:data-selected:before:bg-white/10"
+                  "data-selected:before:bg-neutral-950/5 dark:data-selected:before:bg-white/10"
                 )}
               >
                 <span className="-mx-0.5">
@@ -219,7 +220,7 @@ export function DefaultPagination({ count }: { count?: number }) {
                         //
                         "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg",
                         //
-                        "data-selected:before:bg-zinc-950/5 dark:data-selected:before:bg-white/10"
+                        "data-selected:before:bg-neutral-950/5 dark:data-selected:before:bg-white/10"
                       )}
                     >
                       {page.value}
@@ -245,7 +246,7 @@ export function DefaultPagination({ count }: { count?: number }) {
                   //
                   "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg",
                   //
-                  "data-selected:before:bg-zinc-950/5 dark:data-selected:before:bg-white/10"
+                  "data-selected:before:bg-neutral-950/5 dark:data-selected:before:bg-white/10"
                 )}
               >
                 <span className="-mx-0.5">

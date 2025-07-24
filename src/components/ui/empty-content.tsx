@@ -10,7 +10,7 @@ export function EmptyContent({
 }) {
   return (
     <div
-      className="flex h-60 flex-col items-center justify-center gap-y-4 text-zinc-700"
+      className="flex h-60 flex-col items-center justify-center gap-y-4 text-neutral-700"
       data-testid="empty-document-state"
     >
       <EmptyIcon className="h-12 w-12" />

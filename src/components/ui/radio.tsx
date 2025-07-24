@@ -73,15 +73,15 @@ const base = [
   "after:absolute after:inset-0 after:rounded-full after:shadow-[inset_0_1px_theme(colors.white/15%)]",
   "dark:after:-inset-px dark:after:hidden dark:after:rounded-full dark:group-data-[selected]:after:block",
   // Indicator color (light mode)
-  "[--radio-indicator:transparent] group-data-selected:[--radio-indicator:var(--radio-checked-indicator)] group-data-[selected]:group-data-[hovered]:[--radio-indicator:var(--radio-checked-indicator)] group-data-[hovered]:[--radio-indicator:theme(colors.zinc.900/10%)]",
+  "[--radio-indicator:transparent] group-data-selected:[--radio-indicator:var(--radio-checked-indicator)] group-data-[selected]:group-data-[hovered]:[--radio-indicator:var(--radio-checked-indicator)] group-data-[hovered]:[--radio-indicator:var(--color-neutral-900)]/10",
   // Indicator color (dark mode)
-  "dark:group-data-selected:group-data-[hovered]:[--radio-indicator:var(--radio-checked-indicator)] dark:group-data-[hovered]:[--radio-indicator:theme(colors.zinc.700)]",
+  "dark:group-data-selected:group-data-[hovered]:[--radio-indicator:var(--radio-checked-indicator)] dark:group-data-[hovered]:[--radio-indicator:var(--color-neutral-700)]",
   // Focus ring
   "group-data-[focused]:outline group-data-[focused]:outline-2 group-data-[focused]:outline-offset-2 group-data-[focused]:outline-blue-500",
   // Disabled state
   "group-data-[disabled]:opacity-50",
-  "group-data-[disabled]:border-neutral-950/25 group-data-[disabled]:bg-neutral-950/5 group-data-[disabled]:[--radio-checked-indicator:theme(colors.zinc.950/50%)] group-data-[disabled]:before:bg-transparent",
-  "dark:group-data-[disabled]:border-white/20 dark:group-data-[disabled]:bg-white/[2.5%] dark:group-data-[disabled]:[--radio-checked-indicator:theme(colors.white/50%)] dark:group-data-[disabled]:group-data-[selected]:after:hidden",
+  "group-data-[disabled]:border-neutral-950/25 group-data-[disabled]:bg-neutral-950/5 group-data-[disabled]:[--radio-checked-indicator:var(--color-neutral-950)]/50 group-data-[disabled]:before:bg-transparent",
+  "dark:group-data-[disabled]:border-white/20 dark:group-data-[disabled]:bg-white/[2.5%] dark:group-data-[disabled]:[--radio-checked-indicator:var(--color-white)]/50 dark:group-data-[disabled]:group-data-[selected]:after:hidden",
 ];
 
 const colors = {

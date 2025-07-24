@@ -12,7 +12,7 @@ export function DescriptionList({
         className,
         "group text-base/6 sm:text-sm/6",
         // Layout, use a different layout when a there are items that are grouped
-        "grid grid-cols-1 has-not-[[data-component=description-group]]:sm:grid-cols-[var(--cols,min(50%,theme(spacing.80))_auto)] has-data-[component=description-group]:sm:grid-cols-[repeat(var(--cols,2),minmax(0,1fr))]",
+        "grid grid-cols-1 has-not-[[data-component=description-group]]:sm:grid-cols-[var(--cols,min(50%,theme(spacing.80))_auto)] has-data-[component=description-group]:sm:grid-cols-[repeat(var(--cols,2),minmax(0,1fr))]"
       )}
     />
   );
@@ -44,11 +44,11 @@ export function DescriptionTerm({
       {...props}
       className={cn(
         className,
-        "col-start-1 text-zinc-500 dark:text-zinc-400",
+        "col-start-1 text-neutral-500 dark:text-neutral-400",
         // Border
-        "border-t border-zinc-950/5 group-data-[component=description-group]/dl:border-0 first:border-none sm:border-zinc-950/5 dark:border-white/5 sm:dark:border-white/5",
+        "border-t border-neutral-950/5 group-data-[component=description-group]/dl:border-0 first:border-none sm:border-neutral-950/5 dark:border-white/5 sm:dark:border-white/5",
         // Spacing
-        "pt-3 group-data-[component=description-group]/dl:py-0 group-data-[component=description-group]/dl:pt-0 sm:py-3",
+        "pt-3 group-data-[component=description-group]/dl:py-0 group-data-[component=description-group]/dl:pt-0 sm:py-3"
       )}
     />
   );
@@ -63,11 +63,11 @@ export function DescriptionDetails({
       {...props}
       className={cn(
         className,
-        "text-zinc-950 dark:text-white",
+        "text-neutral-950 dark:text-white",
         // Border
-        "sm:border-zinc-950/5 group-not-data-[component=description-group]:sm:border-t dark:sm:border-white/5 sm:[&:nth-child(2)]:border-none",
+        "sm:border-neutral-950/5 group-not-data-[component=description-group]:sm:border-t dark:sm:border-white/5 sm:[&:nth-child(2)]:border-none",
         // Spacing
-        "pt-1 pb-3 group-data-[component=description-group]/dl:py-0 group-data-[component=description-group]/dl:pt-0 sm:py-3",
+        "pt-1 pb-3 group-data-[component=description-group]/dl:py-0 group-data-[component=description-group]/dl:pt-0 sm:py-3"
       )}
     />
   );

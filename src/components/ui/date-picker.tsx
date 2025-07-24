@@ -121,6 +121,7 @@ export function DatePickerField<
   return (
     <AriaDatePicker
       data-slot="control"
+      granularity="day"
       {...mergeProps(props, {
         ...fieldControl,
         value: parseToDate(fieldControl?.value),

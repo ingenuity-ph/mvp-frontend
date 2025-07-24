@@ -77,9 +77,9 @@ export function FileUpload({
     >
       <div
         data-slot="upload-container"
-        className="rounded-surface border-brand-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-danger-500"
+        className="rounded-surface border-control-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-danger-500"
       >
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-200 p-1">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neutral-200 p-1">
           <UploadSimpleIcon className="size-5" />
         </span>
         <div className="flex items-baseline gap-1.5">
@@ -267,7 +267,7 @@ export function Dropzone({
     <div
       data-slot="upload-container"
       className={cn([
-        "rounded-surface border-brand-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-danger-500",
+        "rounded-surface border-control-border p-surface flex min-h-32 flex-col items-center justify-center gap-2 border border-dashed bg-neutral-50 group-data-invalid/field:border-danger-500",
         //
         className,
       ])}

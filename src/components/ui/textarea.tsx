@@ -53,7 +53,7 @@ export const Textarea = forwardRef(function Textarea(
         // Focus ring
         "after:pointer-events-none after:absolute after:inset-0 after:rounded-[var(--radius-control)] after:ring-transparent after:ring-inset sm:has-[[data-focus-visible]]:after:ring-2 sm:has-[[data-focus-visible]]:after:ring-blue-500",
         // Disabled state
-        "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
+        "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-neutral-950/5 before:has-[[data-disabled]]:shadow-none",
         // Invalid state
         "before:has-[[data-invalid]]:shadow-danger-500/10",
       ])}
@@ -65,15 +65,14 @@ export const Textarea = forwardRef(function Textarea(
         className={cn([
           // Basic layout
           "relative flex rounded-[var(--radius-control)]",
-
           // Border
-          "border-brand-border border has-[[data-hovered]]:border-zinc-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
+          "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
           // Background color
           "bg-transparent dark:bg-white/5",
           // Invalid state
           "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
           // Disabled state
-          "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
+          "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
         ])}
       >
         <AriaTextArea
@@ -83,7 +82,7 @@ export const Textarea = forwardRef(function Textarea(
             // Layout
             "block w-full appearance-none bg-transparent",
             // Typography
-            "text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white",
+            "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
             // Hide default focus styles
             "focus-within:outline-none focus:outline-none focus-visible:outline-none",
             // Padding
@@ -121,11 +120,7 @@ export function TextareaField<
         defaultValue={defaultValue}
         className={className}
       >
-        <Field>
-          {label ? <Label>{label}</Label> : null}
-          <Textarea disabled={disabled} {...props} />
-          {description ? <Description>{description}</Description> : null}
-        </Field>
+        <TextareaField {...props} label={label} description={description} />
       </FieldControl>
     );
   }

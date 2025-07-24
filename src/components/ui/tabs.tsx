@@ -8,19 +8,16 @@ import {
   Tabs as AriaTabs,
   type TabsProps,
 } from "react-aria-components";
+import { plainButtonStyles } from "./button";
+import { surfaceStyles } from "./surface";
 import { cn } from "./utils";
-
-type Variants = "outline" | "plain";
 
 export function Tabs(props: TabsProps) {
   // eslint-disable-next-line react/destructuring-assignment
   return <AriaTabs {...props} className={cn([props.className])} />;
 }
 
-export function TabList<T extends object>({
-  variant = "outline",
-  ...props
-}: TabListProps<T> & { variant?: Variants }) {
+export function TabList<T extends object>({ ...props }: TabListProps<T>) {
   return (
     <AriaTabList
       {...props}
@@ -28,9 +25,7 @@ export function TabList<T extends object>({
         props.className,
         [
           // Base
-          "border-brand-border flex border-b",
-          //   Variant
-          variant === "outline" && "dark:divide-brand-border divide-x",
+          "border-surface-border flex border-b",
         ],
       ])}
     />
@@ -46,26 +41,10 @@ export function Tab({
       {...props}
       className={cn([
         props.className,
-        // Base
-        "relative isolate inline-flex cursor-default items-center justify-center gap-x-2 text-base/6 font-medium",
-        // Focus
-        "focus:outline-none focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-500",
-        // Disabled
-        "disabled:opacity-50",
-        // Icon
-        "forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText] [&>[data-slot=icon]]:-mx-0.5 [&>[data-slot=icon]]:my-0.5 [&>[data-slot=icon]]:size-5 [&>[data-slot=icon]]:shrink-0 [&>[data-slot=icon]]:text-[--btn-icon] [&>[data-slot=icon]]:sm:my-1 [&>[data-slot=icon]]:sm:size-4",
-        // Group
-        "group relative",
-        // Sizing (48px)
-        "px-[calc(theme(spacing[5])-1px)] py-[calc(theme(spacing[3])-1px)]",
-        // Variant
-        "hover:bg-brand-primary-50 hover:text-brand-primary-600 pressed:bg-brand-primary-950/[2.5%] pressed:text-zinc-950 border-zinc-950/10 text-zinc-950",
-        // Dark mode
-        "dark:pressed:bg-white/10 dark:text-white dark:hover:bg-white/10",
-        // Icon
-        "pressed:[--btn-icon:theme(colors.zinc.700)] [--btn-icon:theme(colors.zinc.500)] hover:[--btn-icon:theme(colors.zinc.700)] dark:[--btn-icon:theme(colors.zinc.500)] dark:hover:[--btn-icon:theme(colors.zinc.400)] dark:data-[active]:[--btn-icon:theme(colors.zinc.400)]",
-        // Selected
-        "selected:text-brand-primary-600",
+        // Extend Button
+        plainButtonStyles({ color: "neutral" }),
+        //
+        "group/tab",
       ])}
     >
       {children}
@@ -73,9 +52,9 @@ export function Tab({
         aria-hidden="true"
         className={cn(
           // Base
-          "absolute inset-x-0 bottom-0 h-0.5",
+          "absolute inset-x-0 bottom-0 h-0.5 translate-y-1/2",
           // Selected
-          "group-data-selected:bg-brand-primary-500 group-not-data-selected:border-transparent",
+          "group-[[data-selected]]/tab:bg-primary-500 group-not-[[data-selected]]/tab:border-transparent"
         )}
       />
     </AriaTab>
@@ -89,12 +68,10 @@ export function TabPanel({ bleed = false, ...props }: TabPanelProps) {
       {...props}
       className={cn(
         props.className,
-        // Base
-        "rounded-[var(--surface-radius)] forced-colors:outline",
-        // Layout
-        "flex flex-col gap-[var(--gutter,var(--surface-gutter))]",
+        // Inherit surface styles
+        surfaceStyles({ color: "none", border: "none" }),
         // Bleed
-        !bleed && "p-[var(--gutter,theme(spacing.4))]",
+        bleed && "[--gutter:0]"
       )}
     />
   );

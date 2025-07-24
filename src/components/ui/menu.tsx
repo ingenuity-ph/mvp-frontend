@@ -16,7 +16,7 @@ import { cn } from "./utils";
  */
 export function Menu<T extends object>({
   className,
-  placement,
+  placement = "bottom end",
   ...props
 }: AriaMenuProps<T> & Pick<PopoverProps, "placement">) {
   return (
@@ -25,7 +25,7 @@ export function Menu<T extends object>({
         {...props}
         className={cn(className, "outline-none", [
           // Base
-          "min-w-(--trigger-width) py-1",
+          "min-w-(--trigger-width) w-max isolate py-1",
           // Define grid at the menu level if subgrid is supported
           "supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_1.5rem_0.5rem_auto]",
         ])}
@@ -81,7 +81,7 @@ export function MenuSection<T extends object>({
     "col-span-full grid grid-cols-[auto_1fr_1.5rem_0.5rem_auto] items-center supports-[grid-template-columns:subgrid]:grid-cols-subgrid",
     // Icons
     "*:data-[slot=icon]:col-start-1 *:data-[slot=icon]:row-start-1 *:data-[slot=icon]:mr-2.5 *:data-[slot=icon]:-ml-0.5 *:data-[slot=icon]:size-5 sm:*:data-[slot=icon]:mr-2 sm:*:data-[slot=icon]:size-4",
-    "*:data-[slot=icon]:text-zinc-500 focus:*:data-[slot=icon]:text-brand-primary dark:*:data-[slot=icon]:text-zinc-400 dark:focus:*:data-[slot=icon]:text-white",
+    "*:data-[slot=icon]:text-neutral-500 focus:*:data-[slot=icon]:text-brand-primary dark:*:data-[slot=icon]:text-neutral-400 dark:focus:*:data-[slot=icon]:text-white",
     // Avatar
     "*:data-[slot=avatar]:mr-2.5 *:data-[slot=avatar]:-ml-1 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:mr-2 sm:*:data-[slot=avatar]:size-5"
   );
@@ -107,7 +107,7 @@ export function MenuDescription(props: AriaTextProps) {
       {...props}
       slot="description"
       className={cn(
-        "col-span-2 col-start-2 row-start-2 text-sm/5 text-zinc-500 group-focus:text-white sm:text-xs/5 dark:text-zinc-400 forced-colors:group-focus:text-[HighlightText]"
+        "col-span-2 col-start-2 row-start-2 text-sm/5 text-neutral-500 group-focus:text-white sm:text-xs/5 dark:text-neutral-400 forced-colors:group-focus:text-[HighlightText]"
       )}
     />
   );

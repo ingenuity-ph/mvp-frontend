@@ -41,7 +41,7 @@ export function TagInput(props: Partial<TagInputProps>) {
         // Focus ring
         "after:pointer-events-none after:absolute after:inset-0 after:rounded-[var(--radius-control)] after:ring-transparent after:ring-inset sm:has-[:focus]:after:ring-2 sm:has-[:focus]:after:ring-blue-500",
         // Disabled state
-        "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-zinc-950/5 before:has-[[data-disabled]]:shadow-none",
+        "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-neutral-950/5 before:has-[[data-disabled]]:shadow-none",
         // Invalid state
         "before:has-[[data-invalid]]:shadow-danger-500/10",
       ])}
@@ -55,13 +55,13 @@ export function TagInput(props: Partial<TagInputProps>) {
           // Horizontal Padding - moved the horizontal padding here to handle enhancers
           "px-[calc(theme(spacing[3.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)]",
           // Border
-          "border-brand-border border has-[[data-hovered]]:border-zinc-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
+          "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
           // Background color
           "bg-transparent dark:bg-white/5",
           // Invalid state
           "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
           // Disabled state
-          "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
+          "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
         ])}
       >
         <div
@@ -82,7 +82,7 @@ export function TagInput(props: Partial<TagInputProps>) {
                   // Icon
                   "forced-colors:[--btn-icon:ButtonText] forced-colors:data-[hovered]:[--btn-icon:ButtonText] [&_[data-slot=icon]]:-mx-0.5 [&_[data-slot=icon]]:my-0.5 [&_[data-slot=icon]]:size-5 [&_[data-slot=icon]]:shrink-0 [&_[data-slot=icon]]:text-[--btn-icon] [&_[data-slot=icon]]:sm:my-1 [&_[data-slot=icon]]:sm:size-4",
                   //Color
-                  "bg-zinc-600/10 text-zinc-700 group-data-[hovered]:bg-zinc-600/20 dark:bg-white/5 dark:text-zinc-400 dark:group-data-[hovered]:bg-white/10",
+                  "bg-neutral-600/10 text-neutral-700 group-data-[hovered]:bg-neutral-600/20 dark:bg-white/5 dark:text-neutral-400 dark:group-data-[hovered]:bg-white/10",
                 ])}
               >
                 <div
@@ -106,7 +106,7 @@ export function TagInput(props: Partial<TagInputProps>) {
             // Layout
             "inline-block min-w-0 appearance-none bg-transparent",
             // Typography
-            "text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white",
+            "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
             // Hide default focus styles
             "focus:outline-none",
             // Vertical Padding - we only apply the vertical padding to the input itself to have consistent dimensions
