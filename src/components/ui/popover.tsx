@@ -4,9 +4,35 @@ import {
   type PopoverProps as AriaPopoverProps,
 } from "react-aria-components";
 import { surfaceStyles } from "./surface";
-import { cn } from "./utils";
+import { cn, createSplitProps } from "./utils";
 
 export type PopoverProps = AriaPopoverProps;
+
+/**
+ * popover props that are passed through to the underlying AriaPopover component
+ * if we are composing it with another components (e.g. Menu,Combobox)
+ */
+export type PassThroughPopoverProps = Pick<
+  AriaPopoverProps,
+  | "placement"
+  | "arrowBoundaryOffset"
+  | "containerPadding"
+  | "crossOffset"
+  | "isKeyboardDismissDisabled"
+>;
+/**
+ * Handles splitting the popover props when composing it with another components (e.g. Menu,Combobox)
+ */
+export const splitPopoverProps = <T extends PassThroughPopoverProps>(
+  props: T
+) =>
+  createSplitProps<PassThroughPopoverProps>()(props, [
+    "arrowBoundaryOffset",
+    "placement",
+    "containerPadding",
+    "isKeyboardDismissDisabled",
+    "crossOffset",
+  ]);
 
 export function Popover({
   children,
@@ -34,6 +60,8 @@ export function Popover({
         "slide-in-from-left-1 entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out exiting:slide-out-to-bottom-1",
         // Placement aware animation
         "data-[placement=bottom]:entering:slide-in-from-top-1 data-[placement=left]:entering:slide-in-from-right-1 data-[placement=right]:entering:slide-in-from-left-1 data-[placement=top]:entering:slide-in-from-bottom-1",
+        // Shadows
+        "ring-1 shadow-lg ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
         //
         props.className,
       ])}

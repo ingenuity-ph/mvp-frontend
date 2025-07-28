@@ -8,44 +8,54 @@ import {
   Text as AriaText,
   type TextProps as AriaTextProps,
 } from "react-aria-components";
-import { Popover, type PopoverProps } from "./popover";
+import { tv, type VariantProps } from "tailwind-variants";
+import type { ColorMap } from "./constants";
+import { Description } from "./fieldset";
+import {
+  type PassThroughPopoverProps,
+  Popover,
+  splitPopoverProps,
+} from "./popover";
 import { cn } from "./utils";
 
 /**
  * Menu with forwardedRef.
  */
-export function Menu<T extends object>({
-  className,
-  placement = "bottom end",
-  ...props
-}: AriaMenuProps<T> & Pick<PopoverProps, "placement">) {
+export function Menu<T extends object>(
+  props: AriaMenuProps<T> & PassThroughPopoverProps
+) {
+  const [popoverProps, menuProps] = splitPopoverProps(props);
+  const { className } = menuProps;
+
   return (
-    <Popover bleed placement={placement}>
+    <Popover bleed {...popoverProps}>
       <AriaMenu
-        {...props}
+        {...menuProps}
         className={cn(className, "outline-none", [
-          // Base
-          "min-w-(--trigger-width) w-max isolate py-1",
+          // Base styles
+          "isolate max-h-64 w-max min-w-[var(--trigger-width)] scroll-py-1 rounded-radius-control py-1 select-none",
+          // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
+          "outline outline-transparent focus:outline-none",
+          // Handle scrolling when menu won't fit in viewport
+          "overflow-y-auto overscroll-contain",
           // Define grid at the menu level if subgrid is supported
           "supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_1.5rem_0.5rem_auto]",
+          // Shadows
+          "shadow-lg ring-1 ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
         ])}
       />
     </Popover>
   );
 }
 
-export function MenuItem<T extends object>({
-  className,
-  ...props
-}: AriaMenuItemProps<T>) {
-  const classes = cn(
-    className,
+const menuItemStyles = tv({
+  base: [
     // Base styles
     "group cursor-default  px-3.5 py-2.5 focus:outline-hidden sm:px-3 sm:py-1.5",
-    // Text styles
-    "text-left text-base/6 text-brand-neutral-500 sm:text-sm/6 dark:text-white forced-colors:text-[CanvasText]",
-    // Focus
-    "focus:bg-brand-primary-50 focus:text-brand-primary",
+    // Typography styles
+    "text-left text-base/6 sm:text-sm/6 forced-colors:text-[CanvasText]",
+    // Text Color
+    "bg-[color:var(--menu-item-bg)] text-[color:var(--menu-item-text)]",
     // Disabled state
     "disabled:opacity-50",
     // Forced colors mode
@@ -54,11 +64,49 @@ export function MenuItem<T extends object>({
     "col-span-full grid grid-cols-[auto_1fr_1.5rem_0.5rem_auto] items-center supports-[grid-template-columns:subgrid]:grid-cols-subgrid",
     // Icons
     "*:data-[slot=icon]:col-start-1 *:data-[slot=icon]:row-start-1 *:data-[slot=icon]:mr-2.5 *:data-[slot=icon]:-ml-0.5 *:data-[slot=icon]:size-5 sm:*:data-[slot=icon]:mr-2 sm:*:data-[slot=icon]:size-4",
+    "*:data-[slot=icon]:text-zinc-500 data-focus:*:data-[slot=icon]:text-white dark:*:data-[slot=icon]:text-zinc-400 dark:data-focus:*:data-[slot=icon]:text-white",
     // Avatar
-    "*:data-[slot=avatar]:mr-2.5 *:data-[slot=avatar]:-ml-1 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:mr-2 sm:*:data-[slot=avatar]:size-5"
-  );
+    "*:data-[slot=avatar]:mr-2.5 *:data-[slot=avatar]:-ml-1 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:mr-2 sm:*:data-[slot=avatar]:size-5",
+  ],
+  variants: {
+    color: {
+      none: "",
+      primary: [
+        "[--menu-item-bg:var(--color-brand-primary-muted)] [--menu-item-text:var(--color-brand-primary-text)]",
+      ],
+      neutral: [
+        "[--menu-item-text:var(--color-brand-neutral-text)]",
+        // Active
+        "focus:[--menu-item-bg:var(--color-brand-neutral-muted)] focus:[--menu-item-text:var(--color-brand-neutral-text)]",
+      ],
+      danger: [
+        "[--menu-item-text:var(--color-brand-danger-text)]",
+        // Active
+        "focus:[--menu-item-bg:var(--color-brand-danger-muted)] focus:[--menu-item-text:var(--color-brand-danger-text)]",
+      ],
+      warning: [
+        "[--menu-item-bg:var(--color-brand-warning-muted)] [--menu-item-text:var(--color-brand-warning-text)]",
+      ],
+      success: [
+        "[--menu-item-bg:var(--color-brand-success-muted)] [--menu-item-text:var(--color-brand-success-text)]",
+      ],
+      info: [
+        "[--menu-item-bg:var(--color-brand-info-muted)] [--menu-item-text:var(--color-brand-info-text)]",
+      ],
+    } satisfies ColorMap,
+  },
+});
+type MenuItemVariants = VariantProps<typeof menuItemStyles>;
 
-  return <AriaMenuItem {...props} className={classes} />;
+export function MenuItem<T extends object>({
+  className,
+  color = "neutral",
+  ...props
+}: Omit<AriaMenuItemProps<T>, "className"> &
+  MenuItemVariants & { className?: string }) {
+  return (
+    <AriaMenuItem {...props} className={menuItemStyles({ color, className })} />
+  );
 }
 
 export function MenuSection<T extends object>({
@@ -72,7 +120,7 @@ export function MenuSection<T extends object>({
     // Text styles
     "text-left text-base/6 text-brand-neutral-500 sm:text-sm/6 dark:text-white forced-colors:text-[CanvasText]",
     // Focus
-    "focus:bg-brand-primary-50 focus:text-brand-primary",
+    "focus:bg-brand-neutral-subtle focus:text-brand-neutral-text",
     // Disabled state
     "disabled:opacity-50",
     // Forced colors mode
@@ -102,13 +150,9 @@ export function MenuLabel({ className, ...props }: AriaTextProps) {
 
 export function MenuDescription(props: AriaTextProps) {
   return (
-    <AriaText
-      data-slot="description"
+    <Description
       {...props}
-      slot="description"
-      className={cn(
-        "col-span-2 col-start-2 row-start-2 text-sm/5 text-neutral-500 group-focus:text-white sm:text-xs/5 dark:text-neutral-400 forced-colors:group-focus:text-[HighlightText]"
-      )}
+      className={cn(["col-span-2 col-start-2 row-start-2"])}
     />
   );
 }

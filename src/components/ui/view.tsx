@@ -1,4 +1,5 @@
 import { type ComponentPropsWithoutRef, forwardRef } from "react";
+import { Header as AriaHeader } from "react-aria-components";
 
 /**
  * Content represents the primary content within a container such as as Card or Modal.
@@ -17,7 +18,7 @@ export const Header = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<"header">
 >(function Header(props, ref) {
-  return <header {...props} data-slot="header" ref={ref} />;
+  return <AriaHeader {...props} data-slot="header" ref={ref} />;
 });
 
 /**
@@ -27,5 +28,5 @@ export const Footer = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<"footer">
 >(function Footer(props, ref) {
-  return <header {...props} data-slot="footer" ref={ref} />;
+  return <footer {...props} data-slot="footer" ref={ref} />;
 });
