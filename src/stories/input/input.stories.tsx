@@ -1,9 +1,9 @@
 /* eslint-disable import/no-default-export */
-import { fn } from "storybook/test";
-import { CurrencyDollarIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
-import type { Meta, StoryObj } from "@storybook/react-vite";
 import { HeadlessField, Label } from "@/components/ui/fieldset";
-import { InputField, TextInput } from "@/components/ui/input";
+import { Input, InputField } from "@/components/ui/input";
+import { CurrencyDollarIcon } from "@phosphor-icons/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -54,24 +54,23 @@ export const Disabled: Story = {
 export const Readonly: Story = {
   args: {
     readOnly: true,
+    value: "BaVrRKpRMS_ndKU",
+    description:
+      "This code is used to identify your account and is only shown once. ",
   },
 };
 
 export const WithIcon: Story = {
   args: {
-    label: "Search User",
-    startEnhancer: <MagnifyingGlassIcon />,
+    label: "Enter Amount",
+    startEnhancer: <CurrencyDollarIcon />,
   },
 };
 
 export const WithStartEnhancer: Story = {
   args: {
     label: "Price",
-    startEnhancer: (
-      <div>
-        <CurrencyDollarIcon />
-      </div>
-    ),
+    startEnhancer: <CurrencyDollarIcon />,
   },
 };
 
@@ -80,7 +79,7 @@ export const WithCustomLayout: Story = {
     return (
       <HeadlessField className="flex items-center justify-center gap-6">
         <Label className="shrink-0">Full name</Label>
-        <TextInput name="full_name" className="max-w-48" />
+        <Input name="full_name" className="max-w-48" />
       </HeadlessField>
     );
   },

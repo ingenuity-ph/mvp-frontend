@@ -264,7 +264,7 @@ export const CustomUI: Story = {
               className={cn([
                 surfaceStyles(),
                 //
-                "group relative flex cursor-pointer rounded-lg hover:bg-zinc-800 bg-zinc-900 px-5 py-4 text-white shadow-md transition",
+                "group relative flex cursor-pointer rounded-lg hover:bg-neutral-800 bg-neutral-900 px-5 py-4 text-white shadow-md transition",
                 // focus
                 "focus:outline focus:outline-offset-2 focus-visible:outline-2",
                 // outline color
@@ -274,7 +274,7 @@ export const CustomUI: Story = {
               <div className="flex w-full gap-8 items-center justify-between">
                 <div className="text-sm/6">
                   <p className="font-semibold ">{plan.name}</p>
-                  <div className="flex gap-2 text-zinc-200">
+                  <div className="flex gap-2 text-neutral-200">
                     <div>{plan.ram}</div>
                     <div aria-hidden="true">&middot;</div>
                     <div>{plan.cpus}</div>
