@@ -75,7 +75,7 @@
   --color-brand-primary-muted: var(--color-primary-100);
   --color-brand-primary-subtle: var(--color-primary-200);
   --color-brand-primary-bold: var(--color-primary-700);
-  --color-brand-primary-inverse: var(--color-primary-100);
+  --color-brand-primary-inverse: var(--color-white);
 
   --color-accent-50: oklch(0.986 0.031 120.757);
   --color-accent-100: oklch(0.967 0.067 122.328);
@@ -191,13 +191,15 @@
   --color-brand-info-bold: var(--color-info-700);
   --color-brand-info-inverse: var(--color-white);
 
-  /* Typography */
-  --text-metric-sm: 1.5rem;
-  --text-metric-sm--line-height: 2rem;
-  --text-metric-md: 1.75rem;
-  --text-metric-md--line-height: 2.25rem;
-  --text-metric-lg: 1.5rem;
-  --text-metric-lg--line-height: 2rem;
+  /* Metric */
+  --text-metric-xs: 2rem;
+  --text-metric-xs--line-height: 2.5rem;
+  --text-metric-sm: 2.25rem;
+  --text-metric-sm--line-height: 2.75rem;
+  --text-metric-md: 2.25rem;
+  --text-metric-md--line-height: 3.25rem;
+  --text-metric-lg: 3.25rem;
+  --text-metric-lg--line-height: 4rem;
   /* Title */
   --text-title-xs: 1.25rem;
   --text-title-xs--line-height: 1.75rem;
@@ -211,6 +213,7 @@
   --text-title-xl--line-height: 2.75rem;
   --text-title-xxl: 2.5rem;
   --text-title-xxl--line-height: 3.25rem;
+
   /* Heading  */
   --text-heading-xs: 2.25rem;
   --text-heading-xs--line-height: 2.75rem;
@@ -220,6 +223,7 @@
   --text-heading-md--line-height: 4rem;
   --text-heading-lg: 6rem;
   --text-heading-lg--line-height: 7rem;
+
   /*Labels*/
   --text-label-xs: 0.75rem;
   --text-label-xs--line-height: 1rem;
@@ -245,25 +249,27 @@
   --color-body-muted: var(--color-neutral-500);
 
   /* Component Tokens */
-  --color-text: var(--color-brand-neutral-text);
-
   --color-surface-background: var(--color-white);
   --color-surface-foreground: var(--color-brand-neutral-text);
   --radius-surface: var(--radius-md);
   --spacing-surface: --spacing(4);
   --spacing-surface-gutter: --spacing(6);
 
+  --radius-control: var(--radius-md);
+  --radius-control-verbose: var(--radius-control) var(--radius-control)
+    var(--radius-control) var(--radius-control);
+  --radius-btn: var(--radius-control);
+
+  --color-surface-border: var(--color-brand-neutral-border);
+  --color-control-border: var(--color-brand-neutral-border);
+}
+
+:root {
   --surface-padding-top: var(--spacing-surface-gutter);
   --surface-padding-right: var(--spacing-surface-gutter);
   --surface-padding-bottom: var(--spacing-surface-gutter);
   --surface-padding-left: var(--spacing-surface-gutter);
   --surface-border-width: 1px;
-
-  --radius-control: var(--radius-md);
-  --radius-btn: var(--radius-control);
-
-  --color-surface-border: var(--color-brand-neutral-border);
-  --color-control-border: var(--color-brand-neutral-border);
 
   /* Sidebar */
   --sidebar-gutter: --spacing(4);
