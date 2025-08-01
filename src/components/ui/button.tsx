@@ -18,8 +18,7 @@ const baseButton = tv({
   base: [
     // Base
     "relative isolate inline-flex items-center justify-center gap-x-2 rounded-(--radius-btn) border text-base/6 font-semibold",
-    // Padding
-    "px-[var(--btn-padding-x)] py-[var(--btn-padding-y)]",
+
     // Focus
     "focus:outline-2 focus:outline-offset-2 focus:outline-info-500",
     // Disabled
@@ -30,6 +29,22 @@ const baseButton = tv({
     "focus:group-data-[adjoined]:z-10",
   ],
   variants: {
+    /**
+     * Content Model Primitives
+     */
+    border: {
+      none: "",
+      default: "border",
+    },
+    padding: {
+      none: "",
+      // Default padding config
+      default: "px-[var(--btn-padding-x)] py-[var(--btn-padding-y)]",
+    },
+    margin: {
+      none: "",
+      default: "",
+    },
     shape: {
       pill: ["[--radius:9999px]"],
       default: "[--radius:var(--radius-btn)]",
@@ -63,6 +78,9 @@ const baseButton = tv({
   },
   defaultVariants: {
     inset: "none",
+    padding: "default",
+    margin: "default",
+    border: "default",
     intent: "default",
     size: "md",
     shape: "default",

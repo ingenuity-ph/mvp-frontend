@@ -17,6 +17,7 @@ import {
   splitPopoverProps,
 } from "./popover";
 import { cn } from "./utils";
+import { textStyles } from "./text";
 
 /**
  * Menu with forwardedRef.
@@ -28,12 +29,16 @@ export function Menu<T extends object>(
   const { className } = menuProps;
 
   return (
-    <Popover bleed {...popoverProps}>
+    <Popover
+      bleed
+      {...popoverProps}
+      placement={popoverProps.placement ?? "bottom end"}
+    >
       <AriaMenu
         {...menuProps}
-        className={cn(className, "outline-none", [
+        className={cn(className, [
           // Base styles
-          "isolate max-h-64 w-max min-w-[var(--trigger-width)] scroll-py-1 rounded-radius-control py-1 select-none",
+          "isolate max-h-64 w-max outline-none min-w-[var(--trigger-width)] scroll-py-1 rounded-radius-control py-1 select-none",
           // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
           "outline outline-transparent focus:outline-none",
           // Handle scrolling when menu won't fit in viewport
@@ -42,6 +47,8 @@ export function Menu<T extends object>(
           "supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_1.5rem_0.5rem_auto]",
           // Shadows
           "shadow-lg ring-1 ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
+          // Divider
+          "*:data-[slot=divider]:col-span-full",
         ])}
       />
     </Popover>
@@ -51,9 +58,10 @@ export function Menu<T extends object>(
 const menuItemStyles = tv({
   base: [
     // Base styles
-    "group cursor-default  px-3.5 py-2.5 focus:outline-hidden sm:px-3 sm:py-1.5",
+    "group cursor-default px-3.5 py-2.5 focus:outline-hidden",
     // Typography styles
-    "text-left text-base/6 sm:text-sm/6 forced-colors:text-[CanvasText]",
+    textStyles({ label: "sm" }),
+    "forced-colors:text-[CanvasText]",
     // Text Color
     "bg-[color:var(--menu-item-bg)] text-[color:var(--menu-item-text)]",
     // Disabled state

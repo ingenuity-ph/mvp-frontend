@@ -27,9 +27,9 @@ import {
   type UseControllerProps,
   type UseControllerReturn,
 } from "react-hook-form";
-import { useId } from "@react-aria/utils";
+import { mergeProps, useId } from "@react-aria/utils";
 import { textStyles, type TextVariants } from "./text";
-import { cn } from "./utils";
+import { cn, createSplitProps } from "./utils";
 
 export function Fieldset({
   className,
@@ -125,7 +125,13 @@ type PublicAriaFieldProps = Omit<
   "label" | "description" | "errorMessage"
 >;
 export const FieldContext = createContext<
-  ContextValue<PublicAriaFieldProps, HTMLDivElement>
+  ContextValue<
+    PublicAriaFieldProps & {
+      isDisabled?: boolean;
+      isInvalid?: boolean;
+    },
+    HTMLDivElement
+  >
 >({});
 export const useFieldProps = () => useSlottedContext(FieldContext);
 
@@ -144,6 +150,42 @@ export interface ComposedFieldProps {
   label?: React.ReactNode;
   description?: React.ReactNode;
 }
+export type WithComposedFieldControlProps<
+  TBaseProps extends object,
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = ComposedFieldProps &
+  TBaseProps &
+  Partial<
+    Pick<
+      UseControllerProps<TFieldValues, TName>,
+      "control" | "shouldUnregister"
+    > & {
+      field: TName;
+      defaultFieldValue?: UseControllerProps<
+        TFieldValues,
+        TName
+      >["defaultValue"];
+    }
+  >;
+/**
+ * Helper to split the props of a `FieldControl` component.
+ */
+// export function splitComposedFieldControlProps<
+//   TFieldValues extends FieldValues,
+//   TName extends FieldPath<TFieldValues>,
+// >(props: any) {
+//   return createSplitProps<
+//     WithComposedFieldControlProps<{}, TFieldValues, TName>
+//   >()(props, [
+//     "control",
+//     "field",
+//     "defaultFieldValue",
+//     "label",
+//     "description",
+//     "shouldUnregister",
+//   ]);
+// }
 
 export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
   function HeadlessField({ isDisabled, isInvalid, ...props }, ref) {
@@ -174,14 +216,17 @@ export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
               },
             },
           ],
-          [FieldContext, field.fieldProps],
+          [
+            FieldContext,
+            mergeProps(field.fieldProps, { isDisabled, isInvalid }),
+          ],
         ]}
       >
         <div
           ref={ref}
           {...props}
-          data-disabled={isDisabled || undefined}
-          data-invalid={isInvalid || undefined}
+          data-disabled={isDisabled ? "" : undefined}
+          data-invalid={isInvalid ? "" : undefined}
         />
       </Provider>
     );
@@ -200,7 +245,10 @@ export const fieldLayoutStyles = [
 ];
 export function Field({ className, ...props }: FieldProps) {
   return (
-    <HeadlessField {...props} className={cn(className, fieldLayoutStyles)} />
+    <HeadlessField
+      {...props}
+      className={cn(className, "group", fieldLayoutStyles)}
+    />
   );
 }
 
@@ -219,7 +267,6 @@ export function FieldControl<
   TName extends FieldPath<T> = FieldPath<T>,
 >({
   className,
-  disabled,
   children,
   control,
   field,
@@ -228,10 +275,7 @@ export function FieldControl<
   defaultFieldValue,
   ...props
 }: FieldProps &
-  Pick<
-    UseControllerProps<T, TName>,
-    "control" | "disabled" | "shouldUnregister"
-  > & {
+  Pick<UseControllerProps<T, TName>, "control" | "shouldUnregister"> & {
     field: TName;
     defaultFieldValue?: UseControllerProps<T, TName>["defaultValue"];
     /**
@@ -242,7 +286,7 @@ export function FieldControl<
   const controller = useController<T, TName>({
     control,
     name: field,
-    disabled,
+    disabled: props.isDisabled,
     shouldUnregister,
     defaultValue: defaultFieldValue,
   });

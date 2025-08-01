@@ -4,32 +4,31 @@ import {
   ComboBox as AriaCombobox,
   type ComboBoxProps as AriaComboboxProps,
   ListBox,
-  ListBoxItem,
   Popover,
 } from "react-aria-components";
 import type { Adjoined } from "./constants";
 import { useFieldController, useFieldProps } from "./fieldset";
-import { BaseInput } from "./input";
 import { cn, type forwardRefType } from "./utils";
 import { forwardRef, useCallback, useRef, useState } from "react";
 import { useResizeObserver } from "@react-aria/utils";
 import { Button } from "./button";
+import { Input } from "./input";
+import { pickerStyles } from "./picker";
 
 export type ComboBoxProps<T extends object> = {
   className?: string;
-  disabled?: boolean;
   adjoined?: Adjoined;
   items?: Iterable<T>;
   placeholder?: string;
   children: React.ReactNode | ((item: T) => React.ReactNode);
-} & Omit<AriaComboboxProps<T>, "className" | "children" | "isDisabled">;
+} & Omit<AriaComboboxProps<T>, "className" | "children">;
 
 export function _ComboboxInternal<T extends object>(
   {
     className,
     children,
     adjoined = "none",
-    disabled = false,
+    isDisabled = false,
     items,
     placeholder,
     ...props
@@ -37,6 +36,8 @@ export function _ComboboxInternal<T extends object>(
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const field = useFieldProps();
+  const resolvedIsDisabled = isDisabled || field?.isDisabled;
+
   const controller = useFieldController();
   const fieldControl = controller?.field;
 
@@ -58,7 +59,7 @@ export function _ComboboxInternal<T extends object>(
     <div data-slot="control" className="block isolate">
       <AriaCombobox
         ref={ref}
-        {...mergeProps(props, { isDisabled: disabled }, field, {
+        {...mergeProps(props, { isDisabled: resolvedIsDisabled }, field, {
           onSelectionChange: fieldControl?.onChange,
           onBlur: fieldControl?.onBlur,
           selectedKey: fieldControl?.value,
@@ -83,7 +84,7 @@ export function _ComboboxInternal<T extends object>(
         ])}
       >
         <div ref={controlRef}>
-          <BaseInput
+          <Input
             placeholder={placeholder}
             endEnhancer={
               <Button data-slot="action" variant="plain" inset="right">
@@ -119,19 +120,7 @@ export function _ComboboxInternal<T extends object>(
         >
           <ListBox
             items={items}
-            className={cn([
-              // Base styles
-              // TODO: Fix the max-width calculation to handle the case where the width is too small
-              "isolate max-h-64 w-max min-w-[var(--trigger-width)] scroll-py-1 rounded-[var(--radius-control)] py-1 select-none",
-              // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
-              "outline outline-transparent focus:outline-none",
-              // Handle scrolling when menu won't fit in viewport
-              "overflow-y-auto overscroll-contain",
-              // Popover background
-              "bg-white/95 backdrop-blur-xl dark:bg-neutral-800/75",
-              // Shadows
-              "shadow-lg ring-1 ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
-            ])}
+            className={cn(pickerStyles().list({ className: "max-h-64" }))}
           >
             {children}
           </ListBox>

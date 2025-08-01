@@ -22,6 +22,7 @@ export const textStyles = tv({
       lg: "text-metric-lg",
       md: "text-metric-md",
       sm: "text-metric-sm",
+      xs: "text-metric-xs",
       // using inherit means we want to "inherit" the styles from parent
       inherit: "",
     },
@@ -96,7 +97,7 @@ export const TypographyInheritContext = createContext(false);
 export type TextVariants = VariantProps<typeof textStyles>;
 
 interface OwnTextProps {
-  color?: TextVariants["color"] | "inherit";
+  color?: Exclude<TextVariants["color"], "none"> | "inherit";
   size?: TextVariants["paragraph"];
 }
 
@@ -106,14 +107,12 @@ export function Text({
   size = "sm",
   color = "neutral",
   ...props
-}: TextProps) {
+}: TextProps /**
+ * we are remapping the color prop from "none" to "inherit" to make it clearer that we want to inherit the parent's color
+ * instead of "none" which would mean that we want to use the default browser color
+ */ & { color?: Exclude<TextVariants["color"], "none"> | "inherit" }) {
   const isNested = useContext(_TextNestedContext);
-
   const shouldInheritColor = color === "inherit";
-  const isThemeColor = Object.keys(textStyles.variants.color).includes(color);
-  const colorStyle = isThemeColor
-    ? textStyles.variants.color[color as ThemeColors]
-    : color;
 
   return (
     <_TextNestedContext.Provider value>
@@ -130,11 +129,10 @@ export function Text({
         {...props}
         className={clsx(
           className,
-          textStyles({ paragraph: size }),
-          /**
-           * Text color will inherit styles applied to parent.
-           */
-          shouldInheritColor ? "" : colorStyle
+          textStyles({
+            paragraph: size,
+            color: shouldInheritColor ? "none" : color,
+          })
         )}
       />
     </_TextNestedContext.Provider>
@@ -184,14 +182,13 @@ export function TextButton({
         className,
         // Inherit text styles
         textStyles({
-          paragraph: size,
+          paragraph: shouldInherit ? undefined : size,
           color: shouldInherit ? undefined : color,
         }),
         // Base
         "relative isolate gap-x-2 focus:outline-none cursor-pointer ",
-        // Icon
+        // Forced colors
         "forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]"
-        //
       )}
     />
   );

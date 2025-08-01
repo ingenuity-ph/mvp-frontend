@@ -5,6 +5,7 @@ import {
   type TooltipProps as AriaTooltipProps,
 } from "react-aria-components";
 import { cn } from "./utils";
+import { surfaceStyles } from "./surface";
 
 export const Tooltip = forwardRef<HTMLDivElement, AriaTooltipProps>(
   function Tooltip(props, ref) {
@@ -14,12 +15,10 @@ export const Tooltip = forwardRef<HTMLDivElement, AriaTooltipProps>(
         {...props}
         className={cn([
           props.className,
-          // Base
-          "forced-colors:outline' bg-surface-background p-[var(--gutter,theme(spacing.2))] shadow-sm ring-neutral-950/10 sm:rounded-[calc(var(--surface-radius)/2)] dark:bg-neutral-900 dark:ring-white/10",
-          // Layout
-          "flex gap-[var(--gutter,theme(spacing.5))]",
-          // Border
-          "border border-neutral-950/10 dark:border-white/10",
+          // extend surface
+          surfaceStyles({ padding: "none" }),
+          // Padding
+          "p-2",
         ])}
       >
         {(renderProps) => {

@@ -1,4 +1,4 @@
-import { clsx } from "clsx";
+import { mergeRefs, useObjectRef } from "@react-aria/utils";
 import { forwardRef } from "react";
 import {
   TextArea as AriaTextArea,
@@ -7,7 +7,6 @@ import {
   useSlottedContext,
 } from "react-aria-components";
 import type { FieldPath, FieldValues } from "react-hook-form";
-import { mergeRefs, useObjectRef } from "@react-aria/utils";
 import {
   type ComposedFieldProps,
   Description,
@@ -20,10 +19,11 @@ import {
 } from "./fieldset";
 import { cn } from "./utils";
 
-export type TextAreaProps = { className?: string; resizable?: boolean } & Omit<
-  AriaTextAreaProps,
-  "className"
->;
+export type TextAreaProps = {
+  className?: string;
+  resizable?: boolean;
+  isDisabled?: boolean;
+} & Omit<AriaTextAreaProps, "className" | "disabled">;
 
 export const Textarea = forwardRef(function Textarea(
   { className, resizable = true, ...props }: TextAreaProps,
@@ -33,16 +33,18 @@ export const Textarea = forwardRef(function Textarea(
   const field = useSlottedContext(FieldContext);
   const fieldControl = useSlottedContext(FieldControllerContext)?.field;
   const mergedRef = mergeRefs(objectRef, fieldControl?.ref);
-
+  const resolvedIsDisabled = props.isDisabled || field?.isDisabled;
   return (
     <AriaTextField
       id={field?.id}
       aria-labelledby={field?.["aria-labelledby"]}
+      aria-describedby={field?.["aria-describedby"]}
+      isDisabled={resolvedIsDisabled}
+      isInvalid={field?.isInvalid}
       data-slot="control"
       value={fieldControl?.value}
       name={fieldControl?.name}
-      isDisabled={fieldControl?.disabled}
-      className={clsx([
+      className={cn([
         className,
         // Basic layout
         "relative isolate block w-full",
@@ -78,7 +80,7 @@ export const Textarea = forwardRef(function Textarea(
         <AriaTextArea
           ref={mergedRef}
           {...props}
-          className={clsx([
+          className={cn([
             // Layout
             "block w-full appearance-none bg-transparent",
             // Typography
@@ -116,7 +118,7 @@ export function TextareaField<
       <FieldControl
         control={control}
         field={field}
-        disabled={disabled}
+        isDisabled={disabled}
         defaultValue={defaultValue}
         className={className}
       >
@@ -128,7 +130,7 @@ export function TextareaField<
   return (
     <Field isDisabled={disabled} className={className}>
       {label ? <Label>{label}</Label> : null}
-      <Textarea disabled={disabled} {...props} />
+      <Textarea isDisabled={disabled} {...props} />
       {description ? <Description>{description}</Description> : null}
     </Field>
   );

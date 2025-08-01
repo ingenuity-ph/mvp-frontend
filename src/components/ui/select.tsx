@@ -2,18 +2,15 @@ import { clsx } from "clsx";
 import { forwardRef } from "react";
 import { mergeProps } from "react-aria";
 import {
-  Button,
-  LabelContext,
-  ListBox,
-  ListBoxItem,
-  type ListBoxItemProps,
-  Popover,
-  Provider,
   Select as AriaSelect,
   type SelectProps as AriaSelectProps,
+  Button,
+  ListBox,
+  Popover,
   SelectValue,
   useSlottedContext,
 } from "react-aria-components";
+export { Option } from "./picker";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { tv } from "tailwind-variants";
 import type { Adjoined } from "./constants";
@@ -72,24 +69,25 @@ const adjoinedStyles = tv({
 
 export type SelectProps<T extends object> = {
   className?: string;
-  disabled?: boolean;
   adjoined?: Adjoined;
   items?: Iterable<T>;
   children: React.ReactNode | ((item: T) => React.ReactNode);
-} & Omit<AriaSelectProps<T>, "className" | "children" | "isDisabled">;
+} & Omit<AriaSelectProps<T>, "className" | "children">;
 
 function Select<T extends object>(
   {
     className,
     children,
     adjoined = "none",
-    disabled = false,
+    isDisabled = false,
     items,
     ...props
   }: SelectProps<T>,
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
   const field = useSlottedContext(FieldContext);
+  const resolvedDisabled = isDisabled || field?.isDisabled;
+
   const fieldControl = useSlottedContext(FieldControllerContext)?.field;
 
   return (
@@ -97,7 +95,7 @@ function Select<T extends object>(
       <AriaSelect
         ref={ref}
         {...field}
-        {...mergeProps(props, { isDisabled: disabled }, field, {
+        {...mergeProps(props, { isDisabled: resolvedDisabled }, field, {
           onSelectionChange: fieldControl?.onChange,
           onBlur: fieldControl?.onBlur,
           selectedKey: fieldControl?.value,
@@ -216,16 +214,12 @@ export function SelectField<
       <FieldControl
         control={control}
         field={field}
-        disabled={disabled}
+        isDisabled={disabled}
         defaultValue={defaultSelectedKey}
       >
         <Field>
           {label ? <Label>{label}</Label> : null}
-          <_Select
-            {...props}
-            disabled={disabled}
-            defaultSelectedKey={defaultSelectedKey}
-          />
+          <_Select {...props} defaultSelectedKey={defaultSelectedKey} />
           {description ? <Description>{description}</Description> : null}
         </Field>
       </FieldControl>
@@ -235,7 +229,7 @@ export function SelectField<
   return (
     <Field isDisabled={disabled}>
       {label ? <Label>{label}</Label> : null}
-      <_Select disabled={disabled} {...props} />
+      <_Select {...props} />
       {description ? <Description>{description}</Description> : null}
     </Field>
   );
@@ -245,36 +239,3 @@ export function SelectField<
 const _Select = (forwardRef as forwardRefType)(Select);
 
 export { _Select as Select };
-
-export function Option({ className, ...props }: ListBoxItemProps) {
-  return (
-    <Provider values={[[LabelContext, { elementType: "span" }]]}>
-      <ListBoxItem
-        {...props}
-        className={clsx([
-          className,
-          // Base styles
-          "group cursor-default gap-2 focus:outline-hidden px-3 py-2",
-          // Text styles
-          // TODO: Think about if we want to set the text styles here or we require to explicitly use a <Label> component
-          "text-left text-base/6 text-brand-neutral-text sm:text-sm/6 dark:text-white forced-colors:text-[CanvasText]",
-          // Focus
-          "focus:bg-brand-neutral-muted",
-          // Disabled state
-          "disabled:opacity-50",
-          // Forced colors mode
-          "forced-color-adjust-none forced-colors:data-focused:bg-[Highlight] forced-colors:data-focused:text-[HighlightText] forced-colors:data-focused:*:data-[slot=icon]:text-[HighlightText]",
-          // Icons
-          "*:data-[slot=icon]:size-4 &>[data-slot=icon]]:-mx-0.5 [&>[data-slot=icon]]:my-0.5 [&>[data-slot=icon]]:shrink-0",
-          "*:data-[slot=icon]:text-neutral-500 data-focus:*:data-[slot=icon]:text-white dark:*:data-[slot=icon]:text-neutral-400 dark:data-focus:*:data-[slot=icon]:text-white",
-          // Avatar
-          "*:data-[slot=avatar]:mr-2.5 *:data-[slot=avatar]:-ml-1 *:data-[slot=avatar]:size-6 sm:*:data-[slot=avatar]:mr-2 sm:*:data-[slot=avatar]:size-5",
-          // Label
-          "[&>[data-slot=label]]:col-start-2 [&>[data-slot=label]]:row-start-1",
-          // Description
-          "[&>[data-slot=description]]:col-start-2 [&>[data-slot=description]]:row-start-2 [&>[data-slot=description]]:col-span-2",
-        ])}
-      />
-    </Provider>
-  );
-}

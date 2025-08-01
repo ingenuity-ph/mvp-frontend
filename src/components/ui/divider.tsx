@@ -1,5 +1,9 @@
 import { Children } from "react";
 import { cn } from "./utils";
+import {
+  Separator as AriaSeparator,
+  type SeparatorProps as AriaSeparatorProps,
+} from "react-aria-components";
 
 type Inset = "none" | "context";
 const insetStyle: Record<Inset, string> = {
@@ -19,14 +23,14 @@ export function Divider({
   soft?: boolean;
   orientation?: "horizontal" | "vertical";
   inset?: Inset;
-} & React.ComponentPropsWithoutRef<"div">) {
+} & AriaSeparatorProps & { children?: React.ReactNode }) {
   const hasChildren = Children.count(props.children) !== 0;
 
   if (orientation === "vertical") {
     return (
-      <div
+      <AriaSeparator
+        data-slot="divider"
         {...props}
-        role="separator"
         className={cn(
           className,
           hasChildren
@@ -59,9 +63,9 @@ export function Divider({
   }
 
   return (
-    <div
+    <AriaSeparator
+      data-slot="divider"
       {...props}
-      role="separator"
       style={{
         unicodeBidi: "isolate",
       }}
