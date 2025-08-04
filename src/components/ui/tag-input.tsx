@@ -1,20 +1,22 @@
-import { mergeProps } from "react-aria";
-import { useSlottedContext } from "react-aria-components";
 import { normalizeProps, useMachine } from "@zag-js/react";
 import * as tagsInput from "@zag-js/tags-input";
-import { FieldContext, FieldControllerContext } from "./fieldset";
+import { useFieldController, useFieldProps } from "./fieldset";
 import { cn } from "./utils";
+import { mergeProps } from "@react-aria/utils";
 
 type TagInputProps = tagsInput.Props;
 
 export function TagInput(props: Partial<TagInputProps>) {
-  const field = useSlottedContext(FieldContext);
-  const fieldControl = useSlottedContext(FieldControllerContext)?.field;
+  const fieldProps = useFieldProps();
+  const controller = useFieldController();
+  const fieldControl = controller?.field;
+  const resolvedIsDisabled = fieldControl?.disabled || fieldProps?.isDisabled;
+
   const service = useMachine(tagsInput.machine, {
     ...mergeProps(props, {
       name: fieldControl?.name,
-      id: field?.id,
-      disabled: fieldControl?.disabled,
+      id: fieldProps?.id,
+      disabled: resolvedIsDisabled,
       value: fieldControl?.value,
       onValueChange(details) {
         fieldControl?.onChange(details.value);
