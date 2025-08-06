@@ -8,7 +8,7 @@ import {
   Label,
   Legend,
 } from "@/components/ui/fieldset";
-import { TextInput } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import {
   MetricText,
   Strong,
@@ -86,7 +86,7 @@ export const TextAsButton: Story = {
       <div>
         <Field>
           <Label className="font-bold">Shipping details</Label>
-          <TextInput />
+          <Input />
           <Description>
             Without this your odds of getting your order are low.{" "}
             <DialogTrigger>

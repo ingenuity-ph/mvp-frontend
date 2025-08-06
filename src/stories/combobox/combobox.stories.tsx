@@ -6,7 +6,7 @@ import {
   HeadlessField,
   Label,
 } from "@/components/ui/fieldset";
-import { Option, Select } from "@/components/ui/select";
+import { Option } from "@/components/ui/select";
 import { WarningCircleIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 

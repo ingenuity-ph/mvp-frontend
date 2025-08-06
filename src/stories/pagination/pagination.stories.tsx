@@ -1,14 +1,4 @@
 /* eslint-disable import/no-default-export */
-import { Avatar, AvatarButton } from "@/components/ui/avatar";
-import { Divider } from "@/components/ui/divider";
-import { Menu, MenuItem, MenuLabel } from "@/components/ui/menu";
-import {
-  Navbar,
-  NavbarItem,
-  NavbarLabel,
-  NavbarSection,
-  NavbarSpacer,
-} from "@/components/ui/navbar";
 import {
   Pagination,
   PaginationGap,
@@ -17,19 +7,7 @@ import {
   PaginationPage,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  CaretDownIcon,
-  GearIcon,
-  LightbulbIcon,
-  MagnifyingGlassIcon,
-  PlusIcon,
-  ShieldCheckIcon,
-  SignOutIcon,
-  TrayIcon,
-  UserIcon,
-} from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { MenuTrigger } from "react-aria-components";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {

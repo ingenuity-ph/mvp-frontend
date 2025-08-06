@@ -5,14 +5,6 @@ import type { ThemeColors } from "./constants";
 import { surfaceStyles, type SurfaceVariants } from "./surface";
 import { cn } from "./utils";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
-const DENSITY = Object.freeze({
-  compact: "compact",
-  default: "default",
-  spacious: "spacious",
-} as const);
-
-type Density = keyof typeof DENSITY;
 type OptionalThemeColors = ThemeColors | "none";
 
 const bannerStyles = tv({

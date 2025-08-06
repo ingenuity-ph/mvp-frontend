@@ -22,12 +22,7 @@ import {
   useFieldProps,
   type WithFieldControlProps,
 } from "./fieldset";
-import {
-  inputGroupStyles,
-  inputSlots,
-  inputStyles,
-  matchMultipleAdjoined,
-} from "./input";
+import { inputGroupStyles, inputStyles, matchMultipleAdjoined } from "./input";
 import { cn, Group } from "./utils";
 
 const parseToDate = (value: unknown) => {
@@ -111,7 +106,7 @@ export function TimePickerField<
       }
       <div
         data-slot="control"
-        className={cn("group", inputSlots().root(), inputStyles({ adjoined }))}
+        className={cn("group", inputStyles().root(), inputStyles({ adjoined }))}
       >
         <Group
           className={cn([

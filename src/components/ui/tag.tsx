@@ -1,11 +1,6 @@
 import React, { type Ref } from "react";
-import {
-  Button as AriaButton,
-  type ButtonProps,
-  Link,
-} from "react-aria-components";
 import { tv, type VariantProps } from "tailwind-variants";
-import { TouchTarget } from "./button";
+import { Button, TouchTarget, type ButtonProps } from "./button";
 import type { ColorMap } from "./constants";
 import { cn } from "./utils";
 
@@ -59,42 +54,24 @@ export function Tag({
 }
 
 export const TagButton = React.forwardRef(function TagButton(
-  {
-    color = "neutral",
-    className,
-    children,
-    ...props
-  }: TagProps & { className?: string; children: React.ReactNode } & (
-      | Omit<ButtonProps, "className">
-      | Omit<React.ComponentPropsWithoutRef<typeof Link>, "className">
-    ),
+  { color = "neutral", className, children, ...props }: TagProps & ButtonProps,
   ref: React.ForwardedRef<HTMLElement>
 ) {
   const classes = cn(
     className,
-    "group relative inline-flex rounded-md data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-blue-500 focus:outline-none"
+    "group relative inline-flex rounded-md focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 focus:outline-none"
   );
 
-  return "href" in props ? (
-    <Link
+  return (
+    <Button
       {...props}
-      className={classes}
-      ref={ref as React.ForwardedRef<HTMLAnchorElement>}
-    >
-      <TouchTarget>
-        <Tag color={color}>{children}</Tag>
-      </TouchTarget>
-    </Link>
-  ) : (
-    <AriaButton
-      {...props}
-      style={props.style as ButtonProps["style"]}
+      variant="unstyled"
       className={classes}
       ref={ref as Ref<HTMLButtonElement>}
     >
       <TouchTarget>
         <Tag color={color}>{children}</Tag>
       </TouchTarget>
-    </AriaButton>
+    </Button>
   );
 });

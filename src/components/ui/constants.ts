@@ -22,6 +22,15 @@ export type Emphasis = "muted" | "subtle" | "bold";
 
 export type Inset = "top" | "right" | "bottom" | "left" | "none" | "all";
 
+// eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
+const DENSITY = Object.freeze({
+  compact: "compact",
+  default: "default",
+  spacious: "spacious",
+} as const);
+
+export type Density = keyof typeof DENSITY;
+
 export const ADJOINED = {
   none: "none",
   top: "top",

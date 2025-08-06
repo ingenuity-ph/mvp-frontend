@@ -1,6 +1,5 @@
 import { EyeIcon, MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
 import { mergeProps, mergeRefs, useObjectRef } from "@react-aria/utils";
-import { clsx } from "clsx";
 import { forwardRef, useState } from "react";
 import {
   Input as AriaInput,
@@ -22,7 +21,7 @@ import {
   useFieldProps,
   type WithComposedFieldControlProps,
 } from "./fieldset";
-import { cn } from "./utils";
+import { cn, type forwardRefType } from "./utils";
 
 export const inputGroupStyles = tv({
   slots: {
@@ -201,10 +200,6 @@ export const Input = forwardRef(function Input(
   }: InputProps,
   ref: React.ForwardedRef<HTMLInputElement>
 ) {
-  const adjoinedStyles = Array.isArray(adjoined)
-    ? matchMultipleAdjoined(adjoined)
-    : inputStyles.variants.adjoined[adjoined ?? "none"];
-
   const field = useFieldProps();
 
   const objectRef = useObjectRef(ref);
@@ -289,24 +284,50 @@ export function InputField<
   );
 }
 
-export const PasswordInputField = forwardRef(function PasswordInput<
-  TControl extends FieldValues = FieldValues,
-  TFieldName extends FieldPath<TControl> = FieldPath<TControl>,
->(
-  {
-    className,
-    label,
-    description,
-    control,
-    field,
-    disabled,
-    defaultValue,
-    ...props
-  }: WithComposedFieldControlProps<InputProps, TControl, TFieldName>,
+export function _PasswordInput(
+  { className, disabled, defaultValue, ...props }: InputProps,
   ref: React.ForwardedRef<HTMLInputElement>
 ) {
   const [isVisible, setIsVisible] = useState(false);
 
+  return (
+    <Input
+      ref={ref}
+      {...props}
+      type={isVisible ? "text" : "password"}
+      autoComplete="password"
+      endEnhancer={
+        <Button
+          variant="plain"
+          data-slot="action"
+          inset="right"
+          onPress={() => {
+            setIsVisible((prev) => !prev);
+          }}
+        >
+          <EyeIcon />
+        </Button>
+      }
+    />
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const PasswordInput = (forwardRef as forwardRefType)(_PasswordInput);
+
+export function PasswordInputField<
+  TControl extends FieldValues = FieldValues,
+  TFieldName extends FieldPath<TControl> = FieldPath<TControl>,
+>({
+  className,
+  label,
+  description,
+  control,
+  field,
+  disabled,
+  defaultValue,
+  ...props
+}: WithComposedFieldControlProps<InputProps, TControl, TFieldName>) {
   if (control && field) {
     return (
       <FieldControl
@@ -317,24 +338,7 @@ export const PasswordInputField = forwardRef(function PasswordInput<
         className={className}
       >
         {label ? <Label>{label}</Label> : null}
-        <Input
-          ref={ref}
-          {...props}
-          type={isVisible ? "text" : "password"}
-          autoComplete="password"
-          endEnhancer={
-            <Button
-              variant="plain"
-              data-slot="action"
-              inset="right"
-              onPress={() => {
-                setIsVisible((prev) => !prev);
-              }}
-            >
-              <EyeIcon />
-            </Button>
-          }
-        />
+        <PasswordInput {...props} />
         {description ? <Description>{description}</Description> : null}
       </FieldControl>
     );
@@ -343,28 +347,11 @@ export const PasswordInputField = forwardRef(function PasswordInput<
   return (
     <Field isDisabled={disabled} className={className}>
       {label ? <Label>{label}</Label> : null}
-      <Input
-        ref={ref}
-        {...props}
-        type={isVisible ? "text" : "password"}
-        autoComplete="password"
-        endEnhancer={
-          <Button
-            variant="plain"
-            data-slot="action"
-            inset="right"
-            onPress={() => {
-              setIsVisible((prev) => !prev);
-            }}
-          >
-            <EyeIcon />
-          </Button>
-        }
-      />
+      <PasswordInput {...props} />
       {description ? <Description>{description}</Description> : null}
     </Field>
   );
-});
+}
 
 type SearchInputProps = Omit<
   InputProps,

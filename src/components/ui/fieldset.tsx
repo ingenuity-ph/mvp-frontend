@@ -1,3 +1,4 @@
+import { mergeProps, useId } from "@react-aria/utils";
 import {
   type ComponentPropsWithoutRef,
   createContext,
@@ -5,18 +6,18 @@ import {
 } from "react";
 import { type AriaFieldProps, useField, useObjectRef } from "react-aria";
 import {
-  type ContextValue,
-  DEFAULT_SLOT,
   Group as AriaGroup,
   type GroupProps as AriaGroupProps,
   Label as AriaLabel,
   LabelContext as AriaLabelContext,
-  LabelContext,
   type LabelProps as AriaLabelProps,
-  Provider,
   Text as AriaText,
-  TextContext,
   type TextProps as AriaTextProps,
+  type ContextValue,
+  DEFAULT_SLOT,
+  LabelContext,
+  Provider,
+  TextContext,
   useContextProps,
   useSlottedContext,
 } from "react-aria-components";
@@ -27,9 +28,8 @@ import {
   type UseControllerProps,
   type UseControllerReturn,
 } from "react-hook-form";
-import { mergeProps, useId } from "@react-aria/utils";
 import { textStyles, type TextVariants } from "./text";
-import { cn, createSplitProps } from "./utils";
+import { cn } from "./utils";
 
 export function Fieldset({
   className,

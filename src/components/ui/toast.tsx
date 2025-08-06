@@ -39,7 +39,7 @@ export function Toast({ ...props }: ToasterProps) {
             // Icon
             "[&>[data-icon]]:-mx-0.5 [&>[data-icon]]:my-0.5 [&>[data-icon]]:size-5 [&>[data-icon]]:shrink-0 [&>[data-icon]]:text-[--btn-icon] [&>[data-icon]]:sm:my-1 [&>[data-icon]]:sm:size-4 forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]"
           ),
-          content: textStyles({ level: "paragraph-sm", colors: "dark" }),
+          content: textStyles({ paragraph: "sm", color: "neutral" }),
           error:
             "bg-danger ring-danger-fg/10 text-white ring-inset [&>[data-close-button=true]>svg]:text-white [&>[data-close-button=true]:hover]:bg-white/20",
           info: "bg-info ring-info-fg/10 text-info-fg ring-inset [&>[data-close-button=true]>svg]:text-info-fg [&>[data-close-button=true]:hover]:bg-white/20",
@@ -49,7 +49,6 @@ export function Toast({ ...props }: ToasterProps) {
             "bg-primary ring-primary/50 text-primary-fg ring-inset [&>[data-close-button=true]>svg]:text-primary-fg [&>[data-close-button=true]:hover]:bg-primary-fg/20",
           cancelButton: cn([buttonStyles()]),
           actionButton: cn([buttonStyles()]),
-          // closeButton: "absolute left-auto",
         },
       }}
       {...props}

@@ -1,4 +1,5 @@
-import { CaretDownIcon } from "@phosphor-icons/react";
+import { useResizeObserver } from "@react-aria/utils";
+import { forwardRef, useCallback, useRef, useState } from "react";
 import { mergeProps } from "react-aria";
 import {
   ComboBox as AriaCombobox,
@@ -6,14 +7,12 @@ import {
   ListBox,
   Popover,
 } from "react-aria-components";
+import { Button } from "./button";
 import type { Adjoined } from "./constants";
 import { useFieldController, useFieldProps } from "./fieldset";
-import { cn, type forwardRefType } from "./utils";
-import { forwardRef, useCallback, useRef, useState } from "react";
-import { useResizeObserver } from "@react-aria/utils";
-import { Button } from "./button";
 import { Input } from "./input";
 import { pickerStyles } from "./picker";
+import { cn, type forwardRefType } from "./utils";
 
 export type ComboBoxProps<T extends object> = {
   className?: string;

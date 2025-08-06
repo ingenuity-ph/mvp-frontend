@@ -194,6 +194,10 @@ function Select<T extends object>(
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const _Select = (forwardRef as forwardRefType)(Select);
+export { _Select as Select };
+
 export function SelectField<
   T extends object,
   TControl extends FieldValues = FieldValues,
@@ -234,8 +238,3 @@ export function SelectField<
     </Field>
   );
 }
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const _Select = (forwardRef as forwardRefType)(Select);
-
-export { _Select as Select };

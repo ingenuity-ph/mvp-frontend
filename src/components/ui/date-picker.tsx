@@ -29,12 +29,7 @@ import {
   useFieldProps,
   type WithFieldControlProps,
 } from "./fieldset";
-import {
-  inputGroupStyles,
-  inputSlots,
-  inputStyles,
-  matchMultipleAdjoined,
-} from "./input";
+import { inputGroupStyles, inputStyles, matchMultipleAdjoined } from "./input";
 import { PopoverDialog } from "./popover";
 import { cn } from "./utils";
 
@@ -139,7 +134,7 @@ export function DatePickerField<
       }
       <div
         data-slot="control"
-        className={cn("group", inputSlots().root(), inputStyles({ adjoined }))}
+        className={cn("group", inputStyles().root(), inputStyles({ adjoined }))}
       >
         <Group
           aria-labelledby={field?.id}
@@ -255,7 +250,7 @@ export function DateRangePickerField<
       {label ? <Label>{label}</Label> : null}
       <div
         data-slot="control"
-        className={cn("group", inputSlots().root(), inputStyles({ adjoined }))}
+        className={cn("group", inputStyles().root(), inputStyles({ adjoined }))}
       >
         <Group
           className={cn([
