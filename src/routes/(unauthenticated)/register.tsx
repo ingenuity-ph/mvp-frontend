@@ -5,16 +5,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthLayout } from "@/components/layouts/auth-layout";
-import { Banner, BannerContent } from "@/components/ui/banner";
+import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
-import {
-  Description,
-  FieldControl,
-  FieldGroup,
-  Label,
-} from "@/components/ui/fieldset";
-import { InputField, PasswordInput } from "@/components/ui/input";
+import { Description, FieldGroup, Label } from "@/components/ui/fieldset";
+import { InputField, PasswordInputField } from "@/components/ui/input";
 import { Strong, Text, TextLink, Title } from "@/components/ui/text";
+import { Content } from "@/components/ui/view";
 import { getErrorMessage } from "@/libs/query/query-error";
 
 type AuthConfig = NonNullable<ResourcesConfig["Auth"]>;
@@ -225,10 +221,10 @@ function SignUpForm() {
       <Title>Sign up for an account</Title>
       {rootError !== undefined && (
         <Banner>
-          <BannerContent>
+          <Content>
             <Label>Register Error</Label>
             <Description>{rootError}</Description>
-          </BannerContent>
+          </Content>
         </Banner>
       )}
       <FieldGroup>
@@ -237,14 +233,16 @@ function SignUpForm() {
           field="email"
           label="Email Address"
         />
-        <FieldControl control={form.control} field="password">
-          <Label>Password</Label>
-          <PasswordInput />
-        </FieldControl>
-        <FieldControl control={form.control} field="confirmPassword">
-          <Label>Confirm Password</Label>
-          <PasswordInput />
-        </FieldControl>
+        <PasswordInputField
+          label="Password"
+          control={form.control}
+          field="password"
+        />
+        <PasswordInputField
+          label="Confirm Password"
+          control={form.control}
+          field="confirmPassword"
+        />
       </FieldGroup>
       <Button
         type="submit"

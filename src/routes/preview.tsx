@@ -1,32 +1,60 @@
-import { DialogTrigger } from "react-aria-components";
-import { WarningCircleIcon } from "@phosphor-icons/react";
-import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Calendar, RangeCalendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { CheckboxField, CheckboxGroup } from "@/components/ui/checkbox";
-import type { Emphasis, ThemeColors } from "@/components/ui/constants";
+import { Combobox } from "@/components/ui/combobox";
+import type { ThemeColors } from "@/components/ui/constants";
 import {
   DatePickerField,
   DateRangePickerField,
 } from "@/components/ui/date-picker";
+import {
+  DescriptionDetails,
+  DescriptionList,
+  DescriptionTerm,
+} from "@/components/ui/description-list";
 import { Dialog } from "@/components/ui/dialog";
+import { Divider } from "@/components/ui/divider";
 import {
   Description,
   Field,
   FieldGroup,
+  Fieldset,
   Label,
+  Legend,
 } from "@/components/ui/fieldset";
-import { InputField, PasswordInput, TextInput } from "@/components/ui/input";
+import { Input, InputField, PasswordInput } from "@/components/ui/input";
 import { Link } from "@/components/ui/link";
+import {
+  Menu,
+  MenuDescription,
+  MenuItem,
+  MenuLabel,
+  MenuSection,
+} from "@/components/ui/menu";
 import { RadioField, RadioGroup } from "@/components/ui/radio";
-import { Option, Select } from "@/components/ui/select";
+import { Option, Select, SelectField } from "@/components/ui/select";
 import { SurfaceActions } from "@/components/ui/surface";
 import { SwitchField } from "@/components/ui/switch";
+import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
+import { Tag } from "@/components/ui/tag";
 import { Text, Title } from "@/components/ui/text";
+import { TextareaField } from "@/components/ui/textarea";
 import { TimePickerField } from "@/components/ui/time-picker";
-import { Group } from "@/components/ui/utils";
+import { cn, Group } from "@/components/ui/utils";
 import { Content, Footer, Header } from "@/components/ui/view";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CaretRightIcon,
+  CubeTransparentIcon,
+  HandHeartIcon,
+  StarIcon,
+  WarningCircleIcon,
+} from "@phosphor-icons/react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Collection, DialogTrigger, MenuTrigger } from "react-aria-components";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 export const Route = createFileRoute("/preview")({
   component: RouteComponent,
@@ -61,7 +89,7 @@ const buttonVariants: Array<"solid" | "outline" | "plain"> = [
   "outline",
   "plain",
 ];
-const emphasis: Array<Emphasis> = ["muted", "subtle", "bold"];
+// const emphasis: Array<Emphasis> = ["muted", "subtle", "bold"];
 const themeColors: Array<ThemeColors> = [
   "primary",
   "neutral",
@@ -71,7 +99,12 @@ const themeColors: Array<ThemeColors> = [
   "info",
 ];
 
+const schema = z.object({
+  value: z.string(),
+});
+
 function RouteComponent() {
+  const form = useForm({ resolver: zodResolver(schema) });
   return (
     <div className="p-4">
       <div className="grid gap-surface">
@@ -130,7 +163,11 @@ function RouteComponent() {
             <Content className="space-y-6">
               <form>
                 <FieldGroup>
-                  <InputField label="Email" placeholder="Enter your email" />
+                  <InputField
+                    type="date"
+                    label="Email"
+                    placeholder="Enter your email"
+                  />
                   <Field>
                     <Label>Password</Label>
                     <PasswordInput placeholder="Enter your password" />
@@ -238,6 +275,43 @@ function RouteComponent() {
             </DialogTrigger>
           </Card>
           <Card>
+            <form>
+              <Fieldset>
+                <Legend>Shipping details</Legend>
+                <Description>
+                  Without this your odds of getting your order are low.
+                </Description>
+                <FieldGroup>
+                  <InputField label="Street address" name="street_address" />
+                  <SelectField
+                    label="Country"
+                    description="We currently only ship to North America."
+                    name="country"
+                  >
+                    <Option>Canada</Option>
+                    <Option>Mexico</Option>
+                    <Option>United States</Option>
+                  </SelectField>
+                  <TextareaField
+                    control={form.control}
+                    field="value"
+                    label="Delivery notes"
+                    description="If you have a tiger, we'd like to know about it."
+                    name="notes"
+                  />
+                </FieldGroup>
+              </Fieldset>
+              {/* ... */}
+            </form>
+          </Card>
+          <Card className="grid items-center justify-center">
+            <div className="flex gap-3">
+              <Tag color="success">documentation</Tag>
+              <Tag color="warning">help wanted</Tag>
+              <Tag color="danger">bug</Tag>
+            </div>
+          </Card>
+          <Card>
             <Label size="md" className="font-semibold">
               Team Members
             </Label>
@@ -247,7 +321,7 @@ function RouteComponent() {
                 organization.
               </Description>
               <Group className="flex gap-3 mt-3">
-                <TextInput
+                <Input
                   readOnly
                   value="https://example.com/teams/invite/eHGJEj12FHDKSi"
                 />
@@ -264,6 +338,8 @@ function RouteComponent() {
             <DatePickerField
               label="Date of birth"
               className="max-w-3xs w-full"
+              control={form.control}
+              field="value"
             />
           </Card>
           <Card className="items-center justify-center">
@@ -279,10 +355,96 @@ function RouteComponent() {
             </Field>
           </Card>
           <Card className="items-center justify-center">
-            <DateRangePickerField label="Duration of stay" />
+            <DateRangePickerField
+              label="Duration of stay"
+              control={form.control}
+              field="value"
+            />
+            <pre>{JSON.stringify(form.watch(), null, 2)}</pre>
+          </Card>
+          <Card className="items-center justify-center">
+            <Fieldset>
+              <Legend>Discoverability</Legend>
+              <Description>
+                Decide where your events can be found across the web.
+              </Description>
+              <CheckboxGroup>
+                <CheckboxField
+                  label="Show on events page"
+                  name="discoverability"
+                  value="show_on_events_page"
+                  description="Make this event visible on your profile."
+                />
+                <CheckboxField
+                  label="Allow embedding"
+                  name="discoverability"
+                  value="allow_embedding"
+                  description="Allow others to embed your event details on their own site."
+                />
+              </CheckboxGroup>
+            </Fieldset>
           </Card>
           <Card className="items-center justify-center">
             <TimePickerField label="Time of arrival" />
+          </Card>
+          <Card>
+            <DescriptionList>
+              <DescriptionTerm>Customer</DescriptionTerm>
+              <DescriptionDetails>Michael Foster</DescriptionDetails>
+
+              <DescriptionTerm>Event</DescriptionTerm>
+              <DescriptionDetails>Bear Hug: Live in Concert</DescriptionDetails>
+
+              <DescriptionTerm>Amount</DescriptionTerm>
+              <DescriptionDetails>$150.00 USD</DescriptionDetails>
+
+              <DescriptionTerm>Amount after exchange rate</DescriptionTerm>
+              <DescriptionDetails>
+                US$150.00 &rarr; CA$199.79
+              </DescriptionDetails>
+
+              <DescriptionTerm>Fee</DescriptionTerm>
+              <DescriptionDetails>$4.79 USD</DescriptionDetails>
+
+              <DescriptionTerm>Net</DescriptionTerm>
+              <DescriptionDetails>$1,955.00</DescriptionDetails>
+            </DescriptionList>
+          </Card>
+          <Card className="">
+            <Tabs>
+              <TabList>
+                <Tab id="account">Account</Tab>
+                <Tab id="settings">Settings</Tab>
+              </TabList>
+              <TabPanel id="account">
+                <Header>
+                  <Title>Personal Information</Title>
+                  <Description>
+                    This will be shown under the product title.
+                  </Description>
+                </Header>
+              </TabPanel>
+              <TabPanel id="settings">
+                <Title>Settings</Title>
+                <Description>
+                  This will be shown under the product title.
+                </Description>
+              </TabPanel>
+            </Tabs>
+          </Card>
+          <Card>
+            <Field>
+              <Label>Favorite Color</Label>
+              <Combobox>
+                <Option>Red</Option>
+                <Option>Blue</Option>
+                <Option>Yellow</Option>
+                <Option>Orange</Option>
+              </Combobox>
+              <Description>
+                We will use this color for the logo on your profile.
+              </Description>
+            </Field>
           </Card>
           <Card>
             <RadioGroup
@@ -324,6 +486,114 @@ function RouteComponent() {
               />
             </RadioGroup>
           </Card>
+          <Card>
+            <Group orientation="vertical" adjoined className="flex flex-col">
+              <DialogTrigger>
+                <Button
+                  variant="unstyled"
+                  className={cn([
+                    // Base
+                    "relative isolate inline-flex max-w-md w-full items-start justify-center gap-x-3 rounded-t-(--radius-btn) border-t border-x text-sm",
+                    //
+                    "text-brand-neutral border-brand-neutral-muted bg-neutral-200/10 hover:bg-neutral-50",
+                    // Padding
+                    "px-4 py-2",
+                    // Focus
+                    "focus:outline-2 focus:outline-offset-2 focus:outline-info-500",
+                    // Disabled
+                    "disabled:opacity-50",
+                    // Elevate button on focus when adjoined
+                    "focus:group-data-[adjoined]:z-10",
+                  ])}
+                >
+                  <HandHeartIcon
+                    weight="fill"
+                    className="size-6 text-brand-bold"
+                  />
+                  <div className="flex-1 flex items-center">
+                    <ul className="grid flex-1 gap-1 text-left font-light">
+                      <li>Free Shipping</li>
+                      <li>1% Credit Reward</li>
+                      <li>Up to 30-day Returns</li>
+                    </ul>
+                    <CaretRightIcon className="size-4" />
+                  </div>
+                </Button>
+                <Dialog size="xl">
+                  <Content className="grid gap-8">
+                    <div>
+                      <Label className="font-medium" size="lg">
+                        Free Shipping
+                      </Label>
+                      <Description className="mt-2">
+                        Provides official products, comprehensive services and
+                        free shipping for orders.
+                      </Description>
+                    </div>
+                    <div>
+                      <Label className="font-medium" size="lg">
+                        1% DJI Credit Reward
+                      </Label>
+                      <Description className="mt-2">
+                        1% DJI Credit reward on the paid value, which can be
+                        used to reduce order amounts in the same currency unit
+                        next time.
+                      </Description>
+                    </div>
+                    <div>
+                      <Label className="font-medium" size="lg">
+                        Up to 30-Day Returns
+                      </Label>
+                      <Description className="mt-2">
+                        Easy shopping with hassle-free returns and replacements.
+                        *Some products have special return and replacement
+                        policies. Please refer to the information on the
+                        corresponding product detail page.
+                      </Description>
+                    </div>
+                  </Content>
+                </Dialog>
+              </DialogTrigger>
+              <Divider inset="none" />
+              <Button
+                variant="unstyled"
+                className={cn([
+                  // Base
+                  "relative isolate inline-flex max-w-md w-full items-start justify-center gap-x-3 rounded-b-(--radius-btn) border-x border-b text-sm",
+                  //
+                  "text-brand-neutral border-brand-neutral-muted bg-neutral-200/10 hover:bg-neutral-50",
+                  // Padding
+                  "px-4 py-2",
+                  // Focus
+                  "focus:outline-2 focus:outline-offset-2 focus:outline-info-500",
+                  // Disabled
+                  "disabled:opacity-50",
+                  // Elevate button on focus when adjoined
+                  "focus:group-data-[adjoined]:z-10",
+                ])}
+              >
+                <CubeTransparentIcon
+                  weight="fill"
+                  className="size-6 text-brand-bold"
+                />
+                <div className="flex-1 flex items-center">
+                  <ul className="text-left font-light gap-1 grid">
+                    <li>1-Inch CMOS &amp; 4K/120fps</li>
+                    <li>
+                      2-Inch Rotatable Screen &amp; Smart Horizontal-Vertical
+                      Shooting
+                    </li>
+                    <li>3-Axis Gimbal Mechanical Stabilization</li>
+                    <li>ActiveTrack 6.0</li>
+                    <li>Full-Pixel Fast Focusing</li>
+                    <li>D-Log M &amp; 10-Bit</li>
+                    <li>Stereo Recording</li>
+                    <li>Pocket-Sized Vlogging Camera</li>
+                  </ul>
+                </div>
+              </Button>
+            </Group>
+          </Card>
           <Card className="grid place-content-center">
             <SwitchField
               label="Location services"
@@ -339,10 +609,60 @@ function RouteComponent() {
               description="You will receive email notifications"
             />
           </Card>
-        </div>
-        <div className="grid gap-1 sm:grid-cols-2">
-          {/* <AreaChartDemo />
-          <BarChartDemo /> */}
+          <Card className="grid place-content-center">
+            <MenuTrigger>
+              <Button variant="outline" color="neutral">
+                More Options
+              </Button>
+              <Menu>
+                <MenuItem>
+                  <StarIcon weight="fill" className="size-4 text-warning-500" />
+                  <MenuLabel>Favorite</MenuLabel>
+                  <MenuDescription>
+                    This will be shown under the product title.
+                  </MenuDescription>
+                </MenuItem>
+                <MenuItem>
+                  <MenuLabel>Edit</MenuLabel>
+                </MenuItem>
+                <MenuItem color="danger">
+                  <MenuLabel>Favorite</MenuLabel>
+                  <MenuDescription>
+                    This will be shown under the product title.
+                  </MenuDescription>
+                </MenuItem>
+                <MenuItem>
+                  <MenuLabel>Share</MenuLabel>
+                </MenuItem>
+              </Menu>
+            </MenuTrigger>
+            <MenuTrigger>
+              <Button variant="outline" color="neutral">
+                Configure
+              </Button>
+              <Menu>
+                <MenuSection>
+                  <Header
+                    className={cn([
+                      "col-span-full grid grid-cols-[1fr_auto] gap-x-12 px-3.5 pt-2 pb-1 sm:px-3",
+                    ])}
+                  >
+                    <Label
+                      className="font-medium text-neutral-500"
+                      color="none"
+                      size="xs"
+                    >
+                      Styles
+                    </Label>
+                  </Header>
+                  <Collection>
+                    <MenuItem>Edit Permissions</MenuItem>
+                    <MenuItem color="danger">Delete User</MenuItem>
+                  </Collection>
+                </MenuSection>
+              </Menu>
+            </MenuTrigger>
+          </Card>
         </div>
       </div>
     </div>

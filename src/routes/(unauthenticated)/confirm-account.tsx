@@ -5,11 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { AuthLayout } from "@/components/layouts/auth-layout";
-import { Banner, BannerContent } from "@/components/ui/banner";
+import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
 import { Description, FieldControl, Label } from "@/components/ui/fieldset";
 import { Title } from "@/components/ui/text";
 import { toaster } from "@/components/ui/toast";
+import { Content } from "@/components/ui/view";
 import { PinCodeInput } from "@/features/auth/components/PinInput";
 import { getErrorMessage } from "@/libs/query/query-error";
 
@@ -98,10 +99,10 @@ function RouteComponent() {
         </div>
         {rootError !== undefined && (
           <Banner>
-            <BannerContent>
+            <Content>
               <Label>Login Error</Label>
               <Description>{rootError}</Description>
-            </BannerContent>
+            </Content>
           </Banner>
         )}
         <FieldControl

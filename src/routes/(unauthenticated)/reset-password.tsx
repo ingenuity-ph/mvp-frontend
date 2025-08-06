@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
 import { AuthLayout } from "@/components/layouts/auth-layout";
-import { Banner, BannerContent } from "@/components/ui/banner";
+import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
 import {
   Description,
@@ -15,6 +15,7 @@ import {
 import { InputField, PasswordInput } from "@/components/ui/input";
 import { Stepper, useStep } from "@/components/ui/stepper";
 import { Strong, Text, TextLink, Title } from "@/components/ui/text";
+import { Content } from "@/components/ui/view";
 import { getErrorMessage } from "@/libs/query/query-error";
 
 export const Route = createFileRoute("/(unauthenticated)/reset-password")({
@@ -60,10 +61,10 @@ function ResetPasswordForm() {
     >
       {rootError !== undefined && (
         <Banner>
-          <BannerContent>
+          <Content>
             <Label>Login Error</Label>
             <Description>{rootError}</Description>
-          </BannerContent>
+          </Content>
         </Banner>
       )}
 
