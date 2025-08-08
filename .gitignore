@@ -3,6 +3,9 @@ node_modules
 dist
 dist-ssr
 *.local
+*.local.md
+
+.tsbuildinfo
 
 *storybook.log
 storybook-static

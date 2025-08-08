@@ -3,153 +3,122 @@
  * Provides mocks, spies, and helpers for testing analytics functionality
  */
 
-import { vi, beforeEach, expect, type MockedFunction } from "vitest";
+import { expect, vi } from "vitest";
 import { AnalyticsClient } from "../analytics-client";
-import { MockStrategy, ConsoleStrategy } from "../index";
-import type {
-  TrackingEvents,
-  UserProperties,
-} from "../analytics-types";
+import { ConsoleStrategy } from "../index";
+
+/**
+ * Test data for consistent testing across all test suites
+ */
+export const testData = {
+  userProperties: {
+    name: "John Doe",
+    email: "john@example.com",
+    plan: "premium",
+    team_size: 5,
+  },
+  eventProperties: {
+    location: "header",
+    text: "Get Started",
+    source: "homepage",
+  },
+};
+
+/**
+ * Simple mock strategy for testing
+ */
+class TestMockStrategy {
+  readonly name = "test-mock";
+
+  initialize(): void {
+    // No-op
+  }
+
+  track(): void {
+    // No-op
+  }
+
+  identify(): void {
+    // No-op
+  }
+
+  clearIdentity(): void {
+    // No-op
+  }
+
+  isReady(): boolean {
+    return true;
+  }
+}
 
 /**
  * Create a mock analytics client with spied methods
  */
 export function createMockAnalytics() {
-  const client = new AnalyticsClient(new MockStrategy());
+  const mockStrategy = new ConsoleStrategy();
+  const client = new AnalyticsClient(mockStrategy);
   client.initialize();
 
-  // Spy on all tracking methods
-  const spies = {
-    track: vi.spyOn(client, "track"),
-    identify: vi.spyOn(client, "identify"),
-    page: vi.spyOn(client, "page"),
-    setUser: vi.spyOn(client, "setUser"),
-    captureException: vi.spyOn(client, "captureException"),
-    reset: vi.spyOn(client, "reset"),
-  };
+  // Spy on strategy methods
+  const track = vi.spyOn(mockStrategy, "track");
+  const identify = vi.spyOn(mockStrategy, "identify");
+  const clearIdentity = vi.spyOn(mockStrategy, "clearIdentity");
 
   return {
     client,
-    ...spies,
-    // Convenience methods for assertions
-    expectTracked: <T extends keyof TrackingEvents>(
-      event: T,
-      properties?: Partial<TrackingEvents[T]>
-    ) => {
-      expect(spies.track).toHaveBeenCalledWith(
-        event,
-        properties ? expect.objectContaining(properties) : expect.any(Object)
-      );
+    strategy: mockStrategy,
+    // Spies
+    track,
+    identify,
+    clearIdentity,
+    // Helper methods for assertions
+    expectTracked(event: string, properties?: Record<string, any>) {
+      expect(track).toHaveBeenCalledWith(event, properties);
     },
-    expectNotTracked: () => {
-      expect(spies.track).not.toHaveBeenCalled();
+    expectIdentified(userId: string, properties?: Record<string, any>) {
+      expect(identify).toHaveBeenCalledWith(userId, properties);
     },
-    expectIdentified: (
-      userId: string,
-      properties?: Partial<UserProperties>
-    ) => {
-      expect(spies.identify).toHaveBeenCalledWith(
-        userId,
-        properties ? expect.objectContaining(properties) : expect.any(Object)
-      );
+    expectIdentityCleared() {
+      expect(clearIdentity).toHaveBeenCalled();
     },
-    clearMocks: () => {
-      Object.values(spies).forEach((spy) => spy.mockClear());
+    // Clear all spies
+    clearMocks() {
+      track.mockClear();
+      identify.mockClear();
+      clearIdentity.mockClear();
     },
   };
 }
 
 /**
- * Create a console analytics client for debugging tests
+ * Create a console analytics client for testing console output
  */
-export function createTestConsoleAnalytics() {
-  const client = new AnalyticsClient(new ConsoleStrategy());
+export function createConsoleAnalytics() {
+  const consoleStrategy = new ConsoleStrategy();
+  const client = new AnalyticsClient(consoleStrategy);
   client.initialize();
-  return client;
-}
 
-/**
- * Mock PostHog for integration tests
- */
-export function mockPostHog() {
-  const mockPostHog = {
-    init: vi.fn(),
-    capture: vi.fn(),
-    identify: vi.fn(),
-    people: {
-      set: vi.fn(),
+  // Spy on console methods
+  const consoleInfo = vi.spyOn(console, "info");
+  const consoleLog = vi.spyOn(console, "log");
+
+  return {
+    client,
+    strategy: consoleStrategy,
+    consoleInfo,
+    consoleLog,
+    expectConsoleMessage(message: string) {
+      expect(consoleInfo).toHaveBeenCalledWith(
+        expect.stringContaining(message)
+      );
     },
-    reset: vi.fn(),
-    captureException: vi.fn(),
+    clearConsoleMocks() {
+      consoleInfo.mockClear();
+      consoleLog.mockClear();
+    },
+    restoreConsole() {
+      consoleInfo.mockRestore();
+      consoleLog.mockRestore();
+    },
   };
-
-  // Mock the posthog-js module
-  vi.doMock("posthog-js", () => ({
-    posthog: mockPostHog,
-  }));
-
-  return mockPostHog;
-}
-
-/**
- * Test data factories
- */
-export const testData = {
-  clickEvent: {
-    element: "button",
-    label: "Test Button",
-  },
-  submitEvent: {
-    form: "test-form",
-    success: true,
-  },
-  userProperties: {
-    user_id: "test-user-123",
-    email: "test@example.com",
-  },
-};
-
-/**
- * Custom matchers for analytics testing
- */
-export const analyticsMatchers = {
-  toHaveTrackedEvent: (
-    client: AnalyticsClient,
-    event: keyof TrackingEvents,
-    properties?: Record<string, any>
-  ) => {
-    const spy = vi.spyOn(client, "track");
-    const calls = spy.mock.calls;
-
-    const found = calls.find(
-      ([eventName, props]) =>
-        eventName === event &&
-        (!properties ||
-          Object.keys(properties).every(
-            (key) => props[key] === properties[key]
-          ))
-    );
-
-    return {
-      pass: !!found,
-      message: () =>
-        found
-          ? `Expected not to track ${event}`
-          : `Expected to track ${event} with ${JSON.stringify(properties)}`,
-    };
-  },
-};
-
-/**
- * Setup function for analytics tests
- */
-export function setupAnalyticsTest() {
-  const mockAnalytics = createMockAnalytics();
-
-  // Reset all mocks before each test
-  beforeEach(() => {
-    mockAnalytics.clearMocks();
-  });
-
-  return mockAnalytics;
 }

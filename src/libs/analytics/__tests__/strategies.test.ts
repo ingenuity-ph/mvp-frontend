@@ -1,147 +1,124 @@
-/**
- * Strategy Tests
- * Test different analytics strategies
- */
-
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from "vitest";
 import { ConsoleStrategy } from "../index";
 import { testData } from "./test-utils";
 
-describe("Analytics Strategies", () => {
-  describe("ConsoleStrategy", () => {
-    let strategy: ConsoleStrategy;
-    let consoleSpy: any;
+describe("ConsoleStrategy", () => {
+  let strategy: ConsoleStrategy;
+  let consoleSpy: MockInstance;
 
-    beforeEach(() => {
-      strategy = new ConsoleStrategy();
-      consoleSpy = vi.spyOn(console, "info").mockImplementation(() => {});
-    });
-
-    it("should initialize with default config", () => {
-      strategy.initialize();
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "[Analytics] Console strategy initialized"
-      );
-    });
-
-    it("should initialize with custom config", () => {
-      const customSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-
-      strategy.initialize({
-        prefix: "[TEST]",
-        logLevel: "warn",
-      });
-
-      expect(customSpy).toHaveBeenCalledWith(
-        "[TEST] Console strategy initialized"
-      );
-    });
-
-    it("should log tracking events", () => {
-      strategy.initialize();
-      strategy.track("click", testData.clickEvent);
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "[Analytics] Track:",
-        "click",
-        testData.clickEvent
-      );
-    });
-
-    it("should log user identification", () => {
-      strategy.initialize();
-      strategy.identify("user-123", testData.userProperties);
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "[Analytics] Identify:",
-        "user-123",
-        testData.userProperties
-      );
-    });
-
-    it("should be ready immediately", () => {
-      expect(strategy.isReady()).toBe(true);
-    });
+  beforeEach(() => {
+    strategy = new ConsoleStrategy();
+    consoleSpy = vi.spyOn(console, "info").mockImplementation(() => {});
   });
 
-  // describe("PostHogStrategy", () => {
-  //   let strategy: PostHogStrategy;
-  //   let mockPH: ReturnType<typeof mockPostHog>;
+  afterEach(() => {
+    consoleSpy.mockRestore();
+  });
 
-  //   beforeEach(() => {
-  //     mockPH = mockPostHog();
-  //     strategy = new PostHogStrategy();
-  //   });
+  it("should initialize with default config", () => {
+    strategy.initialize();
 
-  //   it("should require apiKey and apiHost for initialization", async () => {
-  //     await expect(strategy.initialize({} as any)).rejects.toThrow(
-  //       "PostHog requires apiKey and apiHost"
-  //     );
-  //   });
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Analytics] Console strategy initialized"
+    );
+  });
 
-  //   it("should initialize PostHog with config", async () => {
-  //     const config = {
-  //       apiKey: "test-key",
-  //       apiHost: "https://app.posthog.com",
-  //       debug: true,
-  //     };
+  it("should initialize with custom config", () => {
+    const customSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-  //     // Mock successful initialization
-  //     mockPH.init.mockImplementation((key, options) => {
-  //       if (options.loaded) {
-  //         setTimeout(options.loaded, 0);
-  //       }
-  //     });
+    strategy.initialize({
+      prefix: "[TEST]",
+      logLevel: "warn",
+    });
 
-  //     await strategy.initialize(config);
+    expect(customSpy).toHaveBeenCalledWith(
+      "[TEST] Console strategy initialized"
+    );
 
-  //     expect(mockPH.init).toHaveBeenCalledWith(config.apiKey, {
-  //       api_host: config.apiHost,
-  //       debug: config.debug,
-  //       capture_pageview: true,
-  //       capture_exceptions: true,
-  //       loaded: expect.any(Function),
-  //     });
-  //   });
+    customSpy.mockRestore();
+  });
 
-  //   it("should track events through PostHog", () => {
-  //     // Setup initialized state
-  //     vi.spyOn(strategy, "isReady").mockReturnValue(true);
+  it("should log tracking events with PostHog format", () => {
+    strategy.initialize();
+    strategy.track("user signed up", { method: "email", source: "homepage" });
 
-  //     strategy.track("click", testData.clickEvent);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Analytics] Track:",
+      "user signed up",
+      { method: "email", source: "homepage" }
+    );
+  });
 
-  //     expect(mockPH.capture).toHaveBeenCalledWith("click", testData.clickEvent);
-  //   });
+  it("should log tracking events without properties", () => {
+    strategy.initialize();
+    strategy.track("page viewed");
 
-  //   it("should identify users through PostHog", () => {
-  //     vi.spyOn(strategy, "isReady").mockReturnValue(true);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Analytics] Track:",
+      "page viewed",
+      undefined
+    );
+  });
 
-  //     strategy.identify("user-123", testData.userProperties);
+  it("should log user identification", () => {
+    strategy.initialize();
+    strategy.identify("user-123", testData.userProperties);
 
-  //     expect(mockPH.identify).toHaveBeenCalledWith(
-  //       "user-123",
-  //       testData.userProperties
-  //     );
-  //   });
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Analytics] Identify:",
+      "user-123",
+      testData.userProperties
+    );
+  });
 
-  //   it("should handle PostHog errors gracefully", () => {
-  //     vi.spyOn(strategy, "isReady").mockReturnValue(true);
-  //     mockPH.capture.mockImplementation(() => {
-  //       throw new Error("PostHog error");
-  //     });
+  it("should log user identification without properties", () => {
+    strategy.initialize();
+    strategy.identify("user-123");
 
-  //     expect(() => {
-  //       strategy.track("click", testData.clickEvent);
-  //     }).not.toThrow();
-  //   });
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[Analytics] Identify:",
+      "user-123",
+      undefined
+    );
+  });
 
-  //   it("should not track when not ready", () => {
-  //     vi.spyOn(strategy, "isReady").mockReturnValue(false);
+  it("should log identity clearing", () => {
+    strategy.initialize();
+    strategy.clearIdentity();
 
-  //     strategy.track("click", testData.clickEvent);
+    expect(consoleSpy).toHaveBeenCalledWith("[Analytics] Clear identity");
+  });
 
-  //     expect(mockPH.capture).not.toHaveBeenCalled();
-  //   });
-  // });
+  it("should be ready immediately", () => {
+    expect(strategy.isReady()).toBe(true);
+  });
+
+  it("should handle all PostHog recommended event patterns", () => {
+    strategy.initialize();
+
+    const events = [
+      "user signed up",
+      "project created",
+      "button clicked",
+      "page viewed",
+      "file uploaded",
+      "form submitted",
+      "payment completed",
+    ];
+
+    events.forEach((event) => {
+      strategy.track(event, { test: true });
+      expect(consoleSpy).toHaveBeenCalledWith("[Analytics] Track:", event, {
+        test: true,
+      });
+    });
+  });
 });

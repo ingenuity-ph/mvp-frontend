@@ -1,26 +1,26 @@
 /**
  * PostHog Analytics Strategy
- * Handles its own configuration internally
+ * Implements PostHog-specific optimizations while maintaining simple API
  */
 
-import { posthog } from 'posthog-js'
-import type { AnalyticsStrategy, TrackingEvents, UserProperties } from '../analytics-types'
+import { posthog } from "posthog-js";
+import type { AnalyticsStrategy } from "../types";
 
 export interface PostHogConfig {
-  apiKey: string
-  apiHost: string
-  debug?: boolean
-  capturePageViews?: boolean
-  captureExceptions?: boolean
+  apiKey: string;
+  apiHost: string;
+  debug?: boolean;
+  capturePageViews?: boolean;
+  captureExceptions?: boolean;
 }
 
 export class PostHogStrategy implements AnalyticsStrategy {
-  readonly name = 'posthog'
-  private isInitialized = false
+  readonly name = "posthog";
+  private isInitialized = false;
 
   async initialize(config: PostHogConfig): Promise<void> {
     if (!config.apiKey || !config.apiHost) {
-      throw new Error('PostHog requires apiKey and apiHost')
+      throw new Error("PostHog requires apiKey and apiHost");
     }
 
     return new Promise((resolve, reject) => {
@@ -31,97 +31,66 @@ export class PostHogStrategy implements AnalyticsStrategy {
           capture_pageview: config.capturePageViews ?? true,
           capture_exceptions: config.captureExceptions ?? true,
           loaded: () => {
-            this.isInitialized = true
-            resolve()
+            this.isInitialized = true;
+            resolve();
           },
-        })
+        });
       } catch (error) {
-        reject(error)
+        reject(error);
       }
-    })
+    });
   }
 
-  track<T extends keyof TrackingEvents>(
-    event: T, 
-    properties: TrackingEvents[T] & Record<string, any>
-  ): void {
-    if (!this.isReady()) return
-    
+  track(event: string, properties?: Record<string, any>): void {
+    if (!this.isReady()) return;
+
     try {
-      posthog.capture(event, properties)
+      // PostHog optimization: handle special events
+      if (event === "page viewed" || event === "pageview") {
+        // Use PostHog's optimized $pageview event with automatic properties
+        posthog.capture("$pageview", properties);
+        return;
+      }
+
+      // Regular event tracking
+      posthog.capture(event, properties);
     } catch (error) {
-      console.error('PostHog track error:', error)
+      console.error("PostHog track error:", error);
     }
   }
 
-  identify(userId: string, properties?: UserProperties): void {
-    if (!this.isReady()) return
-    
+  identify(userId: string, properties?: Record<string, any>): void {
+    if (!this.isReady()) return;
+
     try {
-      posthog.identify(userId, properties)
+      posthog.identify(userId, properties);
     } catch (error) {
-      console.error('PostHog identify error:', error)
+      console.error("PostHog identify error:", error);
     }
   }
 
-  page(name?: string, properties?: Record<string, any>): void {
-    if (!this.isReady()) return
-    
-    try {
-      posthog.capture('$pageview', {
-        $current_url: window.location.href,
-        page_name: name,
-        ...properties,
-      })
-    } catch (error) {
-      console.error('PostHog page error:', error)
-    }
-  }
+  clearIdentity(): void {
+    if (!this.isReady()) return;
 
-  reset(): void {
-    if (!this.isReady()) return
-    
     try {
-      posthog.reset()
+      posthog.reset();
     } catch (error) {
-      console.error('PostHog reset error:', error)
-    }
-  }
-
-  setUser(properties: UserProperties): void {
-    if (!this.isReady()) return
-    
-    try {
-      posthog.people.set(properties)
-    } catch (error) {
-      console.error('PostHog setUser error:', error)
-    }
-  }
-
-  captureException(error: Error, context?: Record<string, any>): void {
-    if (!this.isReady()) return
-    
-    try {
-      posthog.captureException(error, {
-        extra: context,
-      })
-    } catch (captureError) {
-      console.error('PostHog captureException error:', captureError)
+      console.error("PostHog clearIdentity error:", error);
     }
   }
 
   isReady(): boolean {
-    return this.isInitialized && !!posthog
+    return this.isInitialized && !!posthog;
   }
 
-  destroy(): void {
+  cleanup(): void {
     if (this.isInitialized) {
       try {
-        posthog.reset()
+        posthog.reset();
       } catch (error) {
-        console.error('PostHog destroy error:', error)
+        console.error("PostHog cleanup error:", error);
       }
-      this.isInitialized = false
+      this.isInitialized = false;
     }
   }
 }

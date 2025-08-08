@@ -1,11 +1,10 @@
 /**
  * Analytics Client Tests
- * Test the core analytics client functionality
+ * Test the simplified 3-method analytics client functionality
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AnalyticsClient } from "../analytics-client";
-import { MockStrategy } from "../index";
 import { createMockAnalytics, testData } from "./test-utils";
 
 describe("AnalyticsClient", () => {
@@ -16,22 +15,22 @@ describe("AnalyticsClient", () => {
   });
 
   describe("Core Functionality", () => {
-    it("should track events with type safety", () => {
-      mockAnalytics.client.track("click", testData.clickEvent);
+    it("should track events with flexible properties", () => {
+      mockAnalytics.client.track("button clicked", {
+        ...testData.eventProperties,
+        customProperty: "custom-value",
+      });
 
-      mockAnalytics.expectTracked("click", testData.clickEvent);
+      mockAnalytics.expectTracked("button clicked", {
+        ...testData.eventProperties,
+        customProperty: "custom-value",
+      });
     });
 
-    it("should allow additional properties on events", () => {
-      mockAnalytics.client.track("click", {
-        ...testData.clickEvent,
-        customProperty: "custom-value",
-        section: "header",
-      });
+    it("should track events without properties", () => {
+      mockAnalytics.client.track("page viewed");
 
-      mockAnalytics.expectTracked("click", {
-        ...testData.clickEvent,
-      });
+      mockAnalytics.expectTracked("page viewed", undefined);
     });
 
     it("should identify users", () => {
@@ -40,26 +39,39 @@ describe("AnalyticsClient", () => {
       mockAnalytics.expectIdentified("user-123", testData.userProperties);
     });
 
-    it("should track page views", () => {
-      mockAnalytics.client.page("Dashboard", { section: "main" });
+    it("should identify users without properties", () => {
+      mockAnalytics.client.identify("user-123");
 
-      expect(mockAnalytics.page).toHaveBeenCalledWith("Dashboard", {
-        section: "main",
-      });
+      mockAnalytics.expectIdentified("user-123", undefined);
+    });
+
+    it("should clear user identity", () => {
+      mockAnalytics.client.clearIdentity();
+
+      mockAnalytics.expectIdentityCleared();
     });
   });
 
   describe("Configuration", () => {
     it("should respect enabled flag", () => {
-      const client = new AnalyticsClient(new MockStrategy());
-      client.initialize();
-      client.updateConfig({ enabled: false });
-      const trackSpy = vi.spyOn(client, "track");
+      // Create a simple test strategy
+      const testStrategy = {
+        name: "test",
+        initialize: vi.fn(),
+        track: vi.fn(),
+        identify: vi.fn(),
+        clearIdentity: vi.fn(),
+        isReady: vi.fn(() => true),
+      };
 
-      client.track("click", testData.clickEvent);
+      // Create new client with disabled config
+      const disabledClient = new AnalyticsClient(testStrategy, {
+        enabled: false,
+      });
+      disabledClient.track("user signed up", { method: "email" });
 
-      expect(trackSpy).toHaveBeenCalled(); // Client method called
-      // But strategy should not receive the event due to enabled: false
+      // Strategy should not receive the event due to enabled: false
+      expect(testStrategy.track).not.toHaveBeenCalled();
     });
 
     it("should update configuration", () => {
@@ -73,21 +85,29 @@ describe("AnalyticsClient", () => {
 
       expect(config).toHaveProperty("enabled");
       expect(config).toHaveProperty("debug");
+      expect(config.enabled).toBe(true);
+      expect(config.debug).toBe(false);
+    });
+
+    it("should not mutate original config when returned", () => {
+      const config = mockAnalytics.client.getConfig();
+      config.debug = true;
+
+      expect(mockAnalytics.client.getConfig().debug).toBe(false);
     });
   });
 
-  describe("Strategy Integration", () => {
-    it("should return the underlying strategy", () => {
-      const strategy = mockAnalytics.client.getStrategy();
-
-      expect(strategy.name).toBe("mock");
-    });
-
+  describe("State Management", () => {
     it("should report ready state", () => {
       expect(mockAnalytics.client.isReady()).toBe(true);
     });
-  });
 
+    it("should report not ready when disabled", () => {
+      mockAnalytics.client.updateConfig({ enabled: false });
+
+      expect(mockAnalytics.client.isReady()).toBe(false);
+    });
+  });
 
   describe("Error Handling", () => {
     it("should handle strategy initialization errors gracefully", async () => {
@@ -96,10 +116,30 @@ describe("AnalyticsClient", () => {
         initialize: vi.fn().mockRejectedValue(new Error("Init failed")),
         track: vi.fn(),
         identify: vi.fn(),
-        page: vi.fn(),
-        reset: vi.fn(),
-        setUser: vi.fn(),
-        captureException: vi.fn(),
+        clearIdentity: vi.fn(),
+        isReady: vi.fn(() => false),
+      };
+
+      const client = new AnalyticsClient(failingStrategy, {
+        debug: false, // Disable debug to avoid console logs in test
+        enabled: true,
+      });
+
+      // Should not throw
+      await expect(client.initialize()).resolves.toBeUndefined();
+    });
+
+    it("should log initialization errors when debug is enabled", async () => {
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      const failingStrategy = {
+        name: "failing",
+        initialize: vi.fn().mockRejectedValue(new Error("Init failed")),
+        track: vi.fn(),
+        identify: vi.fn(),
+        clearIdentity: vi.fn(),
         isReady: vi.fn(() => false),
       };
 
@@ -108,31 +148,55 @@ describe("AnalyticsClient", () => {
         enabled: true,
       });
 
-      // Should not throw
-      expect(() => client.initialize()).not.toThrow();
+      await client.initialize();
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Analytics initialization failed:",
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
     });
 
-    it("should capture exceptions", () => {
-      const error = new Error("Test error");
+    it("should not log initialization errors when debug is disabled", async () => {
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
-      mockAnalytics.client.captureException(error, {
-        component: "TestComponent",
+      const failingStrategy = {
+        name: "failing",
+        initialize: vi.fn().mockRejectedValue(new Error("Init failed")),
+        track: vi.fn(),
+        identify: vi.fn(),
+        clearIdentity: vi.fn(),
+        isReady: vi.fn(() => false),
+      };
+
+      const client = new AnalyticsClient(failingStrategy, {
+        debug: false,
+        enabled: true,
       });
 
-      expect(mockAnalytics.captureException).toHaveBeenCalledWith(error, {
-        component: "TestComponent",
-      });
+      await client.initialize();
+
+      expect(consoleSpy).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
     });
   });
 
   describe("Cleanup", () => {
-    it("should clean up strategy resources on destroy", () => {
-      const destroySpy = vi.fn();
-      mockAnalytics.client.getStrategy().destroy = destroySpy;
+    it("should clean up strategy resources on cleanup", () => {
+      const cleanupSpy = vi.fn();
+      mockAnalytics.strategy.cleanup = cleanupSpy;
 
-      mockAnalytics.client.destroy();
+      mockAnalytics.client.cleanup();
 
-      expect(destroySpy).toHaveBeenCalled();
+      expect(cleanupSpy).toHaveBeenCalled();
+    });
+
+    it("should handle missing cleanup method gracefully", () => {
+      expect(() => mockAnalytics.client.cleanup()).not.toThrow();
     });
   });
 });
