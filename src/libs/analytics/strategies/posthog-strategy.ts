@@ -5,6 +5,7 @@
 
 import { posthog } from "posthog-js";
 import type { AnalyticsStrategy } from "../types";
+import { env } from "@/env";
 
 export interface PostHogConfig {
   apiKey: string;
@@ -19,17 +20,18 @@ export class PostHogStrategy implements AnalyticsStrategy {
   private isInitialized = false;
 
   async initialize(config: PostHogConfig): Promise<void> {
-    if (!config.apiKey || !config.apiHost) {
+    const posthogKey = env.VITE_PUBLIC_POSTHOG_KEY;
+    if (!posthogKey || !env.VITE_PUBLIC_POSTHOG_HOST) {
       throw new Error("PostHog requires apiKey and apiHost");
     }
-
     return new Promise((resolve, reject) => {
       try {
-        posthog.init(config.apiKey, {
-          api_host: config.apiHost,
-          debug: config.debug || false,
+        posthog.init(posthogKey, {
+          api_host: env.VITE_PUBLIC_POSTHOG_HOST,
+          debug: config.debug ?? import.meta.env.MODE === "development",
           capture_pageview: config.capturePageViews ?? true,
-          capture_exceptions: config.captureExceptions ?? true,
+          capture_exceptions: config.captureExceptions ?? true, // This enables capturing exceptions using Error Tracking
+          enable_recording_console_log: true,
           loaded: () => {
             this.isInitialized = true;
             resolve();

@@ -1,14 +1,15 @@
+// Sentry initialization should be imported first!
+import "../instrumentation.ts";
 import "./styles.css";
-// Import PostHog React provider
-import { PostHogProvider } from "posthog-js/react";
 import { StrictMode } from "react";
 // eslint-disable-next-line @typescript-eslint/naming-convention
-import ReactDOM from "react-dom/client";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { env } from "./env.ts";
+import ReactDOM from "react-dom/client";
 import { queryClient } from "./libs/query/query-client.tsx";
 import reportWebVitals from "./reportWebVitals.ts";
 // Import the generated route tree
+import { AnalyticsProvider } from "./libs/analytics/analytics-provider.tsx";
+import { ConsoleStrategy, PostHogStrategy } from "./libs/analytics/index.ts";
 import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
@@ -30,23 +31,21 @@ declare module "@tanstack/react-router" {
 
 // Render the app
 const rootElement = document.querySelector("#app");
+const createAnalyticsClient = () => {
+  if (import.meta.env.DEV) {
+    return new ConsoleStrategy();
+  }
+  return new PostHogStrategy();
+};
 
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
 
   root.render(
     <StrictMode>
-      <PostHogProvider
-        apiKey={env.VITE_PUBLIC_POSTHOG_KEY}
-        options={{
-          api_host: env.VITE_PUBLIC_POSTHOG_HOST,
-          capture_exceptions: true, // This enables capturing exceptions using Error Tracking
-          debug: import.meta.env.MODE === "development",
-          enable_recording_console_log: true,
-        }}
-      >
+      <AnalyticsProvider strategy={createAnalyticsClient()}>
         <RouterProvider router={router} />
-      </PostHogProvider>
+      </AnalyticsProvider>
     </StrictMode>
   );
 }
