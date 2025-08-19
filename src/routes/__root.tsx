@@ -15,7 +15,7 @@ import {
 // import { AreyouSure } from "~/libs/callable";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Toast } from "@/components/ui/toast";
-import { QueryProvider } from "@/libs/query/query-client";
+import { QueryProvider, queryClient } from "@/libs/query/query-client";
 
 declare module "react-aria-components" {
   interface RouterConfig {
@@ -24,6 +24,9 @@ declare module "react-aria-components" {
   }
 }
 export const Route = createRootRoute({
+  context: () => ({
+    queryClient,
+  }),
   component: () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const router = useRouter();

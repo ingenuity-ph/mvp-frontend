@@ -19,12 +19,12 @@ import {
   type RouterQuery,
   type RouterQueryOptions,
 } from "react-query-kit";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { QueryKey } from "@tanstack/react-query";
 import { stripNull, stripUndefined } from "../helpers";
 
 // Endpoint Builder
-interface EndpointSchema<Schema extends z.ZodType> {
+interface EndpointSchema<Schema extends z.ZodTypeAny> {
   payload: Schema;
   response: Schema;
 }
@@ -143,7 +143,7 @@ export const builder = <TConfig extends EndpointConfig>(
 };
 
 function query<
-  Shape extends z.ZodType,
+  Shape extends z.ZodTypeAny,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
 >(
@@ -165,6 +165,25 @@ function query<
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
 
+  // Add validation wrapper if payload schema exists and fetcher is defined
+  if (schema.payload && resolvedOptions.fetcher) {
+    const configuredFetcher = resolvedOptions.fetcher;
+    resolvedOptions.fetcher = (
+      payload: unknown,
+      ctx: Parameters<typeof resolvedOptions.fetcher>[1]
+    ) => {
+      // Validate payload before calling original fetcher
+      const result = schema.payload.safeParse(payload);
+      if (!result.success) {
+        throw new Response(JSON.stringify(result.error), {
+          status: 400,
+          statusText: "Validation Error",
+        });
+      }
+      return configuredFetcher(result.data, ctx);
+    };
+  }
+
   return {
     ...resolvedOptions,
     _type: "q",
@@ -177,7 +196,7 @@ function query<
 }
 
 function infiniteQuery<
-  Shape extends z.ZodType,
+  Shape extends z.ZodTypeAny,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
   TPageParam = number,
@@ -202,6 +221,25 @@ function infiniteQuery<
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
 
+  // Add validation wrapper if payload schema exists and fetcher is defined
+  if (schema.payload && resolvedOptions.fetcher) {
+    const configuredFetcher = resolvedOptions.fetcher;
+    resolvedOptions.fetcher = (
+      payload: unknown,
+      ctx: Parameters<typeof resolvedOptions.fetcher>[1]
+    ) => {
+      // Validate payload before calling original fetcher
+      const result = schema.payload.safeParse(payload);
+      if (!result.success) {
+        throw new Response(JSON.stringify(result.error), {
+          status: 400,
+          statusText: "Validation Error",
+        });
+      }
+      return configuredFetcher(result.data, ctx);
+    };
+  }
+
   return { ...resolvedOptions, _type: "inf", schema } as RouterInfiniteQuery<
     z.infer<Schema["response"]>,
     z.input<Schema["payload"]>,
@@ -211,7 +249,7 @@ function infiniteQuery<
 }
 
 function mutation<
-  Shape extends z.ZodType,
+  Shape extends z.ZodTypeAny,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
   TContext = unknown,
@@ -235,6 +273,22 @@ function mutation<
 ) {
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
+
+  // Add validation wrapper if payload schema exists and mutationFn is defined
+  if (schema.payload && resolvedOptions.mutationFn) {
+    const configuredFetcher = resolvedOptions.mutationFn;
+    resolvedOptions.mutationFn = (payload: unknown) => {
+      // Validate payload before calling original fetcher
+      const result = schema.payload.safeParse(payload);
+      if (!result.success) {
+        throw new Response(JSON.stringify(result.error), {
+          status: 400,
+          statusText: "Validation Error",
+        });
+      }
+      return configuredFetcher(result.data);
+    };
+  }
 
   return { ...resolvedOptions, _type: "m", schema } as RouterMutation<
     z.infer<Schema["response"]>,
@@ -276,7 +330,7 @@ export const paginationMetaSchema = z.object({
   hasPrevious: z.boolean().optional().default(false),
 });
 
-export const withPaginationSchema = <Schema extends z.ZodType>(
+export const withPaginationSchema = <Schema extends z.ZodTypeAny>(
   schema: Schema
 ) => {
   return paginationMetaSchema
@@ -290,7 +344,7 @@ export const withPaginationSchema = <Schema extends z.ZodType>(
     .and(z.object({ results: schema.array() }));
 };
 
-export const parsePaginatedResponse = <Schema extends z.ZodType>(
+export const parsePaginatedResponse = <Schema extends z.ZodTypeAny>(
   schema: Schema,
   data: unknown
 ) => {
