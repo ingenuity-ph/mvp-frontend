@@ -138,6 +138,7 @@ export function Text({
     </_TextNestedContext.Provider>
   );
 }
+export { Text as Paragraph };
 
 export function TextLink({
   className,

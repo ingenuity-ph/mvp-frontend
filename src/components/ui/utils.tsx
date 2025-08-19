@@ -19,6 +19,34 @@ import {
   type useSlottedContext as useAriaSlottedContext,
 } from "react-aria-components";
 import { defaultConfig, tv } from "tailwind-variants";
+
+export const baseStyleConfig = tv({
+  variants: {
+    margin: {
+      default: "",
+      none: "",
+    },
+    border: {
+      default: "",
+      none: "",
+    },
+    padding: {
+      default: "",
+      none: "",
+    },
+    radius: {
+      default: "",
+      none: "",
+    },
+  },
+  defaultVariants: {
+    margin: "default",
+    border: "default",
+    padding: "default",
+    radius: "default",
+  },
+});
+
 /**
  * DISABLE TW MERGE to prevent foot gun.
  */

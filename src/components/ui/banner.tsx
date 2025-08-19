@@ -3,16 +3,15 @@ import { LabelContext, Provider } from "react-aria-components";
 import { tv, type VariantProps } from "tailwind-variants";
 import type { ThemeColors } from "./constants";
 import { surfaceStyles, type SurfaceVariants } from "./surface";
-import { cn } from "./utils";
+import { baseStyleConfig, cn } from "./utils";
 
 type OptionalThemeColors = ThemeColors | "none";
 
 const bannerStyles = tv({
+  extend: baseStyleConfig,
   base: [
     // Define grid at the root level if subgrid is supported
     "supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_auto]",
-    //
-    "[--spacing-surface-gap:--spacing(2)]",
     // Icons
     "[&>[data-slot=icon]]:col-start-1 [&>[data-slot=icon]]:row-start-1 [&>[data-slot=icon]]:size-5",
     "[&>[data-slot=icon]]:text-[color:var(--banner-color-text)]",
@@ -191,7 +190,9 @@ export function Banner({
         {...props}
         className={cn([
           props.className,
+          //
           surfaceStyles({ orientation, color: "none" }),
+          //
           bannerStyles({ color, emphasis }),
           // Override surface border color
           "[--surface-border-color:var(--banner-color-text)]",
