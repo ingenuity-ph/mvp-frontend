@@ -4,7 +4,7 @@ import FormDataAddon from "wretch/addons/formData";
 // eslint-disable-next-line @typescript-eslint/naming-convention, import/no-named-as-default
 import QueryStringAddon from "wretch/addons/queryString";
 import { env } from "@/env";
-import { AuthenticatedRequestAddon } from "./auth";
+import { AuthenticatedRequestAddon } from "./auth-addon";
 
 export const API_URL = env.VITE_API_URL || "http://localhost:9000";
 
