@@ -4,7 +4,7 @@
 
 This template provides everything you need to start building a React application with authentication, analytics, monitoring, and a complete design system - all configured and ready to go!
 
-## ✨ What's Included
+## What's Included
 
 - **React 19** - Latest React with modern features
 - **TypeScript 5.7** - Full type safety with strict configuration
@@ -13,12 +13,9 @@ This template provides everything you need to start building a React application
 - **TanStack Query** - Server state management with caching
 - **Tailwind CSS 4** - Modern styling with custom design system
 - **React Aria Components** - Accessible UI primitives
-- **AWS Amplify** - Authentication ready (configuration needed)
-- **PostHog Analytics** - User behavior tracking
-- **Error Monitoring** - Production-ready error boundaries
 - **Storybook** - Component documentation and testing
 
-## 🎯 Getting Started
+## Getting Started
 
 ### Step 1: Use This Template
 
@@ -83,12 +80,12 @@ VITE_COGNITO_POOL_ID=          # Leave empty for now
 VITE_COGNITO_CLIENT_ID=        # Leave empty for now
 VITE_COGNITO_DOMAIN=           # Leave empty for now
 
-# Analytics & Monitoring (Leave empty - console logging works by default)
+# Analytics  (Leave empty - console logging works by default)
 VITE_PUBLIC_POSTHOG_KEY=
 VITE_PUBLIC_POSTHOG_HOST=
 ```
 
-> 📝 **Note**: Analytics and monitoring work out of the box using console logging. You don't need to configure PostHog or other services initially. When you're ready for production analytics, ask your team lead for the appropriate credentials.
+> 📝 **Note**: Analytics work out of the box using console logging. You don't need to configure PostHog or other services initially. When you're ready for production analytics, ask your team lead for the appropriate credentials.
 
 ### Step 6: Start Development
 
@@ -148,13 +145,14 @@ When conflicts occur, VS Code will show them clearly:
 2. **Click on conflicted files** - VS Code shows a 3-way merge view
 3. **Use VS Code's merge conflict UI**:
    - Click "Accept Current Change" (your project's version)
-   - Click "Accept Incoming Change" (template's version)  
+   - Click "Accept Incoming Change" (template's version)
    - Click "Accept Both Changes" (merge both)
    - Or manually edit the result
 
 **Common conflicts and what to keep:**
+
 - `package.json` - Keep your project name, accept new dependencies
-- `README.md` - Keep your project-specific content  
+- `README.md` - Keep your project-specific content
 - `.env.local` - Keep your configuration values
 
 ```bash
@@ -193,19 +191,18 @@ yarn storybook
 npx tsc --noEmit
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
 ├── components/          # Reusable UI components
-│   ├── ui/             # Design system components (DON'T modify)
+│   ├── ui/             # Design system components (DON'T MODIFY,unless specfied)
 │   └── layouts/        # Page layout components
 ├── features/           # Feature-specific components
 │   └── auth/          # Authentication components
 ├── libs/              # Shared utilities and configurations
 │   ├── analytics/     # PostHog analytics setup
 │   ├── api/          # HTTP client configuration
-│   ├── monitoring/   # Error tracking and monitoring
 │   └── query/        # React Query configuration
 ├── routes/            # File-based routing
 │   ├── __root.tsx    # Root layout (wraps all pages)
@@ -219,7 +216,6 @@ src/
 - **New pages**: Add files to `src/routes/`
 - **New components**: Add to `src/components/` or feature folders
 - **Business logic**: Create new folders in `src/features/`
-- **API calls**: Add to `src/libs/api/` or feature folders
 
 ### Files You Shouldn't Modify (As a Beginner)
 
@@ -227,22 +223,127 @@ src/
 - `src/libs/` - Core library configurations
 - `vite.config.js`, `tsconfig.json` - Build configurations
 
-## 📊 Analytics & Monitoring
+## Design System
 
-The template includes analytics and monitoring that work out of the box:
+The design system is built on **Tailwind CSS 4** with a two-tier token architecture configured in `src/styles.css`. This system provides consistent styling across all components while remaining flexible for customization.
+
+### Token Architecture
+
+**System Tokens** - Foundation-level design decisions defined in the `@theme` block:
+
+- Raw color palettes (50-950 scales for each color family)
+- Typography scales with font sizes and line heights
+- Spacing, border radius, and layout primitives
+
+**Component Tokens** - Higher-level semantic tokens that inherit from system tokens:
+
+- Brand colors (`--color-brand-primary`, `--color-brand-success`, etc.)
+- Surface styling (`--color-surface-background`, `--radius-surface`)
+- Control styling (`--color-control-border`, `--radius-control`)
+
+### Color System
+
+The color system uses **OKLCH color space** for better perceptual uniformity and supports six semantic color families:
+
+- **Primary** - Main brand color
+- **Accent** - Secondary brand color
+- **Neutral** - Text, borders, and backgrounds
+- **Success** - Positive states and confirmations
+- **Warning** - Cautionary messaging
+- **Danger** - Errors and destructive actions
+- **Info** - Informational content
+
+Each color family includes full 50-950 scales designed to work seamlessly across both light and dark modes, covering **80% of typical color use cases**. The scales provide semantic variants (text, border, muted, subtle, bold, inverse) that automatically adapt to theme changes.
+
+### Typography Scale
+
+Five distinct typography categories with consistent sizing:
+
+- **Metric** - Large display numbers and statistics (2rem - 3.25rem)
+- **Heading** - Page and section headers (2.25rem - 6rem)
+- **Title** - Component and card titles (1.25rem - 2.5rem)
+- **Label** - Form labels and UI text (0.75rem - 1.125rem)
+- **Paragraph** - Body text and descriptions (0.75rem - 1.125rem)
+
+All scales include matched line-height values for optimal readability and should **not be modified** unless absolutely necessary for brand requirements.
+
+### Component Integration
+
+The design system integrates seamlessly with **React Aria Components** through component tokens:
+
+- Surface components use `--color-surface-*` and `--radius-surface` tokens
+- Interactive controls use `--color-control-*` and `--radius-control` tokens
+- Button components inherit from `--radius-btn` (maps to control radius)
+- Layout components use standardized spacing through `--spacing-surface-*` tokens
+
+### Customization Guidelines
+
+**For Non-Designers:**
+
+1. **Use Component Tokens First** - Before reaching for system tokens, check if component tokens already provide what you need
+2. **Modify System Tokens for Global Changes** - Want a different primary color? Update the `--color-primary-*` scale
+3. **Create New Component Tokens** - For new components, define semantic tokens that inherit from the system
+4. **Avoid Hardcoded Values** - Always reference design tokens rather than arbitrary CSS values
+5. **Test Across Themes** - Verify your changes work consistently across different theme configurations
+
+**Key Customization Points:**
+
+- Color families can be replaced by updating the OKLCH values in system tokens
+- Component spacing and borders are controlled through surface and control token groups
+- Layout behavior is managed through sidebar and surface padding variables
+
+**Typography Warning:** The typography scales are carefully calibrated for readability and visual hierarchy. Modifying them can break the design system's consistency and should only be done for critical brand requirements.
+
+The system is designed to maintain visual consistency even when customized, as component tokens automatically inherit changes from system tokens.
+
+## Feature Folders
+
+### Organization Pattern
+
+Feature folders group related components, hooks, and logic together.
+Each feature should be self-contained with its own API calls, types, and components.
+Example: `src/features/auth/` contains login forms, auth hooks, and Cognito integration.
+
+### Creating New Features
+
+- Add new folders under `src/features/` for major app sections.
+  Include `components/`, `hooks/`, and `api/` subfolders as needed.
+- Keep feature-specific logic isolated from shared utilities in `src/libs/`.
+
+## Routing
+
+### How to Write Routes
+
+- Create a `.tsx` file in the routes folder - TanStack Router will automatically scaffold the route structure.
+- Add `requireAuth` imported from `auth` feature in the `beforeLoad` for protected routes that need authentication.
+
+### Where to Create Routes
+
+- Add files in `src/routes/(authenticated)/` for protected pages requiring login.
+- Add files in `src/routes/(unauthenticated)/` for public pages like login/signup.
+  See [TanStack Router docs](https://tanstack.com/router/latest/docs/framework/react/guide/file-based-routing) for complete file conventions.
+
+## Analytics & Monitoring
+
+The template includes analytics that work out of the box using PostHog's recommended [object] [verb] naming:
 
 ```tsx
-import { useAnalytics } from '@/libs/analytics';
+import { useAnalytics } from "@/libs/analytics";
 
 function MyComponent() {
   const analytics = useAnalytics();
 
   const handleButtonClick = () => {
-    // This works immediately - logs to console by default
-    analytics.track('button_clicked', {
-      button_name: 'signup',
-      page: 'homepage'
+    // PostHog best practice: [object] [verb] format
+    analytics.track("button clicked", {
+      location: "header",
+      text: "Sign Up",
     });
+
+    // More examples:
+    analytics.track("user signed up", { method: "email" });
+    analytics.track("project created", { template: "react" });
+    analytics.track("page viewed", { page: "dashboard" });
   };
 
   return <button onClick={handleButtonClick}>Sign Up</button>;
@@ -250,16 +351,17 @@ function MyComponent() {
 ```
 
 **What happens by default:**
-- Page views are logged to console automatically
-- Custom events are logged to console  
-- Errors are captured and logged
-- No external service setup required
+
+- Events are logged to console for development
+- Clean [object] [verb] event naming enforced
+- No external service setup required initially
+- IntelliSense shows best practices in JSDoc
 
 ### Production Analytics Setup
 
 When ready for production analytics, ask your **team lead** for:
-- PostHog credentials (if your team uses PostHog)
-- Sentry DSN (if your team uses Sentry for error tracking)  
+
+- PostHog credentials (gets optimized $pageview events automatically)
 - Other monitoring service credentials
 
 Your team should already have these services configured - you just need the environment variables.
@@ -269,6 +371,7 @@ Your team should already have these services configured - you just need the envi
 ### "Command not found: yarn"
 
 **Solution**: Install yarn globally
+
 ```bash
 npm install -g yarn
 ```
@@ -277,28 +380,19 @@ npm install -g yarn
 
 1. Check if port 3000 is already in use
 2. Try a different port: `yarn dev --port 3001`
-3. Clear node_modules and reinstall:
-   ```bash
-   rm -rf node_modules
-   yarn install
-   ```
 
 ### TypeScript errors
 
 Run the type checker to see detailed errors:
+
 ```bash
-npx tsc --noEmit
+yarn typecheck
 ```
 
 ### Build fails
 
 1. Fix any TypeScript errors first
 2. Check that all environment variables are set
-3. Try clearing the build cache:
-   ```bash
-   rm -rf dist
-   yarn build
-   ```
 
 ### Analytics not working
 
@@ -306,7 +400,7 @@ npx tsc --noEmit
 2. Verify the analytics service is initialized (check console messages)
 3. If using production analytics credentials, verify they're correct in `.env.local`
 
-## ⚠️ Important Notes
+## Important Notes
 
 - **Always use yarn**: Never mix npm and yarn in this project
 - **Environment variables**: Never commit `.env.local` to git (it's already in .gitignore)
@@ -314,7 +408,7 @@ npx tsc --noEmit
 - **Node version**: Use Node 18+ for best compatibility
 - **VS Code Recommended**: This template assumes VS Code for merge conflict resolution
 
-## 📋 Team Collaboration
+## Team Collaboration
 
 - **Junior Developers**: Follow this README for setup, create PRs for template updates
 - **Team Leads**: Review and merge template update PRs, manage production credentials
