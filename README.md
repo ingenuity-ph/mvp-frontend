@@ -217,7 +217,7 @@ src/
 - **New components**: Add to `src/components/` or feature folders
 - **Business logic**: Create new folders in `src/features/`
 
-### Files You Shouldn't Modify (As a Beginner)
+### Files You Shouldn't Modify (As a Junior Dev)
 
 - `src/components/ui/` - Design system components
 - `src/libs/` - Core library configurations
@@ -315,13 +315,68 @@ Example: `src/features/auth/` contains login forms, auth hooks, and Cognito inte
 ### How to Write Routes
 
 - Create a `.tsx` file in the routes folder - TanStack Router will automatically scaffold the route structure.
-- Add `requireAuth` imported from `auth` feature in the `beforeLoad` for protected routes that need authentication.
+- Add `requireAuth` imported from `auth` feature in the `beforeLoad` for protected routes that need authentication. by default routes files inside `src/routes/(authenticated)/` are protected.
 
 ### Where to Create Routes
 
 - Add files in `src/routes/(authenticated)/` for protected pages requiring login.
 - Add files in `src/routes/(unauthenticated)/` for public pages like login/signup.
   See [TanStack Router docs](https://tanstack.com/router/latest/docs/framework/react/guide/file-based-routing) for complete file conventions.
+
+## API Integration
+
+### Creating API Endpoints
+
+- Use `builder()` with feature-based query keys and Zod schemas for type safety
+- Define `payload` and `response` schemas for automatic request/response validation
+- Organize endpoints in feature folders (e.g., `src/features/auth/api/endpoints.ts`)
+
+```typescript
+// src/features/users/api/endpoints.ts
+import { z } from "zod";
+import { api } from "@/libs/api/api";
+import { builder } from "@/libs/query/query-kit";
+
+export const UserService = builder("users", {
+  getProfile: builder.query(
+    {
+      payload: z.object({ userId: z.string() }),
+      response: z.object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string(),
+      }),
+    },
+    () => ({
+      fetcher: (payload) => api.get(`/users/${payload.userId}`),
+    })
+  ),
+});
+```
+
+### Query Patterns
+
+- Use `builder.query()` for GET requests, `builder.mutation()` for POST/PUT/DELETE
+- Use `builder.infiniteQuery()` for paginated data with automatic page management
+- Access hooks via `ServiceName.endpointName.useQuery()` or `useMutation()`
+
+### Error Handling
+
+- API errors are automatically structured with `status` and `statusText` properties
+- Use `getErrorMessage()` utility for consistent error display in UI
+- Errors integrate with toast notifications through the global error boundary
+
+### Pagination Support
+
+- Use `toPaginatedResponseSchema()` schema helper for standardized pagination structure
+- Built-in `paginatedParamsSchema` for page/perPage query parameters
+- Infinite queries handle `hasNext`/`hasPrevious` logic automatically
+
+### Best Practices
+
+- Keep API endpoints organized by feature with consistent naming conventions
+- Always define both request and response Zod schemas for full type safety
+- Use the `api` client for requests
 
 ## Analytics & Monitoring
 
@@ -353,7 +408,7 @@ function MyComponent() {
 **What happens by default:**
 
 - Events are logged to console for development
-- Clean [object] [verb] event naming enforced
+- Clean [object] [verb] event naming should be followed
 - No external service setup required initially
 - IntelliSense shows best practices in JSDoc
 
