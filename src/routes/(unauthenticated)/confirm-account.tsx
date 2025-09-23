@@ -128,7 +128,7 @@ function RouteComponent() {
             onPress={() => {
               // TODO: Error Handling
               void resendSignUpCode({ username: email });
-              toaster.success("Code Sent");
+              toaster("Code Sent");
             }}
           >
             Resend Code

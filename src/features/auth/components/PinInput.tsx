@@ -106,13 +106,13 @@ export function PinCodeInput(props: PinCodeProps) {
                   // Horizontal Padding - moved the horizontal padding here to handle enhancers
                   "px-[calc(theme(spacing[3.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)]",
                   // Border
-                  "border-brand-border border has-[[data-hovered]]:border-zinc-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
+                  "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
                   // Background color
                   "bg-transparent dark:bg-white/5",
                   // Invalid state
                   "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
                   // Disabled state
-                  "disabled:border-zinc-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
+                  "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
                   // Adjoined
                 ])}
               >
@@ -127,7 +127,7 @@ export function PinCodeInput(props: PinCodeProps) {
                     // Layout
                     "block w-full h-full text-center appearance-none bg-transparent",
                     // Typography
-                    "text-lg text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white",
+                    "text-lg text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
                     // Hide default focus styles
                     "focus-within:outline-none focus:outline-none focus-visible:outline-none",
                     // Vertical Padding - we only apply the vertical padding to the input itself to have consistent dimensions

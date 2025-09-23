@@ -6,7 +6,7 @@ import QueryStringAddon from "wretch/addons/queryString";
 import { env } from "@/env";
 import { AuthenticatedRequestAddon } from "./auth-addon";
 
-export const API_URL = env.VITE_API_URL || "http://localhost:9000";
+export const API_URL = env.VITE_API_URL;
 
 // Instantiate and configure wretch base
 export const baseAPI = wretch(API_URL)

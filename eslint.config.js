@@ -25,9 +25,10 @@ export default tseslint.config(sheriff(sheriffOptions), {
   extends: [
     ...pluginQuery.configs["flat/recommended"],
     ...pluginRouter.configs["flat/recommended"],
-    ...reactYouMightNotNeedAnEffect,
+    reactYouMightNotNeedAnEffect.configs.recommended,
   ],
   rules: {
+    "@typescript-eslint/consistent-type-definitions": ["error", "type"],
     "fsecond/prefer-destructured-optionals": "off",
     "no-void": "off",
     "@typescript-eslint/no-unsafe-call": "off",
@@ -61,5 +62,27 @@ export default tseslint.config(sheriff(sheriffOptions), {
       2,
       { namedComponents: "function-declaration" },
     ],
+    // Modular Monolith Architecture Rules
+    // "no-restricted-imports": [
+    //   "error",
+    //   {
+    //     patterns: [
+    //       {
+    //         group: [
+    //           "@/features/*/api/*",
+    //           "@/features/*/types/*",
+    //           "@/features/*/utils/*",
+    //         ],
+    //         message:
+    //           "Direct imports from feature internals are not allowed. Use the feature's public interface through its index.ts file.",
+    //       },
+    //       {
+    //         group: ["@/features/*/*", "!@/features/*/index"],
+    //         message:
+    //           "Deep imports into features are not allowed. Import from the feature's public interface (@/features/[feature-name]).",
+    //       },
+    //     ],
+    //   },
+    // ],
   },
 });

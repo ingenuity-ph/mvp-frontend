@@ -5,9 +5,9 @@ const restAPIErrorSchema = z.object({
   status: z.coerce.number(),
 });
 
-type RESTAPIError = z.infer<typeof restAPIErrorSchema>;
+export type APIError = z.infer<typeof restAPIErrorSchema>;
 
-function isRESTAPIError(maybeError: unknown): maybeError is RESTAPIError {
+export function isRESTAPIError(maybeError: unknown): maybeError is APIError {
   return restAPIErrorSchema.safeParse(maybeError).success;
 }
 

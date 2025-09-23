@@ -4,16 +4,14 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
 import { AuthLayout } from "@/components/layouts/auth-layout";
-import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
-import { Description, FieldControl, Label } from "@/components/ui/fieldset";
-import { InputField, PasswordInput } from "@/components/ui/input";
+import { InputField, PasswordInputField } from "@/components/ui/input";
 import { Link } from "@/components/ui/link";
-import { Text, Title } from "@/components/ui/text";
+import { Text, TextLink, Title } from "@/components/ui/text";
 import { toaster } from "@/components/ui/toast";
-import { Content } from "@/components/ui/view";
 import { CognitoAuthService } from "@/features/auth/cognito/api/endpoints";
 import { getErrorMessage } from "@/libs/query/query-error";
+import { MutationErrorBanner } from "@/libs/query/query-resolver";
 
 /**
  * TODO:
@@ -72,10 +70,10 @@ export function LoginFlowForm() {
               void navigate({ to: "/home" });
             },
             onError(error) {
-              toaster.error(getErrorMessage(error));
+              toaster(getErrorMessage(error));
               form.setError("root", { message: getErrorMessage(error) });
             },
-          }
+          },
         );
       }
     }
@@ -98,39 +96,24 @@ export function LoginFlowForm() {
           />
         </span>
         <Title>Sign in to your account</Title>
-        {rootError !== undefined && (
-          <Banner color="danger">
-            <Content>
-              <Label
-                color="none"
-                className="[--text-color:var(--banner-text-color)] font-medium"
-              >
-                Login Error
-              </Label>
-              <Description className="[--text-color:var(--banner-text-color)]">
-                {rootError}
-              </Description>
-            </Content>
-          </Banner>
-        )}
+        <MutationErrorBanner errorMessage={rootError} label="Login Error" />
         <InputField
           control={form.control}
           field="username"
           label="Email Address"
         />
-        <FieldControl control={form.control} field="password">
-          <Label>Password</Label>
-          <PasswordInput type="password" name="password" />
-        </FieldControl>
+        <PasswordInputField
+          control={form.control}
+          field="password"
+          label="Password"
+        />
         <div className="flex items-center justify-between">
-          <Text className="ml-auto">
-            <Link
-              to="/reset-password"
-              className="font-medium hover:text-neutral-700 hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </Text>
+          <TextLink
+            to="/reset-password"
+            className="ml-auto font-medium hover:text-neutral-700 hover:underline"
+          >
+            Forgot password?
+          </TextLink>
         </div>
         <Button type="submit" className="w-full" isPending={isLoading}>
           Login

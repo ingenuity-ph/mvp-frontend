@@ -24,10 +24,10 @@ import type { QueryKey } from "@tanstack/react-query";
 import { stripNull, stripUndefined } from "../helpers";
 
 // Endpoint Builder
-interface EndpointSchema<Schema extends z.ZodTypeAny> {
+type EndpointSchema<Schema extends z.ZodType> = {
   payload: Schema;
   response: Schema;
-}
+};
 
 type QueryEndpoint = RouterQuery<any, any, any> & { schema: any };
 type InfiniteQueryEndpoint = RouterInfiniteQuery<any, any, any> & {
@@ -35,13 +35,13 @@ type InfiniteQueryEndpoint = RouterInfiniteQuery<any, any, any> & {
 };
 type MutationEndpoint = RouterMutation<any, any, any, any> & { schema: any };
 
-interface EndpointConfig {
+type EndpointConfig = {
   [k: string]:
     | QueryEndpoint
     | InfiniteQueryEndpoint
     | MutationEndpoint
     | EndpointConfig;
-}
+};
 
 /**
  * `router` implementation that includes a zod schema for reuse and type safety.
@@ -71,8 +71,8 @@ const buildEndpoints = (keys: QueryKey, config: EndpointConfig) => {
             : opts._type === `q`
               ? {
                   schema: opts.schema,
-                  useQuery: createQuery(options),
                   useSuspenseQuery: createSuspenseQuery(options),
+                  useQuery: createQuery(options),
                   ...createQuery(options),
                 }
               : {
@@ -89,7 +89,7 @@ const buildEndpoints = (keys: QueryKey, config: EndpointConfig) => {
     },
     {
       getKey: () => keys,
-    }
+    },
   );
 };
 
@@ -136,53 +136,57 @@ type CreatEndpoints<TConfig extends EndpointConfig> = {
 
 export const builder = <TConfig extends EndpointConfig>(
   key: string | QueryKey,
-  config: TConfig
+  config: TConfig,
 ): CreatEndpoints<TConfig> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return buildEndpoints(Array.isArray(key) ? key : [key], config);
 };
 
 function query<
-  Shape extends z.ZodTypeAny,
+  Shape extends z.ZodType,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
 >(
   schema: Schema,
   options:
     | ((
-        args: Schema
+        args: Schema,
       ) => RouterQueryOptions<
         z.infer<Schema["response"]>,
-        z.input<Schema["payload"]>,
+        z.infer<Schema["payload"]>,
         TError
       >)
     | RouterQueryOptions<
         z.infer<Schema["response"]>,
-        z.input<Schema["payload"]>,
+        z.infer<Schema["payload"]>,
         TError
-      >
+      >,
 ) {
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
 
-  // Add validation wrapper if payload schema exists and fetcher is defined
-  if (schema.payload && resolvedOptions.fetcher) {
-    const configuredFetcher = resolvedOptions.fetcher;
-    resolvedOptions.fetcher = (
-      payload: unknown,
-      ctx: Parameters<typeof resolvedOptions.fetcher>[1]
-    ) => {
-      // Validate payload before calling original fetcher
-      const result = schema.payload.safeParse(payload);
-      if (!result.success) {
-        throw new Response(JSON.stringify(result.error), {
-          status: 400,
-          statusText: "Validation Error",
-        });
-      }
-      return configuredFetcher(result.data, ctx);
-    };
-  }
+  const configuredFetcher = resolvedOptions.fetcher;
+
+  resolvedOptions.fetcher = (
+    payload: Parameters<typeof resolvedOptions.fetcher>[0],
+    ctx: Parameters<typeof resolvedOptions.fetcher>[1],
+  ) => {
+    // Validate payload before calling original fetcher
+    const isPayloadOptional = schema.payload.safeParse(null).success;
+    const resolvedPayload = isPayloadOptional ? (payload ?? null) : payload;
+
+    const result = schema.payload.safeParse(resolvedPayload);
+
+    if (!result.success) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw new Response(JSON.stringify(result.error), {
+        status: 400,
+        statusText: "Validation Error",
+      });
+    }
+
+    return configuredFetcher(result.data, ctx);
+  };
 
   return {
     ...resolvedOptions,
@@ -196,7 +200,7 @@ function query<
 }
 
 function infiniteQuery<
-  Shape extends z.ZodTypeAny,
+  Shape extends z.ZodType,
   Schema extends EndpointSchema<Shape>,
   TError = CompatibleError,
   TPageParam = number,
@@ -204,41 +208,46 @@ function infiniteQuery<
   schema: Schema,
   options:
     | ((
-        args: Schema
+        args: Schema,
       ) => RouterInfiniteQueryOptions<
         z.infer<Schema["response"]>,
-        z.input<Schema["payload"]>,
+        z.infer<Schema["payload"]>,
         TError,
         TPageParam
       >)
     | RouterInfiniteQueryOptions<
         z.infer<Schema["response"]>,
-        z.input<Schema["payload"]>,
+        z.infer<Schema["payload"]>,
         TError,
         TPageParam
-      >
+      >,
 ) {
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
 
   // Add validation wrapper if payload schema exists and fetcher is defined
-  if (schema.payload && resolvedOptions.fetcher) {
-    const configuredFetcher = resolvedOptions.fetcher;
-    resolvedOptions.fetcher = (
-      payload: unknown,
-      ctx: Parameters<typeof resolvedOptions.fetcher>[1]
-    ) => {
-      // Validate payload before calling original fetcher
-      const result = schema.payload.safeParse(payload);
-      if (!result.success) {
-        throw new Response(JSON.stringify(result.error), {
-          status: 400,
-          statusText: "Validation Error",
-        });
-      }
-      return configuredFetcher(result.data, ctx);
-    };
-  }
+  const configuredFetcher = resolvedOptions.fetcher;
+
+  resolvedOptions.fetcher = (
+    payload: z.infer<Schema["payload"]>,
+    ctx: Parameters<typeof resolvedOptions.fetcher>[1],
+  ) => {
+    // Validate payload before calling original fetcher
+    const isPayloadOptional = schema.payload.safeParse(null).success;
+    const resolvedPayload = isPayloadOptional ? (payload ?? null) : payload;
+
+    const result = schema.payload.safeParse(resolvedPayload);
+
+    if (!result.success) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw new Response(JSON.stringify(result.error), {
+        status: 400,
+        statusText: "Validation Error",
+      });
+    }
+
+    return configuredFetcher(result.data, ctx);
+  };
 
   return { ...resolvedOptions, _type: "inf", schema } as RouterInfiniteQuery<
     z.infer<Schema["response"]>,
@@ -249,44 +258,49 @@ function infiniteQuery<
 }
 
 function mutation<
-  Shape extends z.ZodTypeAny,
+  Shape extends z.ZodType,
   Schema extends EndpointSchema<Shape>,
+  TPayload = z.infer<Schema["payload"]>,
   TError = CompatibleError,
   TContext = unknown,
 >(
   schema: Schema,
   options:
     | ((
-        args: Schema
+        args: Schema,
       ) => RouterMutationOptions<
         z.infer<Schema["response"]>,
-        z.input<Schema["payload"]>,
+        TPayload,
         TError,
         TContext
       >)
     | RouterMutationOptions<
         z.infer<Schema["response"]>,
-        z.input<Schema["payload"]>,
+        TPayload,
         TError,
         TContext
-      >
+      >,
 ) {
   const resolvedOptions =
     typeof options === "function" ? options(schema) : options;
 
   // Add validation wrapper if payload schema exists and mutationFn is defined
-  if (schema.payload && resolvedOptions.mutationFn) {
-    const configuredFetcher = resolvedOptions.mutationFn;
+  const configuredFetcher = resolvedOptions.mutationFn;
+
+  if (configuredFetcher) {
     resolvedOptions.mutationFn = (payload: unknown) => {
       // Validate payload before calling original fetcher
       const result = schema.payload.safeParse(payload);
+
       if (!result.success) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw new Response(JSON.stringify(result.error), {
           status: 400,
           statusText: "Validation Error",
         });
       }
-      return configuredFetcher(result.data);
+
+      return configuredFetcher(result.data as TPayload);
     };
   }
 
@@ -309,7 +323,7 @@ export const toQueryParams = (
   rawParams: Record<string, any>,
   options?: {
     stripNull?: boolean;
-  }
+  },
 ) => {
   const { stripNull: shouldStripNull = true } = options ?? {};
   let parsed = stripUndefined(rawParams);
@@ -330,8 +344,8 @@ export const paginationMetaSchema = z.object({
   hasPrevious: z.boolean().optional().default(false),
 });
 
-export const withPaginationSchema = <Schema extends z.ZodTypeAny>(
-  schema: Schema
+export const withPaginationSchema = <Schema extends z.ZodType>(
+  schema: Schema,
 ) => {
   return paginationMetaSchema
     .transform((values) => {
@@ -344,9 +358,9 @@ export const withPaginationSchema = <Schema extends z.ZodTypeAny>(
     .and(z.object({ results: schema.array() }));
 };
 
-export const parsePaginatedResponse = <Schema extends z.ZodTypeAny>(
+export const parsePaginatedResponse = <Schema extends z.ZodType>(
   schema: Schema,
-  data: unknown
+  data: unknown,
 ) => {
   return withPaginationSchema(schema).parse(data);
 };

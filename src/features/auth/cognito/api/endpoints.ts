@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { api } from "@/libs/api/api";
 import { builder } from "@/libs/query/query-kit";
 
@@ -17,6 +17,6 @@ export const CognitoAuthService = builder(baseQueryKey, {
       return {
         mutationFn: (payload) => api.post(payload, "/validate-token"),
       };
-    }
+    },
   ),
 });

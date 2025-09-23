@@ -1,11 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { MutationHookResult, QueryHookResult } from "react-query-kit";
-import { InfoIcon } from "@phosphor-icons/react";
+import { InfoIcon, WarningCircleIcon } from "@phosphor-icons/react";
+import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/fieldset";
 import { ProgressCircle } from "@/components/ui/progress";
 import { Code, Text } from "@/components/ui/text";
 import { EnhancerGroup } from "@/components/ui/utils";
+import { Content } from "@/components/ui/view";
 import { getErrorMessage } from "./query-error";
 
 function DefaultLoadingElement() {
@@ -121,7 +123,7 @@ export function MutationResolver<TData, TError, TVariables>({
   mutation: MutationHookResult<TData, TError, TVariables>;
   children:
     | ((
-        d: MutationHookResult<TData, TError, TVariables>["data"]
+        d: MutationHookResult<TData, TError, TVariables>["data"],
       ) => React.ReactNode)
     | React.ReactNode;
   loadingElement?: React.ReactNode;
@@ -164,7 +166,7 @@ export function MutationResolver<TData, TError, TVariables>({
                 TData,
                 TError,
                 TVariables
-              >["data"]
+              >["data"],
             )
           : children}
       </>
@@ -172,26 +174,6 @@ export function MutationResolver<TData, TError, TVariables>({
   }
 
   return <>{loadingElement}</>;
-}
-
-export function QueryPendingToast<TData, TError>({
-  query,
-}: {
-  query: QueryHookResult<TData, TError>;
-}) {
-  useEffect(() => {
-    if (query.isLoading) {
-      // toaster.info("Loading");
-    }
-  }, [query.isLoading]);
-
-  useEffect(() => {
-    if (query.isSuccess) {
-      // toaster.success("Loaded");
-    }
-  }, [query.isSuccess]);
-
-  return null;
 }
 
 export function QueryErrorBanner<TData, TError>({
@@ -204,12 +186,50 @@ export function QueryErrorBanner<TData, TError>({
       query={query}
       loadingElement={null}
       errorElement={
-        <EnhancerGroup className="w-full rounded-[var(--surface-radius)] border border-danger-700 bg-brand-danger-subtle p-2">
+        <EnhancerGroup className="border-danger-700 bg-brand-danger-subtle w-full rounded-[var(--surface-radius)] border p-2">
           <InfoIcon weight="fill" className="text-brand-danger-text" />
         </EnhancerGroup>
       }
     >
       {() => null}
     </QueryResolver>
+  );
+}
+
+export function MutationErrorBanner({
+  errorMessage,
+  label,
+}: {
+  errorMessage?: React.ReactNode;
+  label: string;
+}) {
+  const bannerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (errorMessage && bannerRef.current) {
+      bannerRef.current.focus();
+    }
+  }, [errorMessage]);
+
+  if (!errorMessage) {
+    return null;
+  }
+
+  return (
+    <div ref={bannerRef} className="contents">
+      <Banner color="danger">
+        <span data-slot="icon">
+          <WarningCircleIcon className="size-[1lh]" />
+        </span>
+        <Content>
+          <Label color="unset" className="font-medium">
+            {label}
+          </Label>
+          <Text color="inherit" className="text-brand-danger-bold">
+            {errorMessage}
+          </Text>
+        </Content>
+      </Banner>
+    </div>
   );
 }

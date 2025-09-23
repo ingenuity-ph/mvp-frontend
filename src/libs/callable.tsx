@@ -6,22 +6,23 @@
  */
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertDialog, DialogActions } from "@/components/ui/dialog";
+import { AlertDialog } from "@/components/ui/dialog";
 import { Description } from "@/components/ui/fieldset";
+import { SurfaceActions } from "@/components/ui/surface";
 import { Title } from "@/components/ui/text";
 
 export type PrivateResolve<Response> = (
-  value: Response | PromiseLike<Response>
+  value: Response | PromiseLike<Response>,
 ) => void;
 
-export interface PrivateCallContext<Props, Response> {
+export type PrivateCallContext<Props, Response> = {
   key: string;
   props: Props;
   promise: Promise<Response>;
   resolve: PrivateResolve<Response>;
   end: (response: Response) => void;
   ended: boolean;
-}
+};
 export type PrivateStackState<Props, Response> = Array<
   PrivateCallContext<Props, Response>
 >;
@@ -58,17 +59,17 @@ export type UserComponentType<Props, Response, RootProps> =
 /**
  * What createCallable returns.
  */
-export interface Callable<Props, Response, RootProps> {
+export type Callable<Props, Response, RootProps> = {
   Root: React.FunctionComponent<RootProps>;
   call: CallFunction<Props, Response>;
   end: ((promise: Promise<Response>, response: Response) => void) &
     ((response: Response) => void);
   update: ((promise: Promise<Response>, props: Partial<Props>) => void) &
     ((props: Partial<Props>) => void);
-}
+};
 export function createCallable<Props = void, Response = void, RootProps = {}>(
   UserComponent: UserComponentType<Props, Response, RootProps>,
-  unmountingDelay = 0
+  unmountingDelay = 0,
 ): Callable<Props, Response, RootProps> {
   let $setStack: PrivateStackStateSetter<Props, Response> | null = null;
   let $nextKey = 0;
@@ -93,7 +94,7 @@ export function createCallable<Props = void, Response = void, RootProps = {}>(
 
       globalThis.setTimeout(() => {
         scopedSetStack((prev) =>
-          prev.filter((c) => promise && c.promise !== promise)
+          prev.filter((c) => promise && c.promise !== promise),
         );
       }, unmountingDelay);
     };
@@ -154,7 +155,7 @@ export function createCallable<Props = void, Response = void, RootProps = {}>(
     },
     Root: (rootProps: RootProps) => {
       const [stack, setStack] = useState<PrivateStackState<Props, Response>>(
-        []
+        [],
       );
 
       useEffect(() => {
@@ -195,7 +196,7 @@ export const AreyouSure = createCallable<
     <AlertDialog defaultOpen>
       <Title>Confirm Action</Title>
       <Description>{description}</Description>
-      <DialogActions>
+      <SurfaceActions>
         <Button
           variant="plain"
           slot="close"
@@ -213,7 +214,7 @@ export const AreyouSure = createCallable<
         >
           {confirmText}
         </Button>
-      </DialogActions>
+      </SurfaceActions>
     </AlertDialog>
   );
 });

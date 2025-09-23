@@ -13,10 +13,8 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as PreviewImport } from './routes/preview'
 import { Route as LogoutImport } from './routes/logout'
-import { Route as ExamplesRouteImport } from './routes/examples/route'
 import { Route as unauthenticatedRouteImport } from './routes/(unauthenticated)/route'
 import { Route as IndexImport } from './routes/index'
-import { Route as ExamplesIndexImport } from './routes/examples/index'
 import { Route as unauthenticatedResetPasswordImport } from './routes/(unauthenticated)/reset-password'
 import { Route as unauthenticatedRegisterImport } from './routes/(unauthenticated)/register'
 import { Route as unauthenticatedLoginImport } from './routes/(unauthenticated)/login'
@@ -37,12 +35,6 @@ const LogoutRoute = LogoutImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ExamplesRouteRoute = ExamplesRouteImport.update({
-  id: '/examples',
-  path: '/examples',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const unauthenticatedRouteRoute = unauthenticatedRouteImport.update({
   id: '/(unauthenticated)',
   getParentRoute: () => rootRoute,
@@ -52,12 +44,6 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any)
-
-const ExamplesIndexRoute = ExamplesIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ExamplesRouteRoute,
 } as any)
 
 const unauthenticatedResetPasswordRoute =
@@ -110,13 +96,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unauthenticatedRouteImport
       parentRoute: typeof rootRoute
     }
-    '/examples': {
-      id: '/examples'
-      path: '/examples'
-      fullPath: '/examples'
-      preLoaderRoute: typeof ExamplesRouteImport
-      parentRoute: typeof rootRoute
-    }
     '/logout': {
       id: '/logout'
       path: '/logout'
@@ -166,13 +145,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unauthenticatedResetPasswordImport
       parentRoute: typeof unauthenticatedRouteImport
     }
-    '/examples/': {
-      id: '/examples/'
-      path: '/'
-      fullPath: '/examples/'
-      preLoaderRoute: typeof ExamplesIndexImport
-      parentRoute: typeof ExamplesRouteImport
-    }
   }
 }
 
@@ -195,21 +167,8 @@ const unauthenticatedRouteRouteChildren: unauthenticatedRouteRouteChildren = {
 const unauthenticatedRouteRouteWithChildren =
   unauthenticatedRouteRoute._addFileChildren(unauthenticatedRouteRouteChildren)
 
-interface ExamplesRouteRouteChildren {
-  ExamplesIndexRoute: typeof ExamplesIndexRoute
-}
-
-const ExamplesRouteRouteChildren: ExamplesRouteRouteChildren = {
-  ExamplesIndexRoute: ExamplesIndexRoute,
-}
-
-const ExamplesRouteRouteWithChildren = ExamplesRouteRoute._addFileChildren(
-  ExamplesRouteRouteChildren,
-)
-
 export interface FileRoutesByFullPath {
   '/': typeof unauthenticatedRouteRouteWithChildren
-  '/examples': typeof ExamplesRouteRouteWithChildren
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
   '/home': typeof authenticatedHomeRoute
@@ -217,7 +176,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof unauthenticatedLoginRoute
   '/register': typeof unauthenticatedRegisterRoute
   '/reset-password': typeof unauthenticatedResetPasswordRoute
-  '/examples/': typeof ExamplesIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -229,14 +187,12 @@ export interface FileRoutesByTo {
   '/login': typeof unauthenticatedLoginRoute
   '/register': typeof unauthenticatedRegisterRoute
   '/reset-password': typeof unauthenticatedResetPasswordRoute
-  '/examples': typeof ExamplesIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/(unauthenticated)': typeof unauthenticatedRouteRouteWithChildren
-  '/examples': typeof ExamplesRouteRouteWithChildren
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
   '/(authenticated)/home': typeof authenticatedHomeRoute
@@ -244,14 +200,12 @@ export interface FileRoutesById {
   '/(unauthenticated)/login': typeof unauthenticatedLoginRoute
   '/(unauthenticated)/register': typeof unauthenticatedRegisterRoute
   '/(unauthenticated)/reset-password': typeof unauthenticatedResetPasswordRoute
-  '/examples/': typeof ExamplesIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/examples'
     | '/logout'
     | '/preview'
     | '/home'
@@ -259,7 +213,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
-    | '/examples/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -270,12 +223,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
-    | '/examples'
   id:
     | '__root__'
     | '/'
     | '/(unauthenticated)'
-    | '/examples'
     | '/logout'
     | '/preview'
     | '/(authenticated)/home'
@@ -283,14 +234,12 @@ export interface FileRouteTypes {
     | '/(unauthenticated)/login'
     | '/(unauthenticated)/register'
     | '/(unauthenticated)/reset-password'
-    | '/examples/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   unauthenticatedRouteRoute: typeof unauthenticatedRouteRouteWithChildren
-  ExamplesRouteRoute: typeof ExamplesRouteRouteWithChildren
   LogoutRoute: typeof LogoutRoute
   PreviewRoute: typeof PreviewRoute
   authenticatedHomeRoute: typeof authenticatedHomeRoute
@@ -299,7 +248,6 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   unauthenticatedRouteRoute: unauthenticatedRouteRouteWithChildren,
-  ExamplesRouteRoute: ExamplesRouteRouteWithChildren,
   LogoutRoute: LogoutRoute,
   PreviewRoute: PreviewRoute,
   authenticatedHomeRoute: authenticatedHomeRoute,
@@ -317,7 +265,6 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/(unauthenticated)",
-        "/examples",
         "/logout",
         "/preview",
         "/(authenticated)/home"
@@ -333,12 +280,6 @@ export const routeTree = rootRoute
         "/(unauthenticated)/login",
         "/(unauthenticated)/register",
         "/(unauthenticated)/reset-password"
-      ]
-    },
-    "/examples": {
-      "filePath": "examples/route.tsx",
-      "children": [
-        "/examples/"
       ]
     },
     "/logout": {
@@ -365,10 +306,6 @@ export const routeTree = rootRoute
     "/(unauthenticated)/reset-password": {
       "filePath": "(unauthenticated)/reset-password.tsx",
       "parent": "/(unauthenticated)"
-    },
-    "/examples/": {
-      "filePath": "examples/index.tsx",
-      "parent": "/examples"
     }
   }
 }

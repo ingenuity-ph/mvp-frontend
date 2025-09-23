@@ -1,3 +1,15 @@
+import { Collection, DialogTrigger, MenuTrigger } from "react-aria-components";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CaretRightIcon,
+  CubeTransparentIcon,
+  HandHeartIcon,
+  StarIcon,
+  WarningCircleIcon,
+} from "@phosphor-icons/react";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Calendar, RangeCalendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
@@ -25,36 +37,18 @@ import {
 } from "@/components/ui/fieldset";
 import { Input, InputField, PasswordInput } from "@/components/ui/input";
 import { Link } from "@/components/ui/link";
-import {
-  Menu,
-  MenuDescription,
-  MenuItem,
-  MenuLabel,
-  MenuSection,
-} from "@/components/ui/menu";
+import { Menu, MenuItem, MenuSection } from "@/components/ui/menu";
 import { RadioField, RadioGroup } from "@/components/ui/radio";
 import { Option, Select, SelectField } from "@/components/ui/select";
 import { SurfaceActions } from "@/components/ui/surface";
 import { SwitchField } from "@/components/ui/switch";
 import { Tab, TabList, TabPanel, Tabs } from "@/components/ui/tabs";
-import { Tag } from "@/components/ui/tag";
+import { Tag, TagGroup, TagList } from "@/components/ui/tag";
 import { Text, Title } from "@/components/ui/text";
 import { TextareaField } from "@/components/ui/textarea";
 import { TimePickerField } from "@/components/ui/time-picker";
 import { cn, Group } from "@/components/ui/utils";
 import { Content, Footer, Header } from "@/components/ui/view";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  CaretRightIcon,
-  CubeTransparentIcon,
-  HandHeartIcon,
-  StarIcon,
-  WarningCircleIcon,
-} from "@phosphor-icons/react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Collection, DialogTrigger, MenuTrigger } from "react-aria-components";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 export const Route = createFileRoute("/preview")({
   component: RouteComponent,
@@ -105,10 +99,11 @@ const schema = z.object({
 
 function RouteComponent() {
   const form = useForm({ resolver: zodResolver(schema) });
+
   return (
     <div className="p-4">
-      <div className="grid gap-surface">
-        <div className="mt-1 grid gap-surface sm:grid-cols-2 md:grid-cols-3">
+      <div className="gap-surface grid">
+        <div className="gap-surface mt-1 grid sm:grid-cols-2 md:grid-cols-3">
           <Card className="items-center justify-center">
             <div className="grid grid-cols-3 gap-2">
               {themeColors.map((color) => {
@@ -194,7 +189,7 @@ function RouteComponent() {
             </Footer>
           </Card>
           <Card className="items-center justify-center">
-            <FieldGroup className="max-w-sm w-full">
+            <FieldGroup className="w-full max-w-sm">
               <Select
                 aria-label="Select a role"
                 placeholder="Select a role"
@@ -305,11 +300,13 @@ function RouteComponent() {
             </form>
           </Card>
           <Card className="grid items-center justify-center">
-            <div className="flex gap-3">
-              <Tag color="success">documentation</Tag>
-              <Tag color="warning">help wanted</Tag>
-              <Tag color="danger">bug</Tag>
-            </div>
+            <TagGroup>
+              <TagList className="flex gap-3">
+                <Tag color="success">documentation</Tag>
+                <Tag color="warning">help wanted</Tag>
+                <Tag color="danger">bug</Tag>
+              </TagList>
+            </TagGroup>
           </Card>
           <Card>
             <Label size="md" className="font-semibold">
@@ -320,7 +317,7 @@ function RouteComponent() {
                 Share this link with your team to give them access to your
                 organization.
               </Description>
-              <Group className="flex gap-3 mt-3">
+              <Group className="mt-3 flex gap-3">
                 <Input
                   readOnly
                   value="https://example.com/teams/invite/eHGJEj12FHDKSi"
@@ -337,7 +334,7 @@ function RouteComponent() {
           <Card className="items-center justify-center">
             <DatePickerField
               label="Date of birth"
-              className="max-w-3xs w-full"
+              className="w-full max-w-3xs"
               control={form.control}
               field="value"
             />
@@ -348,7 +345,7 @@ function RouteComponent() {
               <RangeCalendar />
             </Field>
           </Card>
-          <Card className="items-center justify-center col-span-2">
+          <Card className="col-span-2 items-center justify-center">
             <Field>
               <Label>Select range</Label>
               <RangeCalendar visibleDuration={{ months: 2 }} />
@@ -487,19 +484,19 @@ function RouteComponent() {
             </RadioGroup>
           </Card>
           <Card>
-            <Group orientation="vertical" adjoined className="flex flex-col">
+            <Group adjoined orientation="vertical" className="flex flex-col">
               <DialogTrigger>
                 <Button
                   variant="unstyled"
                   className={cn([
                     // Base
-                    "relative isolate inline-flex max-w-md w-full items-start justify-center gap-x-3 rounded-t-(--radius-btn) border-t border-x text-sm",
+                    "relative isolate inline-flex w-full max-w-md items-start justify-center gap-x-3 rounded-t-(--radius-btn) border-x border-t text-sm",
                     //
                     "text-brand-neutral border-brand-neutral-muted bg-neutral-200/10 hover:bg-neutral-50",
                     // Padding
                     "px-4 py-2",
                     // Focus
-                    "focus:outline-2 focus:outline-offset-2 focus:outline-info-500",
+                    "focus:outline-info-500 focus:outline-2 focus:outline-offset-2",
                     // Disabled
                     "disabled:opacity-50",
                     // Elevate button on focus when adjoined
@@ -508,9 +505,9 @@ function RouteComponent() {
                 >
                   <HandHeartIcon
                     weight="fill"
-                    className="size-6 text-brand-bold"
+                    className="text-brand-bold size-6"
                   />
-                  <div className="flex-1 flex items-center">
+                  <div className="flex flex-1 items-center">
                     <ul className="grid flex-1 gap-1 text-left font-light">
                       <li>Free Shipping</li>
                       <li>1% Credit Reward</li>
@@ -554,18 +551,18 @@ function RouteComponent() {
                   </Content>
                 </Dialog>
               </DialogTrigger>
-              <Divider inset="none" />
+              <Divider inset="unset" />
               <Button
                 variant="unstyled"
                 className={cn([
                   // Base
-                  "relative isolate inline-flex max-w-md w-full items-start justify-center gap-x-3 rounded-b-(--radius-btn) border-x border-b text-sm",
+                  "relative isolate inline-flex w-full max-w-md items-start justify-center gap-x-3 rounded-b-(--radius-btn) border-x border-b text-sm",
                   //
                   "text-brand-neutral border-brand-neutral-muted bg-neutral-200/10 hover:bg-neutral-50",
                   // Padding
                   "px-4 py-2",
                   // Focus
-                  "focus:outline-2 focus:outline-offset-2 focus:outline-info-500",
+                  "focus:outline-info-500 focus:outline-2 focus:outline-offset-2",
                   // Disabled
                   "disabled:opacity-50",
                   // Elevate button on focus when adjoined
@@ -574,10 +571,10 @@ function RouteComponent() {
               >
                 <CubeTransparentIcon
                   weight="fill"
-                  className="size-6 text-brand-bold"
+                  className="text-brand-bold size-6"
                 />
-                <div className="flex-1 flex items-center">
-                  <ul className="text-left font-light gap-1 grid">
+                <div className="flex flex-1 items-center">
+                  <ul className="grid gap-1 text-left font-light">
                     <li>1-Inch CMOS &amp; 4K/120fps</li>
                     <li>
                       2-Inch Rotatable Screen &amp; Smart Horizontal-Vertical
@@ -616,23 +613,23 @@ function RouteComponent() {
               </Button>
               <Menu>
                 <MenuItem>
-                  <StarIcon weight="fill" className="size-4 text-warning-500" />
-                  <MenuLabel>Favorite</MenuLabel>
-                  <MenuDescription>
+                  <StarIcon weight="fill" className="text-warning-500 size-4" />
+                  <Label>Favorite</Label>
+                  <Description>
                     This will be shown under the product title.
-                  </MenuDescription>
+                  </Description>
                 </MenuItem>
                 <MenuItem>
-                  <MenuLabel>Edit</MenuLabel>
+                  <Label>Edit</Label>
                 </MenuItem>
                 <MenuItem color="danger">
-                  <MenuLabel>Favorite</MenuLabel>
-                  <MenuDescription>
+                  <Label>Favorite</Label>
+                  <Description>
                     This will be shown under the product title.
-                  </MenuDescription>
+                  </Description>
                 </MenuItem>
                 <MenuItem>
-                  <MenuLabel>Share</MenuLabel>
+                  <Label>Share</Label>
                 </MenuItem>
               </Menu>
             </MenuTrigger>
@@ -649,7 +646,7 @@ function RouteComponent() {
                   >
                     <Label
                       className="font-medium text-neutral-500"
-                      color="none"
+                      color="unset"
                       size="xs"
                     >
                       Styles
