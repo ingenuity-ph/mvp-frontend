@@ -1,94 +1,162 @@
-import type React from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import type { Inset, VariantConfigMap } from "./constants";
-import { cn } from "./utils";
+import type { ComponentPropsWithoutRef } from "react";
+import { cn, createSplitProps, createStyles, type VariantProps } from "./utils";
 
-const surfaceStyles = tv({
+/**
+ * @internal
+ *
+ * use `composeSurfaceStyles`
+ */
+const surfaceStyles = createStyles({
   base: [
     // Base
-    "rounded-[var(--surface-radius,var(--radius-surface))] forced-colors:outline",
+    "forced-colors:outline",
     // Layout
-    "flex gap-[var(--spacing-surface-gap,var(--spacing-surface))]",
+    "flex gap-[var(--gap)]",
     //
     "[&>[data-slot=header]+[data-slot=content]]:mt-4",
     "[&>[data-slot=content]+[data-slot=footer]]:mt-8",
+    // Variables that insets inherit to work properly
+    // "[--inset-padding-top:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
+    // "[--inset-padding-right:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
+    // "[--inset-padding-bottom:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
+    // "[--inset-padding-left:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
   ],
   variants: {
     border: {
-      none: "",
+      unset: "",
       default: [
+        "[--inset-border-width:var(--spacing-surface-border)]",
         // Border
         "ring-1 ring-[var(--surface-border-color,var(--color-surface-border))]",
       ],
     },
+    radius: {
+      unset: "",
+      default: [
+        "[--inset-border-radius:var(--radius-surface)]",
+        //
+        "rounded-[var(--surface-radius,var(--radius-surface))]",
+      ],
+    },
     padding: {
-      none: "",
-      default: ["p-[var(--gutter,var(--spacing-surface))]"],
+      unset: "",
+      default: "p-(--gutter)",
     },
     orientation: {
       vertical: "flex-col",
       horizontal: "flex-row",
     },
     color: {
-      default: "bg-surface-background dark:bg-neutral-800/75",
-      none: "",
+      default: "bg-surface-background",
+      unset: "",
     },
-    inset: {
-      top: "mt-[calc(var(--gutter,theme(spacing.4))*-1)]",
-      right: "[margin-inline-end:calc(var(--gutter,theme(spacing.4))*-1)]",
-      bottom: "mb-[calc(var(--gutter,theme(spacing.4))*-1)]",
-      left: "[margin-inline-start:calc(var(--gutter,theme(spacing.4))*-1)]",
-      all: "m-[calc(var(--gutter,theme(spacing.4))*-1)]",
-      none: "",
-    } as VariantConfigMap<Inset>,
     offset: {
-      top: "pt-[var(--gutter,var(--spacing-surface))]",
-      right: "pr-[var(--gutter,var(--spacing-surface))]",
-      bottom: "pb-[var(--gutter,var(--spacing-surface))]",
-      left: "pl-[var(--gutter,var(--spacing-surface))]",
-      all: "p-[var(--gutter,var(--spacing-surface))]",
-      none: "",
-    } as VariantConfigMap<Inset>,
+      top: "pt-[var(--gutter)]",
+      right: "pr-[var(--gutter)]",
+      bottom: "pb-[var(--gutter)]",
+      left: "pl-[var(--gutter)]",
+      unset: "",
+    },
+    bleed: {
+      true: ["[--gutter:0]"],
+      false: "",
+    },
+    gapless: {
+      true: ["[--gap:0]"],
+      false: "",
+    },
+    /**
+     * Experimental
+     * Might be removed.
+     */
+    density: {
+      unset: "",
+      compact: "",
+      default: "",
+      spacious: "",
+    },
   },
+  compoundVariants: [
+    {
+      bleed: true,
+      className: "",
+    },
+    {
+      bleed: false,
+      density: "default",
+      className:
+        "[--gutter:var(--spacing-surface-gutter)] [--gap:var(--spacing-surface-gap)]",
+    },
+    {
+      bleed: false,
+      density: "compact",
+      className:
+        "[--gutter:calc(var(--spacing-surface-gutter)/2.25)] [--gap:calc(var(--spacing-surface-gap)/2.25)]",
+    },
+    {
+      bleed: false,
+      density: "spacious",
+      className:
+        "[--gutter:calc(var(--spacing-surface-gutter)*1.125)] [--gap:calc(var(--spacing-surface-gap)*1.125)]",
+    },
+  ],
   defaultVariants: {
     orientation: "vertical",
     color: "default",
-    inset: "none",
-    offset: "none",
+    inset: "unset",
+    offset: "unset",
     border: "default",
     padding: "default",
+    radius: "default",
+    gapless: false,
+    bleed: false,
+    density: "default",
+  },
+});
+
+/**
+ * @internal
+ * use `composeSurfaceStyles`
+ *
+ * a clone of https://github.com/radix-ui/themes/blob/main/packages/radix-ui-themes/src/components/inset.css
+ */
+const insetStyles = createStyles({
+  base: [
+    "[--inset-padding-top-calc:calc(var(--inset-padding-top,0px)+var(--inset-border-width,0px))]",
+    "[--inset-padding-right-calc:calc(var(--inset-padding-right,0px)+var(--inset-border-width,0px))]",
+    "[--inset-padding-bottom-calc:calc(var(--inset-padding-bottom,0px)+var(--inset-border-width,0px))]",
+    "[--inset-padding-left-calc:calc(var(--inset-padding-left,0px)+var(--inset-border-width,0px))]",
+    // for inset to work
+    "before:after:pointer-events-none before:after:absolute before:after:inset-[var(--spacing-surface-border)]",
+  ],
+  variants: {
+    inset: {
+      top: [
+        "[--margin-top-override:calc(var(--margin-top)-var(--inset-padding-top-calc))]",
+      ],
+      right: [
+        "[--margin-right-override:calc(var(--margin-right)-var(--inset-padding-right-calc))]",
+      ],
+      bottom:
+        "[--margin-bottom-override:calc(var(--margin-bottom)-var(--inset-padding-bottom-calc))]",
+      left: "[--margin-left-override:calc(var(--margin-left)-var(--inset-padding-left-calc))]",
+      unset: [""],
+    },
+  },
+  defaultVariants: {
+    inset: "unset",
   },
 });
 
 export { surfaceStyles };
 export type SurfaceVariants = VariantProps<typeof surfaceStyles>;
 
-export function SurfaceOverflow({
-  inset = "all",
-  offset = "all",
-  ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
-  inset?: Array<Inset> | Inset;
-  offset?: Array<Inset> | Inset;
-}) {
-  const matchingInset = Array.isArray(inset)
-    ? inset.map((item) => surfaceStyles.variants.inset[item]).join(" ")
-    : surfaceStyles.variants.inset[inset];
-  const matchingOffset = Array.isArray(offset)
-    ? offset.map((item) => surfaceStyles.variants.offset[item]).join(" ")
-    : surfaceStyles.variants.offset[offset];
+/**
+ * TODO: Document usage and purpose.
+ */
 
-  return (
-    <div
-      {...props}
-      className={cn([
-        "[unicode-bidi:isolate]",
-        matchingInset,
-        matchingOffset,
-        props.className,
-      ])}
-    />
-  );
+export function splitSurfaceStyleProps<T extends SurfaceVariants>(props: T) {
+  return createSplitProps<SurfaceVariants>()(props, surfaceStyles.variantKeys);
 }
 
 export function SurfaceActions({
@@ -100,8 +168,35 @@ export function SurfaceActions({
       {...props}
       className={cn(
         className,
-        "flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto"
+        "flex flex-col-reverse items-center justify-end gap-3 *:w-full sm:flex-row sm:*:w-auto",
       )}
     />
   );
+}
+
+type SurfaceInset = NonNullable<VariantProps<typeof insetStyles>["inset"]>;
+export const composeInsetStyles = ({
+  inset = "unset",
+}: {
+  inset?: Array<SurfaceInset> | SurfaceInset;
+}) => {
+  const resolvedInsetConfig = Array.isArray(inset) ? inset : [inset];
+  const insetResolvedStyles = resolvedInsetConfig.map(
+    (v) => insetStyles.variants.inset[v],
+  );
+
+  return cn(insetStyles({ className: "surface-inset" }), insetResolvedStyles);
+};
+export function SurfaceInset({
+  className,
+  inset = "unset",
+  ...props
+}: ComponentPropsWithoutRef<"div"> & {
+  inset?: Array<SurfaceInset> | SurfaceInset;
+}) {
+  const styles = composeInsetStyles({
+    inset,
+  });
+
+  return <div {...props} className={cn(styles, className)} />;
 }

@@ -1,4 +1,6 @@
 /* eslint-disable import/no-default-export */
+import { DialogTrigger } from "react-aria-components";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
 import {
@@ -16,8 +18,6 @@ import {
   TextButton,
   Title,
 } from "@/components/ui/text";
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { DialogTrigger } from "react-aria-components";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -90,7 +90,7 @@ export const TextAsButton: Story = {
           <Description>
             Without this your odds of getting your order are low.{" "}
             <DialogTrigger>
-              <TextButton className="hover:underline font-medium text-brand-primary-text">
+              <TextButton className="text-brand-primary-text font-medium hover:underline">
                 Learn More
               </TextButton>
               <Dialog>
@@ -117,9 +117,9 @@ export const Metric: Story = {
   },
   render: () => {
     return (
-      <div className="grid gap-4 grid-cols-3">
+      <div className="grid grid-cols-3 gap-4">
         <Card className="w-2xs">
-          <Label color="none" className="text-neutral-400">
+          <Label color="unset" className="text-neutral-400">
             Unique Visitors
           </Label>
           <div className="flex items-baseline gap-2">
@@ -128,7 +128,7 @@ export const Metric: Story = {
           </div>
         </Card>
         <Card className="w-2xs">
-          <Label color="none" className="text-neutral-400">
+          <Label color="unset" className="text-neutral-400">
             Unique Visitors
           </Label>
           <div className="flex items-baseline gap-2">
@@ -137,7 +137,7 @@ export const Metric: Story = {
           </div>
         </Card>
         <Card className="w-2xs">
-          <Label color="none" className="text-neutral-400">
+          <Label color="unset" className="text-neutral-400">
             Unique Visitors
           </Label>
           <div className="flex items-baseline gap-2">

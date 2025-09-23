@@ -1,6 +1,13 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useFilter, VisuallyHidden } from "react-aria";
 import {
+  Button as AriaButton,
   ComboBox,
   type ComboBoxProps as ComboBoxPrimitiveProps,
   Input,
@@ -10,77 +17,85 @@ import {
   Tag as AriaTag,
   TagGroup,
   TagList,
-  useSlottedContext,
 } from "react-aria-components";
 import { useListData } from "react-stately";
-import { XIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, XIcon } from "@phosphor-icons/react";
+import { useResizeObserver } from "@react-aria/utils";
 import { Button } from "./button";
-import { Description, FieldContext, FieldControllerContext } from "./fieldset";
+import { Description, useFieldController, useFieldProps } from "./fieldset";
+import { composedInputStyles, type ControlOwnProps } from "./input";
+import { pickerStyles } from "./picker";
 import { cn } from "./utils";
 
 /**
  * EXPERIMENTAL CORE COMPONENT .
  */
 
-interface SelectedKey {
+type SelectedKey = {
   id: Key;
   name: string;
-}
+  [key: string]: unknown;
+};
 
-interface MultipleSelectProps<T extends object>
-  extends Omit<
-    ComboBoxPrimitiveProps<T>,
-    | "children"
-    | "validate"
-    | "allowsEmptyCollection"
-    | "inputValue"
-    | "selectedKey"
-    | "className"
-    | "value"
-    | "onSelectionChange"
-    | "onInputChange"
-  > {
-  items: Array<T>;
-  className?: string;
-  onItemInserted?: (key: Key) => void;
-  onItemCleared?: (key: Key) => void;
-  renderEmptyState?: (inputValue: string) => React.ReactNode;
-  tag?: (item: T) => React.ReactNode;
-  children: React.ReactNode | ((item: T) => React.ReactNode);
-  defaultSelectedKeys?: Array<Key>;
-}
+export type SelectedValueRendererProps<T> = {
+  selectedKeys: T;
+  onRemove: (selectedKey: Key) => void;
+};
+
+/**
+ * @internal
+ */
+type OwnProps = Omit<ControlOwnProps, "endEnhancer"> & {
+  placeholder?: string;
+};
+type MultipleSelectProps<T extends object> = Omit<
+  ComboBoxPrimitiveProps<T>,
+  | "children"
+  | "validate"
+  | "allowsEmptyCollection"
+  | "inputValue"
+  | "selectedKey"
+  | "className"
+  | "value"
+  | "onSelectionChange"
+  | "onInputChange"
+> &
+  OwnProps & {
+    items?: Array<T>;
+    onItemInserted?: (key: Key) => void;
+    onItemCleared?: (key: Key) => void;
+    renderEmptyState?: (inputValue: string) => React.ReactNode;
+    renderSelectedValue?: React.FC<SelectedValueRendererProps<T>>;
+    children: React.ReactNode | ((item: T) => React.ReactNode);
+    defaultSelectedKeys?: Array<Key>;
+  };
 
 export function MultipleSelect<T extends SelectedKey>({
   children,
-  items,
+  items = [],
   onItemCleared,
   onItemInserted,
   className,
   name,
+  placeholder = "Select an option",
+  adjoined: adjoinedConfig = "unset",
   renderEmptyState,
+  // renderSelectedValue = SelectedKeysRenderer,
+  // renderSelectedValue,
+  startEnhancer,
   ...props
 }: MultipleSelectProps<T>) {
-  const field = useSlottedContext(FieldContext);
+  const field = useFieldProps();
   /**
    * EXPERIMENTAL
    * Might cause unstability by wrapping in ref.
    */
-  const fieldControl = useRef(
-    useSlottedContext(FieldControllerContext)?.field
-  ).current;
+  const fieldControl = useRef(useFieldController()?.field).current;
 
-  const tagGroupIdentifier = useId();
-  const triggerRef = useRef<HTMLDivElement | null>(null);
-  const [width, setWidth] = useState(0);
-
-  const initialSelectedKeys =
-    props.defaultSelectedKeys ?? fieldControl?.value ?? [];
-  const initialSelectedItems = items.filter((item) =>
-    initialSelectedKeys.includes(item.id)
-  );
+  const initialSelectedKeys = props.defaultSelectedKeys ?? [];
 
   const selectedItems = useListData<T>({
-    initialItems: initialSelectedItems,
+    initialItems: items.filter((item) => initialSelectedKeys.includes(item.id)),
     initialSelectedKeys,
   });
 
@@ -108,7 +123,7 @@ export function MultipleSelect<T extends SelectedKey>({
     (item: T, filterText: string) => {
       return !selectedKeys.includes(item.id) && contains(item.name, filterText);
     },
-    [contains, selectedKeys]
+    [contains, selectedKeys],
   );
 
   const accessibleList = useListData({
@@ -124,19 +139,18 @@ export function MultipleSelect<T extends SelectedKey>({
     inputValue: "",
   });
 
-  const onRemove = useCallback(
-    (keys: Set<Key>) => {
-      const key = keys.values().next().value;
+  // const onRemove = (keys: Set<Key>) => {
+  //   const key = keys.values().next().value;
 
-      if (key) {
-        selectedItems.remove(key);
-        setFieldState({ inputValue: "", selectedKey: null });
-        onItemCleared?.(key);
-        fieldControl?.onChange(selectedItems.items.map((i) => i.id)); // 🔥 Ensure field updates
-      }
-    },
-    [selectedItems, onItemCleared, fieldControl]
-  );
+  //   if (!key) {
+  //     return;
+  //   }
+
+  //   selectedItems.remove(key);
+  //   setFieldState({ inputValue: "", selectedKey: null });
+  //   onItemCleared?.(key);
+  //   fieldControl?.onChange(selectedItems.items.map((i) => i.id));
+  // };
 
   const onSelectionChange = (id: Key | null) => {
     if (!id) {
@@ -195,105 +209,47 @@ export function MultipleSelect<T extends SelectedKey>({
         popLast();
       }
     },
-    [popLast, fieldState.inputValue]
+    [popLast, fieldState.inputValue],
   );
 
-  useEffect(() => {
-    const trigger = triggerRef.current;
-
-    if (!trigger) {
-      return;
+  const controlRef = useRef<HTMLDivElement>(null);
+  const [controlWidth, setControlWidth] = useState(0);
+  const onResize = useCallback(() => {
+    if (controlRef.current) {
+      setControlWidth(controlRef.current.offsetWidth);
     }
-
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setWidth(entry.target.clientWidth);
-      }
-    });
-
-    observer.observe(trigger);
-
-    return () => {
-      observer.unobserve(trigger);
-    };
   }, []);
 
-  const triggerButtonRef = useRef<HTMLButtonElement | null>(null);
+  useResizeObserver({
+    ref: controlRef,
+    onResize,
+  });
+
+  const { container, input, root, enhancerStart, enhancerEnd } =
+    composedInputStyles({
+      adjoined: adjoinedConfig,
+    });
 
   return (
     <div
+      ref={controlRef}
       data-slot="control"
-      className={cn([
-        // Basic layout
-        "group relative isolate block w-full",
-        // Background color + shadow applied to inset pseudo element, so shadow blends with border in light mode
-        "before:absolute before:inset-px before:rounded-[calc(var(--radius-control)-1px)] before:bg-white before:shadow",
-        // Background color is moved to control and shadow is removed in dark mode so hide `before` pseudo
-        "dark:before:hidden",
-        // Focus ring
-        "after:pointer-events-none after:absolute after:inset-0 after:rounded-[var(--radius-control)] after:ring-transparent after:ring-inset sm:has-[:focus]:after:ring-2 sm:has-[:focus]:after:ring-blue-500",
-        // Disabled state
-        "has-[[data-disabled]]:opacity-50 before:has-[[data-disabled]]:bg-neutral-950/5 before:has-[[data-disabled]]:shadow-none",
-        // Invalid state
-        "before:has-[[data-invalid]]:shadow-danger-500/10",
-      ])}
+      data-disabled={props.isDisabled}
+      className={root({ className })}
     >
-      <div className={props.isDisabled ? "opacity-50" : ""}>
-        <div
-          ref={triggerRef}
-          className={cn(
-            // Basic layout
-            "relative flex flex-wrap rounded-[var(--radius-control)]",
-            // Horizontal padding
-            "pl-[calc(theme(spacing[3.5])-1px)] sm:pl-[calc(theme(spacing.3)-1px)]",
-            // Border
-            "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
-            // Background color
-            "bg-transparent dark:bg-white/5",
-            // Invalid state
-            "group-data-[invalid]/field:border-danger-500 group-data-[invalid]/field:hover:border-danger-500 group-data-[invalid]/field:dark:border-danger-500 group-data-[invalid]/field:hover:dark:border-danger-500",
-            // Disabled state
-            "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15"
-          )}
-        >
-          <TagGroup
-            aria-label="Selected items"
-            id={tagGroupIdentifier}
-            className="group has-[data-empty]:hidden"
-            onRemove={onRemove}
-          >
-            <TagList
-              items={selectedItems.items}
-              className={cn(
-                //
-                "inline-flex flex-wrap gap-2 pr-2 empty:hidden",
-                //
-                "my-[calc(theme(spacing[2.5])-1px)] sm:my-[calc(theme(spacing[1.5])-1px)]"
-              )}
-            >
-              {(item) => {
-                return (
-                  <AriaTag
-                    className={cn([
-                      // base
-                      "inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-0.5 text-sm/5 font-medium sm:text-xs/5 forced-colors:outline",
-                      // Color
-                      "bg-neutral-600/10 text-neutral-700 group-data-[hovered]:bg-neutral-600/20 dark:bg-white/5 dark:text-neutral-400 dark:group-data-[hovered]:bg-white/10",
-                    ])}
-                  >
-                    <span>{item.name}</span>
-                    <Button
-                      variant="unstyled"
-                      slot="remove"
-                      className="size-3 hover:opacity-50"
-                    >
-                      <XIcon data-slot="icon" />
-                    </Button>
-                  </AriaTag>
-                );
-              }}
-            </TagList>
-          </TagGroup>
+      <div className={container()}>
+        {Boolean(startEnhancer) && (
+          <div data-slot="enhancer" className={enhancerStart()}>
+            {startEnhancer}
+          </div>
+        )}
+        <SelectedKeysRenderer
+          selectedKeys={selectedItems.items}
+          onRemove={() => {
+            //
+          }}
+        />
+        <div>
           <ComboBox
             {...props}
             allowsEmptyCollection
@@ -307,25 +263,10 @@ export function MultipleSelect<T extends SelectedKey>({
             onSelectionChange={onSelectionChange}
             onInputChange={onInputChange}
           >
-            <div
-              className={cn(
-                "inline-flex flex-1 flex-wrap items-center",
-                className
-              )}
-            >
+            <div className="flex items-center">
               <Input
-                placeholder="Select an option"
-                className={cn([
-                  "flex-1 appearance-none py-1",
-                  // Horizontal Padding
-                  "pr-[calc(theme(spacing.10)-1px)] sm:pr-[calc(theme(spacing.9)-1px)]",
-                  // Typography
-                  "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
-                  // Hide default focus styles
-                  "outline-none",
-                  // Vertical Padding
-                  "py-[calc(theme(spacing[2.5])-1px)] sm:py-[calc(theme(spacing[1.5])-1px)]",
-                ])}
+                placeholder={placeholder}
+                className={input()}
                 onKeyDownCapture={onKeyDownCapture}
                 onBlur={() => {
                   setFieldState({
@@ -336,50 +277,21 @@ export function MultipleSelect<T extends SelectedKey>({
                   fieldControl?.onBlur();
                 }}
               />
-
-              <VisuallyHidden>
-                <Button
-                  slot="remove"
-                  type="button"
-                  aria-label="Remove"
-                  ref={triggerButtonRef}
-                >
-                  <XIcon />
-                </Button>
-              </VisuallyHidden>
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-2"
-                tabIndex={-1}
-                onClick={() => triggerButtonRef.current?.click()}
-              >
-                <svg
-                  className="size-5 stroke-neutral-500 group-has-[[data-disabled]]:stroke-neutral-600 sm:size-4 dark:stroke-neutral-400 forced-colors:stroke-[CanvasText]"
-                  viewBox="0 0 16 16"
-                  aria-hidden="true"
-                  fill="none"
-                >
-                  <path
-                    d="M5.75 10.75L8 13L10.25 10.75"
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M10.25 5.25L8 3L5.75 5.25"
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+              <AriaButton>
+                <span data-slot="enhancer" className={cn(enhancerEnd())}>
+                  <CaretDownIcon />
+                </span>
+              </AriaButton>
             </div>
             <Popover
               isNonModal
-              style={{ width: `${width}px` }}
-              triggerRef={triggerRef}
+              triggerRef={controlRef}
+              style={
+                { "--trigger-width": `${controlWidth}px` } as CSSProperties
+              }
             >
               <ListBox
+                items={items}
                 selectionMode="multiple"
                 renderEmptyState={() => {
                   return renderEmptyState ? (
@@ -400,16 +312,8 @@ export function MultipleSelect<T extends SelectedKey>({
                   );
                 }}
                 className={cn([
-                  // Base styles
-                  "sm:max-w-auto isolate max-h-64 w-full max-w-(--trigger-width) min-w-[var(--trigger-width)] scroll-py-1 rounded-[var(--radius-control)] py-1 select-none",
-                  // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
-                  "outline outline-transparent focus:outline-none",
-                  // Handle scrolling when menu won't fit in viewport
-                  "overflow-y-auto overscroll-contain",
-                  // Popover background
-                  "bg-white/95 backdrop-blur-xl dark:bg-neutral-800/75",
-                  // Shadows
-                  "shadow-lg ring-1 ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
+                  //
+                  pickerStyles().list({ className: "max-h-64" }),
                 ])}
               >
                 {children}
@@ -419,13 +323,59 @@ export function MultipleSelect<T extends SelectedKey>({
         </div>
       </div>
       {name && (
-        <input
-          hidden
-          readOnly
-          name={name}
-          value={selectedItems.items.map((i) => i.id).join(",")}
-        />
+        <VisuallyHidden>
+          <input
+            hidden
+            readOnly
+            name={name}
+            value={selectedItems.items.map((i) => i.id).join(",")}
+          />
+        </VisuallyHidden>
       )}
     </div>
+  );
+}
+
+function SelectedKeysRenderer<T extends Array<SelectedKey>>({
+  selectedKeys,
+}: SelectedValueRendererProps<T>) {
+  return (
+    <TagGroup
+      aria-label="Selected items"
+      className="group has-[data-empty]:hidden"
+      // onRemove={onRemove}
+    >
+      <TagList
+        items={selectedKeys}
+        className={cn(
+          //
+          "inline-flex flex-wrap gap-2 pr-2 empty:hidden",
+          //
+          "my-[calc(theme(spacing[2.5])-1px)] sm:my-[calc(theme(spacing[1.5])-1px)]",
+        )}
+      >
+        {(item) => {
+          return (
+            <AriaTag
+              className={cn([
+                // base
+                "inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-0.5 text-sm/5 font-medium sm:text-xs/5 forced-colors:outline",
+                // Color
+                "bg-neutral-600/10 text-neutral-700 group-data-hovered:bg-neutral-600/20 dark:bg-white/5 dark:text-neutral-400 dark:group-data-hovered:bg-white/10",
+              ])}
+            >
+              <span>{item.name}</span>
+              <Button
+                variant="unstyled"
+                slot="remove"
+                className="size-3 hover:opacity-50"
+              >
+                <XIcon data-slot="icon" />
+              </Button>
+            </AriaTag>
+          );
+        }}
+      </TagList>
+    </TagGroup>
   );
 }

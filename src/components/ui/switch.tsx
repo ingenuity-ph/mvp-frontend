@@ -13,7 +13,6 @@ import {
   mergeRefs,
   useObjectRef,
 } from "@react-aria/utils";
-import type { ThemeColors, VariantConfigMap } from "./constants";
 import {
   Description,
   FieldContext,
@@ -25,6 +24,7 @@ import {
 import { cn, removeDataAttributes } from "./utils";
 
 const colors = {
+  unset: "",
   primary: [
     "[--switch-bg-ring:var(--color-brand-primary-bold)] [--switch-bg:var(--color-brand-primary)] dark:[--switch-bg-ring:transparent] dark:[--switch-bg:var(--color-brand-primary)]",
     "[--switch-ring:var(--color-brand-primary)] [--switch-shadow:theme(colors.black/10%)] [--switch:white] dark:[--switch-ring:theme(colors.brand.primary.700/90%)]",
@@ -49,7 +49,7 @@ const colors = {
     "[--switch-bg-ring:var(--color-brand-info-bold)] [--switch-bg:var(--color-brand-info)] dark:[--switch-bg-ring:transparent] dark:[--switch-bg:var(--color-brand-info)]",
     "[--switch-ring:var(--color-brand-info)] [--switch-shadow:theme(colors.black/10%)] [--switch:white] dark:[--switch-ring:theme(colors.brand.info.700/90%)]",
   ],
-} satisfies VariantConfigMap<ThemeColors>;
+};
 
 type Color = keyof typeof colors;
 
@@ -79,7 +79,7 @@ export function SwitchGroup({
         // Basic groups
         "space-y-3 [&_[data-slot=label]]:font-normal",
         // With descriptions
-        "has-data-[slot=description]:space-y-6 has-data-[slot=description]:**:data-[slot=label]:font-medium"
+        "has-data-[slot=description]:space-y-6 has-data-[slot=description]:**:data-[slot=label]:font-medium",
       )}
     />
   );
@@ -135,7 +135,7 @@ export const Switch = forwardRef(function Switch(
   props: AriaSwitchProps & {
     color?: Color;
   },
-  ref: ForwardedRef<HTMLInputElement>
+  ref: ForwardedRef<HTMLInputElement>,
 ) {
   const { color = "neutral", ...racProps } = props;
 
@@ -170,7 +170,7 @@ export const Switch = forwardRef(function Switch(
       children: typeof props.children === "function" ? true : props.children,
     },
     state,
-    inputRef
+    inputRef,
   );
 
   const { isFocused, isFocusVisible, focusProps } = useFocusRing();
@@ -213,7 +213,7 @@ export const Switch = forwardRef(function Switch(
           // Base styles
           "group relative isolate inline-flex h-6 w-10 cursor-default rounded-full p-[3px] sm:h-5 sm:w-8",
           // Transitions
-          "transition duration-0 ease-in-out duration-200",
+          "transition duration-0 duration-200 ease-in-out",
           // Outline and background color in forced-colors mode so switch is still visible
           "forced-colors:outline forced-colors:[--switch-bg:Highlight] dark:forced-colors:[--switch-bg:Highlight]",
           // Unchecked
@@ -229,7 +229,7 @@ export const Switch = forwardRef(function Switch(
           "data-[disabled]:bg-neutral-200 data-[disabled]:opacity-50 data-[disabled]:data-[selected]:bg-neutral-200 data-[disabled]:data-[selected]:ring-black/5",
           "dark:data-[disabled]:bg-white/15 dark:data-[disabled]:data-[selected]:bg-white/15 dark:data-[disabled]:data-[selected]:ring-white/15",
           // Color specific styles
-          colors[color]
+          colors[color],
         )}
       >
         <span
@@ -242,12 +242,12 @@ export const Switch = forwardRef(function Switch(
             // Invisible border so the switch is still visible in forced-colors mode
             "border border-transparent",
             // Unchecked
-            "bg-white ring-1 shadow ring-black/5",
+            "bg-white shadow ring-1 ring-black/5",
             // Checked
             "group-data-[selected]:bg-[--switch] group-data-[selected]:shadow-[--switch-shadow] group-data-[selected]:ring-[--switch-ring]",
             "group-data-[selected]:translate-x-4 sm:group-data-[selected]:translate-x-3",
             // Disabled
-            "group-data-[disabled]:group-data-[selected]:bg-white group-data-[disabled]:group-data-[selected]:shadow group-data-[disabled]:group-data-[selected]:ring-black/5"
+            "group-data-[disabled]:group-data-[selected]:bg-white group-data-[disabled]:group-data-[selected]:shadow group-data-[disabled]:group-data-[selected]:ring-black/5",
           )}
         />
       </span>

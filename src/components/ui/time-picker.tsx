@@ -7,7 +7,6 @@ import {
   type TimeValue,
 } from "react-aria-components";
 import type { FieldPath, FieldValues } from "react-hook-form";
-import type { VariantProps } from "tailwind-variants";
 import { z } from "zod";
 import { parseAbsoluteToLocal } from "@internationalized/date";
 import { ClockIcon } from "@phosphor-icons/react";
@@ -22,7 +21,7 @@ import {
   useFieldProps,
   type WithFieldControlProps,
 } from "./fieldset";
-import { inputGroupStyles, inputStyles, matchMultipleAdjoined } from "./input";
+import { composedInputStyles, type ControlOwnProps } from "./input";
 import { cn, Group } from "./utils";
 
 const parseToDate = (value: unknown) => {
@@ -43,9 +42,7 @@ const parseToDate = (value: unknown) => {
 type OwnProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = Partial<{
-  adjoined: VariantProps<typeof inputStyles>["adjoined"];
-}> &
+> = ControlOwnProps &
   ComposedFieldProps &
   Partial<WithFieldControlProps<TFieldValues, TName>>;
 
@@ -54,7 +51,7 @@ export function TimePickerField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
-  adjoined = "none",
+  adjoined = "unset",
   label,
   description,
   control,
@@ -68,9 +65,7 @@ export function TimePickerField<
   const fieldErrorMessage = controller?.fieldState?.error?.message;
 
   const field = useFieldProps();
-  const adjoinedStyles = Array.isArray(adjoined)
-    ? matchMultipleAdjoined(adjoined)
-    : inputStyles.variants.adjoined[adjoined];
+  const styles = composedInputStyles({ adjoined });
 
   if (control && fieldName) {
     return (
@@ -98,50 +93,18 @@ export function TimePickerField<
           fieldController?.onChange(value?.toString());
         },
       })}
-      className={cn([className, fieldLayoutStyles, "relative block isolate"])}
+      className={cn([className, fieldLayoutStyles, "relative isolate block"])}
     >
       {
         // eslint-disable-next-line @eslint-react/no-leaked-conditional-rendering
         label && <Label>{label}</Label>
       }
-      <div
-        data-slot="control"
-        className={cn("group", inputStyles().root(), inputStyles({ adjoined }))}
-      >
-        <Group
-          className={cn([
-            // Basic layout
-            "relative flex rounded-[var(--radius-control)]",
-            // Horizontal Padding - moved the horizontal padding here to handle enhancers
-            "px-[calc(theme(spacing[3.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)]",
-            // Border
-            "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
-            // Background color
-            "bg-transparent dark:bg-white/5",
-            // Invalid state
-            "group-data-[invalid]:border-danger-500 group-data-[invalid]:hover:border-danger-500 dark:group-data-[invalid]:border-danger-500 dark:group-data-[invalid]:hover:border-danger-500",
-            // Disabled state
-            "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
-            // Adjoined
-            adjoinedStyles,
-          ])}
-        >
-          <AriaDateInput
-            className={cn([
-              // Layout
-              "block w-full appearance-none bg-transparent",
-              // Typography
-              "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
-              // Hide default focus styles
-              "focus-within:outline-none focus:outline-none focus-visible:outline-none",
-              // Vertical Padding - we only apply the vertical padding to the input itself to have consistent dimensions
-              // when the padding is applied on the wrapper the padding does not collapse properly
-              "py-[calc(theme(spacing[2.5])-1px)] sm:py-[calc(theme(spacing[1.5])-1px)]",
-            ])}
-          >
+      <div data-slot="control" className={styles.root({ className: "group" })}>
+        <Group className={styles.container()}>
+          <AriaDateInput className={styles.input()}>
             {(segment) => <AriaDateSegment segment={segment} />}
           </AriaDateInput>
-          <span data-slot="enhancer" className={cn(inputGroupStyles().end())}>
+          <span data-slot="enhancer" className={styles.enhancerEnd()}>
             <ClockIcon />
           </span>
         </Group>

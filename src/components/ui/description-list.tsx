@@ -1,21 +1,52 @@
+import { tv } from "tailwind-variants/lite";
 import type { Orientation } from "./constants";
+import { textStyles } from "./text";
 import { cn } from "./utils";
+
+const descriptionListStyles = tv({
+  base: "",
+  slots: {
+    root: [
+      "group",
+      // Layout, use a different layout when a there are items that are grouped
+      "grid has-data-[slot=group]:grid-cols-[repeat(var(--cols,2),minmax(0,1fr))]",
+    ],
+    term: [
+      // Typography
+      textStyles({
+        label: "sm",
+        color: "unset",
+        className: "text-neutral-500 dark:text-neutral-400",
+      }),
+      // Layout
+      "col-start-1",
+      // Border
+      "border-t border-surface-border group-data-[slot=group]:border-0 first:border-none",
+      // Spacing
+      "pt-3 group-data-[slot=group]:py-0 group-data-[slot=group]:pt-0 sm:py-3",
+    ],
+    description: [
+      // Typography
+      textStyles({
+        paragraph: "sm",
+        color: "neutral",
+        className: "font-medium",
+      }),
+      // Border
+      "border-surface-border group-not-data-[component=description-group]:sm:border-t sm:[&:nth-child(2)]:border-none",
+      // Spacing
+      "pt-1 pb-3 group-data-[slot=group]:py-0 group-data-[slot=group]:pt-0 sm:py-3",
+    ],
+  },
+});
 
 export function DescriptionList({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"dl">) {
-  return (
-    <dl
-      {...props}
-      className={cn(
-        className,
-        "group text-base/6 sm:text-sm/6",
-        // Layout, use a different layout when a there are items that are grouped
-        "grid grid-cols-1 has-not-[[data-component=description-group]]:sm:grid-cols-[var(--cols,min(50%,theme(spacing.80))_auto)] has-data-[component=description-group]:sm:grid-cols-[repeat(var(--cols,2),minmax(0,1fr))]"
-      )}
-    />
-  );
+  const { root } = descriptionListStyles();
+
+  return <dl {...props} className={root({ className })} />;
 }
 
 export function DescriptionGroup({
@@ -39,36 +70,16 @@ export function DescriptionTerm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"dt">) {
-  return (
-    <dt
-      {...props}
-      className={cn(
-        className,
-        "col-start-1 text-neutral-500 dark:text-neutral-400",
-        // Border
-        "border-t border-neutral-950/5 group-data-[component=description-group]/dl:border-0 first:border-none sm:border-neutral-950/5 dark:border-white/5 sm:dark:border-white/5",
-        // Spacing
-        "pt-3 group-data-[component=description-group]/dl:py-0 group-data-[component=description-group]/dl:pt-0 sm:py-3"
-      )}
-    />
-  );
+  const { term } = descriptionListStyles();
+
+  return <dt {...props} className={term({ className })} />;
 }
 
 export function DescriptionDetails({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"dd">) {
-  return (
-    <dd
-      {...props}
-      className={cn(
-        className,
-        "text-neutral-950 dark:text-white",
-        // Border
-        "sm:border-neutral-950/5 group-not-data-[component=description-group]:sm:border-t dark:sm:border-white/5 sm:[&:nth-child(2)]:border-none",
-        // Spacing
-        "pt-1 pb-3 group-data-[component=description-group]/dl:py-0 group-data-[component=description-group]/dl:pt-0 sm:py-3"
-      )}
-    />
-  );
+  const { description } = descriptionListStyles();
+
+  return <dd {...props} className={description({ className })} />;
 }

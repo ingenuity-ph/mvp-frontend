@@ -1,7 +1,27 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { clsx } from "clsx";
-import { createContext, useContext, useState } from "react";
-import { Link, type LinkProps } from "react-aria-components";
+import { createContext, useContext } from "react";
+import {
+  Cell as AriaCell,
+  type CellProps as AriaCellProps,
+  Collection,
+  Column as AriaColumn,
+  type ColumnProps as AriaColumnProps,
+  composeRenderProps,
+  type LinkProps,
+  Row as AriaRow,
+  type RowProps as AriaRowProps,
+  Table as AriaTable,
+  TableBody as AriaTableBody,
+  type TableBodyProps as AriaTableBodyProps,
+  TableHeader as AriaTableHeader,
+  type TableHeaderProps as AriaTableHeaderProps,
+  type TableProps as AriaTableProps,
+  useTableOptions,
+} from "react-aria-components";
+import { ArrowDownIcon, ArrowUpIcon } from "@phosphor-icons/react";
+import { createLink } from "@tanstack/react-router";
+import { Checkbox } from "./checkbox";
+import { cn, createStyles, EnhancerGroup } from "./utils";
 
 const TableContext = createContext<{
   bleed: boolean;
@@ -28,7 +48,7 @@ export function Table({
   dense?: boolean;
   grid?: boolean;
   striped?: boolean;
-} & React.ComponentPropsWithoutRef<"div">) {
+} & AriaTableProps) {
   return (
     <TableContext.Provider
       value={
@@ -39,22 +59,24 @@ export function Table({
     >
       <div className="flow-root">
         <div
-          {...props}
-          className={clsx(
+          className={cn(
             className,
             // overflow-x-auto
-            "-mx-[--gutter] whitespace-nowrap"
+            "-mx-(--gutter) whitespace-nowrap",
           )}
         >
           <div
-            className={clsx(
+            className={cn(
               "inline-block min-w-full align-middle",
-              !bleed && "sm:px-[--gutter]"
+              !bleed && "sm:px-(--gutter)",
             )}
           >
-            <table className="min-w-full text-left text-sm/6 text-neutral-950 dark:text-white">
+            <AriaTable
+              {...props}
+              className="min-w-full text-left text-sm/6 text-neutral-950"
+            >
               {children}
-            </table>
+            </AriaTable>
           </div>
         </div>
       </div>
@@ -62,20 +84,50 @@ export function Table({
   );
 }
 
-export function TableHead({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"thead">) {
-  return (
-    <thead
-      {...props}
-      className={clsx(className, "text-neutral-500 dark:text-neutral-400")}
-    />
-  );
+export function TableBody<T extends object>(props: AriaTableBodyProps<T>) {
+  return <AriaTableBody {...props} />;
 }
 
-export function TableBody(props: React.ComponentPropsWithoutRef<"tbody">) {
-  return <tbody {...props} />;
+export function TableColumn({
+  children,
+  className,
+  ...props
+}: AriaColumnProps) {
+  const { bleed, grid } = useContext(TableContext);
+
+  return (
+    <AriaColumn
+      {...props}
+      className={composeRenderProps(className, (v) => {
+        return cn([
+          v,
+          //
+          "border-b border-b-neutral-950/10 px-4 py-2 font-medium first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))",
+          //
+          grid && "border-l border-l-neutral-950/5 first:border-l-0",
+          //
+          !bleed && "sm:first:pl-1 sm:last:pr-1",
+        ]);
+      })}
+    >
+      {(renderProps) => {
+        return (
+          <EnhancerGroup className="items-center">
+            {typeof children === "function" ? children(renderProps) : children}
+            {renderProps.allowsSorting ? (
+              <span aria-hidden="true" className="*:data-[slot=icon]:size-4">
+                {renderProps.sortDirection === "ascending" ? (
+                  <ArrowUpIcon weight="bold" />
+                ) : (
+                  <ArrowDownIcon weight="bold" />
+                )}
+              </span>
+            ) : null}
+          </EnhancerGroup>
+        );
+      }}
+    </AriaColumn>
+  );
 }
 
 const TableRowContext = createContext<
@@ -89,19 +141,21 @@ const TableRowContext = createContext<
   title: undefined,
 });
 
-export function TableRow({
+export const TableRowLink = createLink(AriaRow);
+export function TableRow<T extends object>({
   href,
   routerOptions,
   target,
   title,
   className,
+  children,
   ...props
 }: {
   target?: string;
   title?: string;
-} & Pick<LinkProps, "href" | "routerOptions"> &
-  React.ComponentPropsWithoutRef<"tr">) {
+} & AriaRowProps<T>) {
   const { striped } = useContext(TableContext);
+  const options = useTableOptions();
 
   return (
     <TableRowContext.Provider
@@ -111,84 +165,96 @@ export function TableRow({
         >
       }
     >
-      <tr
+      <AriaRow
         {...props}
-        className={clsx(
+        className={cn(
           className,
           "group/row",
-          href &&
-            "has-[[data-row-link][data-focus]]:outline-2 has-[[data-row-link][data-focus]]:-outline-offset-2 has-[[data-row-link][data-focus]]:outline-blue-500 dark:focus-within:bg-white/[2.5%]",
-          striped && "even:bg-neutral-950/[2.5%] dark:even:bg-white/[2.5%]",
-          href && striped && "hover:bg-neutral-950/5 dark:hover:bg-white/5",
-          href &&
-            !striped &&
-            "hover:bg-neutral-950/[2.5%] dark:hover:bg-white/[2.5%]"
+          //
+          "data-href:focus:outline-2 data-href:focus:-outline-offset-2 data-href:focus:outline-blue-500",
+          //
+          striped && "even:bg-neutral-950/[2.5%]",
+          //
+          striped && "hover:bg-neutral-950/5",
+          //
+          !striped &&
+            "data-href:hover:bg-neutral-950/[2.5%] data-selection-mode:hover:bg-neutral-950/[2.5%]",
         )}
-      />
+      >
+        <>
+          {options.selectionBehavior === "toggle" && (
+            <TableCell>
+              <Checkbox slot="selection" />
+            </TableCell>
+          )}
+          {children}
+        </>
+      </AriaRow>
     </TableRowContext.Provider>
   );
 }
 
-export function TableHeader({
+export function TableHeader<T extends object>({
   className,
+  children,
+  columns,
   ...props
-}: React.ComponentPropsWithoutRef<"th">) {
-  const { bleed, grid } = useContext(TableContext);
+}: AriaTableHeaderProps<T>) {
+  const options = useTableOptions();
 
   return (
-    <th
+    <AriaTableHeader
       {...props}
-      className={clsx(
+      className={cn(
         className,
         //
-        "sticky top-0 z-10 bg-white",
-        //
-        "border-b border-b-neutral-950/10 px-4 py-2 font-medium first:pl-[var(--gutter,theme(spacing.2))] last:pr-[var(--gutter,theme(spacing.2))] dark:border-b-white/10",
-        grid &&
-          "border-l border-l-neutral-950/5 first:border-l-0 dark:border-l-white/5",
-        !bleed && "sm:first:pl-1 sm:last:pr-1"
+        "text-zinc-500 dark:text-zinc-400",
       )}
-    />
+    >
+      {options.selectionBehavior === "toggle" && (
+        <TableColumn
+          className={cn([
+            // !bleed && "max-w-4 sm:first:pl-1 sm:last:pr-1"
+          ])}
+        >
+          <Checkbox slot="selection" />
+        </TableColumn>
+      )}
+      <Collection items={columns}>{children}</Collection>
+    </AriaTableHeader>
   );
 }
 
-export function TableCell({
-  className,
-  children,
-  ...props
-}: React.ComponentPropsWithoutRef<"td">) {
+const cellStyles = createStyles({
+  base: "group/cell relative px-4 first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))",
+  variants: {
+    dense: {
+      true: "py-2.5",
+      false: "py-4",
+    },
+    bleed: {
+      true: "",
+      false: "sm:first:pl-1 sm:last:pr-1",
+    },
+    grid: {
+      true: "border-l border-l-neutral-950/5 first:border-l-0",
+      false: "",
+    },
+    striped: {
+      true: "",
+      false: "border-b border-neutral-950/5",
+    },
+  },
+});
+
+export function TableCell({ className, ...props }: AriaCellProps) {
   const { bleed, dense, grid, striped } = useContext(TableContext);
-  const { href, routerOptions, target, title } = useContext(TableRowContext);
-  const [cellRef, setCellRef] = useState<HTMLElement | null>(null);
+  const styles = cellStyles({ bleed, grid, striped, dense });
 
   return (
-    <td
-      ref={href ? setCellRef : undefined}
+    <AriaCell
       {...props}
-      data-navigatable={href || undefined}
-      className={clsx(
-        className,
-        "group/cell relative px-4 first:pl-[var(--gutter,theme(spacing.2))] last:pr-[var(--gutter,theme(spacing.2))]",
-        !striped && "border-b border-neutral-950/5 dark:border-white/5",
-        grid &&
-          "border-l border-l-neutral-950/5 first:border-l-0 dark:border-l-white/5",
-        dense ? "py-2.5" : "py-4",
-        !bleed && "sm:first:pl-1 sm:last:pr-1"
-      )}
-    >
-      {href && (
-        <Link
-          data-row-link
-          href={href}
-          target={target}
-          aria-label={title}
-          routerOptions={routerOptions}
-          // @ts-expect-error
-          tabIndex={cellRef?.previousElementSibling === null ? 0 : -1}
-          className="absolute inset-0 focus:outline-none"
-        />
-      )}
-      {children}
-    </td>
+      className={composeRenderProps(className, (value) => cn(styles, value))}
+    />
   );
 }

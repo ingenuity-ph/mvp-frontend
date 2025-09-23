@@ -1,4 +1,6 @@
 /* eslint-disable import/no-default-export */
+import { CurrencyDollarIcon, WarningCircleIcon } from "@phosphor-icons/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Combobox } from "@/components/ui/combobox";
 import {
   Description,
@@ -7,8 +9,6 @@ import {
   Label,
 } from "@/components/ui/fieldset";
 import { Option } from "@/components/ui/select";
-import { WarningCircleIcon } from "@phosphor-icons/react";
-import type { Meta, StoryObj } from "@storybook/react-vite";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -29,10 +29,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
-export const Basic: Story = {
+export const Default: Story = {
   render: () => {
     return (
-      <Combobox name="user" placeholder="Select favorite color">
+      <Combobox
+        startEnhancer={<CurrencyDollarIcon />}
+        name="color"
+        placeholder="Select favorite color"
+      >
         <Option>Red</Option>
         <Option>Blue</Option>
         <Option>Yellow</Option>
@@ -92,12 +96,12 @@ export const WithOptionIcon: Story = {
       <Field>
         <Label>Favorite Color</Label>
         <Combobox name="color" placeholder="Select favorite color">
-          <Option>
+          <Option textValue="Red">
             <WarningCircleIcon />
             <Label>Red</Label>
             <Description>The color red.</Description>
           </Option>
-          <Option>
+          <Option textValue="Yellow">
             <WarningCircleIcon />
             <Label>Yellow</Label>
             <Description>The color red.</Description>

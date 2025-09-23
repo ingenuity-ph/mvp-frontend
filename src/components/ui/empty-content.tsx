@@ -16,9 +16,11 @@ export function EmptyContent({
       <EmptyIcon className="h-12 w-12" />
 
       <div className="text-center">
-        <h3 className="text-lg font-semibold">{label}</h3>
+        <h3 className="text-label-md font-semibold">{label}</h3>
 
-        <p className="mt-2 max-w-[60ch]">{description}</p>
+        <p className="text-paragraph-sm mt-1 max-w-[60ch] text-neutral-400">
+          {description}
+        </p>
       </div>
     </div>
   );

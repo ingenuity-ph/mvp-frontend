@@ -1,35 +1,37 @@
 import React from "react";
-import type { Link } from "react-aria-components";
-import { tv } from "tailwind-variants";
-import { type BaseButtonProps, Button } from "./button";
-import type { Shape, VariantConfigMap } from "./constants";
+import { tv, type VariantProps } from "tailwind-variants/lite";
+import { Button, type UnstyledButtonProps } from "./button";
 import { cn } from "./utils";
 
-interface AvatarProps {
-  src?: string | null;
-  initials?: string;
-  alt?: string;
-  className?: string;
-  shape?: Shape;
-}
-
-const avatar = tv({
+export const avatarStyles = tv({
   base: [
-    // Basic layout
-    "inline-grid shrink-0 align-middle [--avatar-radius:20%] [--ring-opacity:20%] *:col-start-1 *:row-start-1",
-    "outline -outline-offset-1 outline-black/[--ring-opacity] dark:outline-white/[--ring-opacity]",
+    // Layout
+    "inline-grid shrink-0 align-middle [--ring-opacity:20%] *:col-start-1 *:row-start-1",
+    //
+    "outline -outline-offset-1 outline-black/(--ring-opacity) dark:outline-white/(--ring-opacity)",
   ],
   variants: {
-    // Add the correct border radius
     shape: {
-      square: "rounded-[--avatar-radius] *:rounded-[--avatar-radius]",
+      square:
+        "rounded-(--avatar-radius) *:rounded-(--avatar-radius) [--avatar-radius:20%]",
       circle: "rounded-full *:rounded-full",
-    } satisfies VariantConfigMap<Shape>,
+    },
   },
   defaultVariants: {
     shape: "circle",
   },
 });
+
+/**
+ * @internal
+ */
+type OwnProps = VariantProps<typeof avatarStyles>;
+export type AvatarProps = {
+  src?: string | null;
+  initials?: string;
+  alt?: string;
+  className?: string;
+} & OwnProps;
 
 export function Avatar({
   src = null,
@@ -43,7 +45,7 @@ export function Avatar({
     <span
       data-slot="avatar"
       {...props}
-      className={avatar({ shape, className })}
+      className={avatarStyles({ shape, className })}
     >
       {initials && (
         <svg
@@ -76,20 +78,21 @@ export const AvatarButton = React.forwardRef(function AvatarButton(
     initials,
     alt,
     className,
-  }: AvatarProps &
-    (
-      | Omit<BaseButtonProps, "className">
-      | Omit<React.ComponentPropsWithoutRef<typeof Link>, "className">
-    ),
-  ref: React.ForwardedRef<HTMLButtonElement>
+  }: AvatarProps & UnstyledButtonProps,
+  ref: React.ForwardedRef<HTMLButtonElement>,
 ) {
-  const classes = cn(
-    className,
-    "relative inline-grid focus:outline-none focus:outline-offset-2 focus:outline-blue-500"
-  );
-
   return (
-    <Button variant="unstyled" className={classes} ref={ref}>
+    <Button
+      variant="unstyled"
+      ref={ref}
+      className={cn(
+        className,
+        // Layout
+        "relative inline-grid",
+        // Focus
+        "focus:outline-info-500 focus:outline-offset-2 focus:outline-none",
+      )}
+    >
       <Avatar src={src} shape={shape} initials={initials} alt={alt} />
     </Button>
   );

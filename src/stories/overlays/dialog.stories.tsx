@@ -1,7 +1,6 @@
 /* eslint-disable import/no-default-export */
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { Drawer } from "@/components/ui/drawer";
 import { Description, FieldGroup } from "@/components/ui/fieldset";
 import { InputField } from "@/components/ui/input";
 import { SurfaceActions } from "@/components/ui/surface";
@@ -12,15 +11,15 @@ import { DialogTrigger } from "react-aria-components";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
-  title: "Surfaces/Drawer",
-  component: Drawer,
+  title: "Overlays/Dialog",
+  component: Dialog,
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
     layout: "centered",
   },
   tags: ["autodocs"],
   args: { size: "lg" },
-} satisfies Meta<typeof Drawer>;
+} satisfies Meta<typeof Dialog>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -31,7 +30,7 @@ export const Default: Story = {
     return (
       <DialogTrigger>
         <Button color="danger">Refund Payment</Button>
-        <Drawer>
+        <Dialog>
           <Header>
             <Title>Refund Payment</Title>
             <Description className="mt-2">
@@ -54,7 +53,7 @@ export const Default: Story = {
               <Button color="danger">Refund</Button>
             </SurfaceActions>
           </Footer>
-        </Drawer>
+        </Dialog>
       </DialogTrigger>
     );
   },

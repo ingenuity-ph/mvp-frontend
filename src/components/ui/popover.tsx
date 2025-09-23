@@ -3,14 +3,50 @@ import {
   Popover as AriaPopover,
   type PopoverProps as AriaPopoverProps,
 } from "react-aria-components";
+import { tv, type VariantProps } from "tailwind-variants/lite";
 import { surfaceStyles } from "./surface";
 import { cn, createSplitProps } from "./utils";
 
-export type PopoverProps = AriaPopoverProps;
+export const overlayStyles = tv({
+  extend: surfaceStyles,
+  base: [
+    // Base styles
+    "isolate",
+    // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
+    "outline outline-transparent focus:outline-none",
+    // Handle scrolling it won't fit in viewport
+    "overflow-y-auto",
+    // Shadows
+    "ring-1 shadow-lg ring-neutral-950/10",
+  ],
+  variants: {
+    animate: {
+      true: [
+        // Animation
+        "slide-in-from-left-1 entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out exiting:slide-out-to-bottom-1",
+        // Placement aware animation
+        "data-[placement=bottom]:entering:slide-in-from-top-1 data-[placement=left]:entering:slide-in-from-right-1 data-[placement=right]:entering:slide-in-from-left-1 data-[placement=top]:entering:slide-in-from-bottom-1",
+      ],
+      false: "",
+    },
+  },
+  defaultVariants: {
+    bleed: false,
+    animate: true,
+  },
+});
+
+type PopoverVariants = VariantProps<typeof overlayStyles>;
+export type PopoverOwnProps = PopoverVariants & {
+  className?: string;
+  children: React.ReactNode;
+};
+export type PopoverProps = Omit<AriaPopoverProps, keyof PopoverOwnProps> &
+  PopoverOwnProps;
 
 /**
- * popover props that are passed through to the underlying AriaPopover component
- * if we are composing it with another components (e.g. Menu,Combobox)
+ * Popover props that are passed through to the underlying AriaPopover component
+ * if we are composing it with another components (e.g. Menu,Combobox).
  */
 export type PassThroughPopoverProps = Pick<
   AriaPopoverProps,
@@ -21,97 +57,53 @@ export type PassThroughPopoverProps = Pick<
   | "isKeyboardDismissDisabled"
 >;
 /**
- * Handles splitting the popover props when composing it with another components (e.g. Menu,Combobox)
+ * Handles splitting the popover props when composing it with another components (e.g. Menu,Combobox).
  */
 export const splitPopoverProps = <T extends PassThroughPopoverProps>(
-  props: T
-) =>
-  createSplitProps<PassThroughPopoverProps>()(props, [
+  props: T,
+) => {
+  return createSplitProps<PassThroughPopoverProps>()(props, [
     "arrowBoundaryOffset",
     "placement",
     "containerPadding",
     "isKeyboardDismissDisabled",
     "crossOffset",
   ]);
+};
 
-export function Popover({
-  children,
-  bleed = false,
-  ...props
-}: {
-  children: React.ReactNode;
-  bleed?: boolean;
-} & AriaPopoverProps) {
+/**
+ * Handles splitting the popover props when composing it with another components (e.g. Menu,Combobox).
+ */
+export function splitPopoverStyleProps<T extends PopoverVariants>(props: T) {
+  return createSplitProps<PopoverVariants>()(props, [
+    ...overlayStyles.variantKeys,
+    ...surfaceStyles.variantKeys,
+  ]);
+}
+
+export function Popover({ children, className, ...props }: PopoverProps) {
+  const [variantsProps, popoverProps] = splitPopoverStyleProps(props);
+
   return (
     <AriaPopover
-      {...props}
-      className={cn([
-        // Extend Surface
-        surfaceStyles(),
-        //
-        bleed && "[--gutter:0]",
-        // Base styles
-        "isolate",
-        // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
-        "outline outline-transparent focus:outline-none",
-        // Handle scrolling when menu won't fit in viewport
-        "overflow-y-auto",
-        // Animation
-        "slide-in-from-left-1 entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out exiting:slide-out-to-bottom-1",
-        // Placement aware animation
-        "data-[placement=bottom]:entering:slide-in-from-top-1 data-[placement=left]:entering:slide-in-from-right-1 data-[placement=right]:entering:slide-in-from-left-1 data-[placement=top]:entering:slide-in-from-bottom-1",
-        // Shadows
-        "ring-1 shadow-lg ring-neutral-950/10 dark:ring-white/10 dark:ring-inset",
-        //
-        props.className,
-      ])}
+      {...popoverProps}
+      className={overlayStyles({ ...variantsProps, className })}
     >
       {children}
     </AriaPopover>
   );
 }
 
-export function PopoverDialog({
-  children,
-  bleed = false,
-  ...props
-}: {
-  children: React.ReactNode;
-  bleed?: boolean;
-} & AriaPopoverProps) {
+export function PopoverDialog({ children, ...props }: PopoverProps) {
+  const [variantsProps, { className, ...popoverProps }] =
+    splitPopoverStyleProps(props);
+
   return (
     <AriaPopover
-      {...props}
-      className={cn([
-        // Animation
-        "slide-in-from-left-1 entering:animate-in entering:fade-in exiting:animate-out exiting:fade-out exiting:slide-out-to-bottom-1",
-        // Placement aware animation
-        "data-[placement=bottom]:entering:slide-in-from-top-1 data-[placement=left]:entering:slide-in-from-right-1 data-[placement=right]:entering:slide-in-from-left-1 data-[placement=top]:entering:slide-in-from-bottom-1",
-      ])}
+      {...popoverProps}
+      className={cn(overlayStyles({ ...variantsProps, className }))}
     >
-      {/* <OverlayArrow>
-        <svg width={12} height={12} viewBox="0 0 12 12">
-          <path d="M0 0 L6 6 L12 0" />
-        </svg>
-      </OverlayArrow> */}
-      <Dialog
-        className={cn(
-          // Extend Surface
-          surfaceStyles(),
-          //
-          bleed && "[--gutter:0]",
-          // Base styles
-          "isolate",
-          // Invisible border that is only visible in `forced-colors` mode for accessibility purposes
-          "outline outline-transparent focus:outline-none",
-          // Handle scrolling when menu won't fit in viewport
-          "overflow-y-auto",
-          //
-          props.className
-        )}
-      >
-        {children}
-      </Dialog>
+      <Dialog>{children}</Dialog>
     </AriaPopover>
   );
 }

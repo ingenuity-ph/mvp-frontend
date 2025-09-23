@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, type ButtonProps } from "./button";
 import { cn } from "./utils";
+import { Header } from "./view";
 
 export function Sidebar({
   className,
@@ -14,11 +15,11 @@ export function SidebarHeader({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   return (
-    <div
+    <Header
       {...props}
       className={cn(
         className,
-        "flex flex-col border-b border-neutral-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5"
+        "flex flex-col border-b border-neutral-950/5 p-4 dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5",
       )}
     />
   );
@@ -35,9 +36,9 @@ export function SidebarBody({
         // Variables
         "[--gutter:var(--sidebar-gutter,--spacing(4))]",
         //
-        "flex flex-1 flex-col overflow-y-auto p-[var(--gutter)] [&>[data-slot=section]+[data-slot=section]]:mt-8",
+        "flex flex-1 flex-col overflow-y-auto p-(--gutter) [&>[data-slot=section]+[data-slot=section]]:mt-8",
         //
-        className
+        className,
       )}
     />
   );
@@ -53,9 +54,9 @@ export function SidebarFooter({
       className={cn(
         className,
         // Variables
-        "[--gutter:theme(spacing.4)]",
+        "[--gutter:var(--sidebar-gutter,--spacing(4))]",
         //
-        "flex flex-col border-t border-neutral-950/5 p-[var(--gutter)] dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5"
+        "flex flex-col border-t border-neutral-950/5 p-(--gutter) dark:border-white/5 [&>[data-slot=section]+[data-slot=section]]:mt-2.5",
       )}
     />
   );
@@ -83,7 +84,7 @@ export function SidebarDivider({
       {...props}
       className={cn(
         className,
-        "my-4 border-t border-neutral-950/5 lg:-mx-4 dark:border-white/5"
+        "my-4 border-t border-neutral-950/5 lg:-mx-4 dark:border-white/5",
       )}
     />
   );
@@ -112,7 +113,7 @@ export function SidebarHeading({
       {...props}
       className={cn(
         className,
-        "mb-1 px-2 text-xs/6 font-medium text-neutral-500 dark:text-neutral-400"
+        "mb-1 px-2 text-xs/6 font-medium text-neutral-500 dark:text-neutral-400",
       )}
     />
   );
@@ -127,11 +128,11 @@ export const SidebarItem = React.forwardRef(function SidebarItem(
   }: {
     current?: boolean;
   } & ButtonProps,
-  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>
+  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>,
 ) {
   const classes = cn(
     // Base
-    "flex w-full items-center gap-3 rounded-control px-2 py-2.5 text-left text-base/6 font-medium text-neutral-950 sm:py-2 sm:text-sm/5",
+    "rounded-control flex w-full items-center gap-3 px-2 py-2.5 text-left text-base/6 font-medium text-neutral-950 sm:py-2 sm:text-sm/5",
     // Leading icon/icon-only
     "*:data-[slot=icon]:size-6 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:fill-neutral-500 sm:*:data-[slot=icon]:size-5",
     // Trailing icon (down chevron or similar)
@@ -148,7 +149,7 @@ export const SidebarItem = React.forwardRef(function SidebarItem(
     "dark:text-white dark:*:data-[slot=icon]:fill-neutral-400",
     "dark:hover:bg-white/5 dark:hover:*:data-[slot=icon]:fill-white",
     "dark:data-active:bg-white/5 dark:data-active:*:data-[slot=icon]:fill-white",
-    "dark:data-current:*:data-[slot=icon]:fill-white"
+    "dark:data-current:*:data-[slot=icon]:fill-white",
   );
 
   return (

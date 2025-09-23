@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useViewportSize } from "@react-aria/utils";
 import { Drawer } from "../ui/drawer";
 import { NavbarItem } from "../ui/navbar";
-import { SurfaceOverflow } from "../ui/surface";
 
 function OpenMenuIcon() {
   return (
@@ -28,9 +27,9 @@ function MobileSidebar({
         }
       }}
     >
-      <SurfaceOverflow inset="all" offset="none">
-        {children}
-      </SurfaceOverflow>
+      {/* <SurfaceOverflow inset="all" offset="none"> */}
+      {children}
+      {/* </SurfaceOverflow> */}
     </Drawer>
   );
 }

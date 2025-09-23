@@ -11,7 +11,7 @@ import {
   useContextProps,
   useSlottedContext,
 } from "react-aria-components";
-import { tv } from "tailwind-variants";
+import { tv } from "tailwind-variants/lite";
 import { z } from "zod";
 import {
   filterDOMProps,
@@ -20,7 +20,7 @@ import {
   useObjectRef,
 } from "@react-aria/utils";
 import { stripUndefined } from "@/libs/helpers";
-import type { ColorMap, ThemeColors } from "./constants";
+import type { ThemeColors } from "./constants";
 import {
   type ComposedFieldProps,
   Description,
@@ -85,6 +85,7 @@ const base = [
 ];
 
 const colors = {
+  unset: "",
   primary: [
     "[--radio-checked-bg:var(--color-brand-primary)] [--radio-checked-border:var(--color-brand-primary-border)] [--radio-checked-indicator:var(--color-white)]",
     "dark:[--radio-checked-bg:theme(colors.brand.primary.600)]",
@@ -98,7 +99,7 @@ const colors = {
   success:
     "[--radio-checked-indicator:var(--color-white)] [--radio-checked-bg:var(--color-brand-success)] [--radio-checked-border:var(--color-brand-success-border)]",
   info: "[--radio-checked-indicator:var(--color-white)] [--radio-checked-bg:var(--color-brand-info)] [--radio-checked-border:var(--color-brand-info-border)]",
-} as ColorMap;
+};
 
 type Color = ThemeColors;
 
@@ -156,7 +157,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           {
             onChange: (value: unknown) => {
               controller?.onChange(
-                isBoolean(value) ? toBooleanPrimitive(value) : value
+                isBoolean(value) ? toBooleanPrimitive(value) : value,
               );
             },
             onBlur: controller?.onBlur,
@@ -166,7 +167,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
               .catch(undefined)
               .parse(controller?.value),
             isDisabled: controller?.disabled,
-          }
+          },
         )}
         className={clsx(
           className,
@@ -175,11 +176,11 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             "group space-y-3 [&_[data-slot=label]]:font-normal",
             // With descriptions
             "has-data-[slot=description]:space-y-6 has-data-[slot=description]:**:data-[slot=label]:font-medium",
-          ]
+          ],
         )}
       />
     );
-  }
+  },
 );
 
 export function HeadlessRadioGroup(props: Omit<RadioGroupProps, "unstyled">) {
@@ -237,7 +238,7 @@ export function RadioField({
 export function RadioMark({
   color = "primary",
 }: {
-  color?: Color;
+  color?: ThemeColors;
   className?: string;
 }) {
   return (
@@ -246,7 +247,7 @@ export function RadioMark({
         className={clsx(
           "size-full rounded-full border-[4.5px] border-transparent bg-(--radio-indicator) bg-clip-padding",
           // Forced colors mode
-          "forced-colors:border-[Canvas] forced-colors:group-data-selected:border-[Highlight]"
+          "forced-colors:border-[Canvas] forced-colors:group-data-selected:border-[Highlight]",
         )}
       />
     </span>
@@ -260,7 +261,7 @@ export function RadioMark({
  */
 export const Radio = forwardRef(function Radio(
   props: AriaRadioProps & { color?: Color },
-  ref: ForwardedRef<HTMLLabelElement>
+  ref: ForwardedRef<HTMLLabelElement>,
 ) {
   const { color = "neutral", ...racProps } = props;
   const { inputRef: userProvidedInputRef = null } = props;
@@ -274,8 +275,8 @@ export const Radio = forwardRef(function Radio(
     mergeRefs(
       userProvidedInputRef,
       // eslint-disable-next-line no-negated-condition, @typescript-eslint/prefer-nullish-coalescing
-      props.inputRef !== undefined ? props.inputRef : null
-    )
+      props.inputRef !== undefined ? props.inputRef : null,
+    ),
   );
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const groupState = useContext(AriaRadioGroupStateContext)!;
@@ -289,7 +290,7 @@ export const Radio = forwardRef(function Radio(
       children: typeof props.children === "function" ? true : props.children,
     },
     groupState,
-    inputRef
+    inputRef,
   );
 
   const { isFocused, isFocusVisible, focusProps } = useFocusRing();
@@ -325,12 +326,12 @@ export const Radio = forwardRef(function Radio(
       className={clsx(
         // eslint-disable-next-line unicorn/consistent-destructuring
         props.className,
-        "group relative inline-flex focus:outline-none"
+        "group relative inline-flex focus:outline-none",
       )}
     >
       <RadioMark color={color} />
       <input
-        className="opacity-0 absolute inset-0 size-full"
+        className="absolute inset-0 size-full opacity-0"
         {...mergeProps(inputProps, focusProps)}
         ref={inputRef}
       />
@@ -344,7 +345,7 @@ export const Radio = forwardRef(function Radio(
  */
 export const RadioOverlay = forwardRef(function RadioOverlay(
   props: AriaRadioProps,
-  ref: ForwardedRef<HTMLLabelElement>
+  ref: ForwardedRef<HTMLLabelElement>,
 ) {
   const { ...racProps } = props;
   const { inputRef: userProvidedInputRef = null } = props;
@@ -358,8 +359,8 @@ export const RadioOverlay = forwardRef(function RadioOverlay(
     mergeRefs(
       userProvidedInputRef,
       // eslint-disable-next-line no-negated-condition, @typescript-eslint/prefer-nullish-coalescing
-      props.inputRef !== undefined ? props.inputRef : null
-    )
+      props.inputRef !== undefined ? props.inputRef : null,
+    ),
   );
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const groupState = useContext(AriaRadioGroupStateContext)!;
@@ -373,7 +374,7 @@ export const RadioOverlay = forwardRef(function RadioOverlay(
       children: typeof props.children === "function" ? true : props.children,
     },
     groupState,
-    inputRef
+    inputRef,
   );
 
   const { isFocused, isFocusVisible, focusProps } = useFocusRing();
@@ -429,7 +430,7 @@ export const RadioOverlay = forwardRef(function RadioOverlay(
             props.children
       }
       <input
-        className="opacity-0 absolute inset-0 size-full"
+        className="absolute inset-0 size-full opacity-0"
         {...mergeProps(inputProps, focusProps)}
         ref={inputRef}
       />

@@ -1,130 +1,222 @@
-import type React from "react";
+import {
+  type ComponentPropsWithoutRef,
+  createContext,
+  type ForwardedRef,
+  forwardRef,
+  useContext,
+} from "react";
 import { useId } from "react-aria";
-import type { LinkProps } from "react-aria-components";
-import { z } from "zod";
-import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import {
+  ButtonContext,
+  Collection,
+  CollectionRendererContext,
+  type ContextValue,
+  DEFAULT_SLOT,
+  Provider,
+  UNSTABLE_CollectionBuilder,
+  UNSTABLE_createLeafComponent,
+  useContextProps,
+  useSlottedContext,
+} from "react-aria-components";
+import { match, P } from "ts-pattern";
+import { CollectionNode } from "@react-aria/collections";
+import { Link } from "@tanstack/react-router";
 import * as pagination from "@zag-js/pagination";
 import { normalizeProps, useMachine } from "@zag-js/react";
 import { DEFAULT_PAGE_SIZE } from "@/libs/api/constants";
-import { Button, plainButtonStyles } from "./button";
-import { Description } from "./fieldset";
-import { Strong } from "./text";
+import { composeButtonStyles } from "./button";
+import { Text } from "./text";
 import { cn } from "./utils";
 
-export function Pagination({
-  "aria-label": ariaLabel = "Page navigation",
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"nav">) {
-  return (
-    <nav
-      aria-label={ariaLabel}
-      {...props}
-      className={cn(className, "flex gap-x-2")}
-    />
-  );
-}
+type OwnProps = Pick<
+  pagination.Props,
+  | "count"
+  | "defaultPage"
+  | "defaultPageSize"
+  | "page"
+  | "pageSize"
+  | "onPageChange"
+>;
 
-export function PaginationPrevious({
-  href = null,
-  className,
-  children = "Previous",
-}: React.PropsWithChildren<{ href?: string | null; className?: string }>) {
-  return (
-    <span className={cn(className, "grow basis-0")}>
-      <Button
-        {...(href === null ? { disabled: true } : { href })}
-        variant="plain"
-        aria-label="Previous page"
-      >
-        <svg
-          className="stroke-current"
-          data-slot="icon"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M2.75 8H13.25M2.75 8L5.25 5.5M2.75 8L5.25 10.5"
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        {children}
-      </Button>
-    </span>
-  );
-}
+type PaginationProps = Omit<
+  React.ComponentPropsWithoutRef<"nav">,
+  keyof OwnProps
+> &
+  OwnProps;
+export const PaginationContext = createContext<
+  ContextValue<PaginationProps, HTMLDivElement>
+>({});
 
-export function PaginationNext({
-  href = null,
-  className,
-  children = "Next",
-}: React.PropsWithChildren<{ href?: string | null; className?: string }>) {
-  return (
-    <span className={cn(className, "flex grow basis-0 justify-end")}>
-      <Button
-        {...(href === null ? { disabled: true } : { href })}
-        variant="plain"
-        aria-label="Next page"
-      >
-        {children}
-        <svg
-          className="stroke-current"
-          data-slot="icon"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M13.25 8L2.75 8M13.25 8L10.75 10.5M13.25 8L10.75 5.5"
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </Button>
-    </span>
-  );
-}
+const PaginationApiContext =
+  createContext<ContextValue<pagination.Api, HTMLElement>>(null);
 
-export function PaginationList({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"span">) {
-  return (
-    <span
-      {...props}
-      className={cn(className, "hidden items-baseline gap-x-2 sm:flex")}
-    />
-  );
-}
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+export const usePagination = () => useSlottedContext(PaginationApiContext)!;
 
-export function PaginationPage({
-  href,
-  className,
-  current = false,
-  children,
-}: React.PropsWithChildren<{
-  className?: string;
-  current?: boolean;
-}> &
-  Pick<LinkProps, "href" | "routerOptions">) {
+export const Pagination = forwardRef(function Pagination(
+  {
+    "aria-label": ariaLabel = "Page navigation",
+    className,
+    defaultPage,
+    defaultPageSize = DEFAULT_PAGE_SIZE,
+    pageSize,
+    page,
+    count,
+    onPageChange,
+    ...props
+  }: PaginationProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
+  // eslint-disable-next-line no-param-reassign
+  [props, ref] = useContextProps(props, ref, PaginationContext);
+  const service = useMachine(pagination.machine, {
+    id: useId(),
+    count,
+    defaultPageSize,
+    defaultPage,
+    page,
+    pageSize,
+    onPageChange,
+    /**
+     * TODO: Figure out if we expose this.
+     */
+    siblingCount: 3,
+  });
+
+  const api = pagination.connect(service, normalizeProps);
+
   return (
-    <Button
-      href={href}
-      variant="plain"
-      aria-label={`Page`}
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        className,
-        "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg",
-        current && "before:bg-neutral-950/5 dark:before:bg-white/10"
-      )}
+    <Provider
+      values={[
+        [PaginationApiContext, api],
+        [
+          ButtonContext,
+          {
+            slots: {
+              [DEFAULT_SLOT]: {},
+              "previous-page": {
+                ...api.getPrevTriggerProps(),
+                onClick: undefined,
+                onBlur: undefined,
+                onFocus: undefined,
+                value: undefined,
+                formAction: undefined,
+                // @ts-expect-error
+                isDisabled: api.getPrevTriggerProps().disabled,
+                onPress(e) {
+                  /**
+                   * Based from the source code the `currentTarget` is the only thing needed to make this work
+                   * we just faked it to be able to adapt zagjs + RAC.
+                   */
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  api.getPrevTriggerProps().onClick(e.target);
+                },
+              },
+              "next-page": {
+                ...api.getNextTriggerProps(),
+                onClick: undefined,
+                onBlur: undefined,
+                onFocus: undefined,
+                value: undefined,
+                formAction: undefined,
+                // @ts-expect-error
+                isDisabled: api.getNextTriggerProps().disabled,
+                onPress(e) {
+                  /**
+                   * Based from the source code the `currentTarget` is the only thing needed to make this work
+                   * we just faked it to be able to adapt zagjs + RAC.
+                   */
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  api.getNextTriggerProps().onClick(e.target);
+                },
+              },
+            },
+          },
+        ],
+      ]}
     >
-      <span className="-mx-0.5">{children}</span>
-    </Button>
+      <nav
+        ref={ref}
+        aria-label={ariaLabel}
+        {...props}
+        className={cn(className, "flex gap-x-2")}
+      />
+    </Provider>
+  );
+});
+
+type ArrayItem<T> = T extends Array<infer U> ? U : never;
+// eslint-disable-next-line no-restricted-syntax/noClasses
+class PaginationNode extends CollectionNode<unknown> {
+  static readonly type = "item";
+}
+
+export const PaginationPage = UNSTABLE_createLeafComponent(
+  PaginationNode,
+  function PaginationPage(
+    {
+      page,
+      ...props
+    }: ComponentPropsWithoutRef<"li"> & {
+      page: ArrayItem<pagination.Api["pages"]>;
+    },
+    ref: ForwardedRef<HTMLLIElement>,
+  ) {
+    const api = usePagination();
+    const styles = composeButtonStyles("outline", {});
+
+    return (
+      <li ref={ref} {...props}>
+        {match({
+          type: page.type,
+          value: page.type === "page" ? page.value : null,
+        })
+          .with({ type: "page", value: P.not(null) }, ({ value }) => {
+            return (
+              <Link
+                {...api.getItemProps(page as pagination.ItemProps)}
+                className={cn(styles, "shrink-0")}
+                to="."
+              >
+                {value}
+              </Link>
+            );
+          })
+          .with({ type: "ellipsis" }, () => <Text>...</Text>)
+          .otherwise(() => null)}
+      </li>
+    );
+  },
+);
+
+export function PaginationPages() {
+  const api = usePagination();
+  const { CollectionRoot } = useContext(CollectionRendererContext);
+
+  return (
+    <UNSTABLE_CollectionBuilder
+      content={
+        <Collection
+          items={api.pages.map((v, i) => {
+            return v.type === "ellipsis"
+              ? { ...v, id: `ellipsis-${i}` }
+              : { ...v, id: v.value };
+          })}
+        >
+          {(item) => <PaginationPage page={item} />}
+        </Collection>
+      }
+    >
+      {(collection) => {
+        return (
+          <ol className={cn("flex items-baseline gap-x-2")}>
+            <CollectionRoot collection={collection} />
+          </ol>
+        );
+      }}
+    </UNSTABLE_CollectionBuilder>
   );
 }
 
@@ -139,124 +231,10 @@ export function PaginationGap({
       {...props}
       className={cn(
         className,
-        "w-[2.25rem] text-center text-sm/6 font-semibold text-neutral-950 select-none dark:text-white"
+        "w-[2.25rem] text-center text-sm/6 font-semibold text-neutral-950 select-none dark:text-white",
       )}
     >
       {children}
     </span>
-  );
-}
-
-const getPageValue = (maybePage: unknown) => {
-  return z
-    .object({ page: z.coerce.number() })
-    .catch({ page: 1 })
-    .parse(maybePage);
-};
-
-export function DefaultPagination({ count }: { count?: number }) {
-  const search = useSearch({ strict: false });
-  const currentPage = getPageValue(search).page;
-  const navigate = useNavigate();
-  const service = useMachine(pagination.machine, {
-    id: useId(),
-    count,
-    onPageChange(details) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      void navigate({ to: ".", search: { page: details.page.toString() } });
-    },
-    page: currentPage,
-    pageSize: DEFAULT_PAGE_SIZE,
-    siblingCount: 3,
-  });
-
-  const api = pagination.connect(service, normalizeProps);
-
-  if (!count) {
-    return null;
-  }
-
-  return (
-    <div>
-      {api.totalPages <= 1 && (
-        <Description>
-          Showing all <Strong>{api.count}</Strong> item/s
-        </Description>
-      )}
-      {api.totalPages > 1 && (
-        <nav {...api.getRootProps()}>
-          <ul className="flex gap-x-2">
-            <li>
-              <Link
-                to="."
-                {...api.getPrevTriggerProps()}
-                data-rac
-                className={cn(
-                  plainButtonStyles({ color: "neutral" }),
-                  //
-                  "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg disabled:opacity-50",
-                  //
-                  "data-selected:before:bg-neutral-950/5 dark:data-selected:before:bg-white/10"
-                )}
-              >
-                <span className="-mx-0.5">
-                  Previous <span className="sr-only">Page</span>
-                </span>
-              </Link>
-            </li>
-            {api.pages.map((page, i) => {
-              if (page.type === "page") {
-                return (
-                  <li key={page.value}>
-                    <Link
-                      to="."
-                      {...api.getItemProps(page)}
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
-                      params={{ page: "2" }}
-                      className={cn(
-                        plainButtonStyles({ color: "neutral" }),
-                        //
-                        "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg",
-                        //
-                        "data-selected:before:bg-neutral-950/5 dark:data-selected:before:bg-white/10"
-                      )}
-                    >
-                      {page.value}
-                    </Link>
-                  </li>
-                );
-              }
-
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <li key={`ellipsis-${i}`}>
-                  <PaginationGap {...api.getEllipsisProps({ index: i })} />
-                </li>
-              );
-            })}
-            <li>
-              <Link
-                to="."
-                {...api.getNextTriggerProps()}
-                data-rac
-                className={cn(
-                  plainButtonStyles({ color: "neutral" }),
-                  //
-                  "min-w-[2.25rem] before:absolute before:-inset-px before:rounded-lg",
-                  //
-                  "data-selected:before:bg-neutral-950/5 dark:data-selected:before:bg-white/10"
-                )}
-              >
-                <span className="-mx-0.5">
-                  Next <span className="sr-only">Page</span>
-                </span>
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      )}
-    </div>
   );
 }

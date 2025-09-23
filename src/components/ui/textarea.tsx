@@ -1,4 +1,3 @@
-import { mergeRefs, useObjectRef } from "@react-aria/utils";
 import { forwardRef } from "react";
 import {
   TextArea as AriaTextArea,
@@ -7,6 +6,7 @@ import {
   useSlottedContext,
 } from "react-aria-components";
 import type { FieldPath, FieldValues } from "react-hook-form";
+import { mergeRefs, useObjectRef } from "@react-aria/utils";
 import {
   type ComposedFieldProps,
   Description,
@@ -27,19 +27,20 @@ export type TextAreaProps = {
 
 export const Textarea = forwardRef(function Textarea(
   { className, resizable = true, ...props }: TextAreaProps,
-  ref: React.ForwardedRef<HTMLTextAreaElement>
+  ref: React.ForwardedRef<HTMLTextAreaElement>,
 ) {
   const objectRef = useObjectRef(ref);
   const field = useSlottedContext(FieldContext);
   const fieldControl = useSlottedContext(FieldControllerContext)?.field;
   const mergedRef = mergeRefs(objectRef, fieldControl?.ref);
-  const resolvedIsDisabled = props.isDisabled || field?.isDisabled;
+  const isDisabled = props.isDisabled || field?.isDisabled;
+
   return (
     <AriaTextField
       id={field?.id}
       aria-labelledby={field?.["aria-labelledby"]}
       aria-describedby={field?.["aria-describedby"]}
-      isDisabled={resolvedIsDisabled}
+      isDisabled={isDisabled}
       isInvalid={field?.isInvalid}
       data-slot="control"
       value={fieldControl?.value}

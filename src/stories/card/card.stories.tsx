@@ -1,8 +1,8 @@
 /* eslint-disable import/no-default-export */
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Card } from "@/components/ui/card";
 import { Description } from "@/components/ui/fieldset";
 import { Title } from "@/components/ui/text";
-import type { Meta, StoryObj } from "@storybook/react-vite";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -22,6 +22,21 @@ export const Default: Story = {
   render: () => {
     return (
       <Card>
+        <Title>Example card</Title>
+        <Description>
+          Proin ut dui sed metus pharetra hend rerit vel non mi. Nulla ornare
+          faucibus ex, non facilisis nisl.
+        </Description>
+      </Card>
+    );
+  },
+};
+
+export const Bleed: Story = {
+  args: { bleed: true },
+  render: (args) => {
+    return (
+      <Card {...args}>
         <Title>Example card</Title>
         <Description>
           Proin ut dui sed metus pharetra hend rerit vel non mi. Nulla ornare

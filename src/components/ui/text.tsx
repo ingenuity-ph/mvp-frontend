@@ -4,19 +4,20 @@ import { mergeProps } from "react-aria";
 import {
   Button as AriaButton,
   type ButtonProps as AriaButtonProps,
+  composeRenderProps,
   Heading,
   type HeadingProps,
   Text as AriaText,
   TextContext,
   type TextProps as AriaTextProps,
 } from "react-aria-components";
-import { tv, type VariantProps } from "tailwind-variants";
-import type { ColorMap, ThemeColors } from "./constants";
+import { tv, type VariantProps } from "tailwind-variants/lite";
+import type { ThemeColors } from "./constants";
 import { Link, type LinkProps } from "./link";
 import { useSlottedContextExists } from "./utils";
 
 export const textStyles = tv({
-  base: "text-[color:var(--text-color)]",
+  base: "",
   variants: {
     metric: {
       lg: "text-metric-lg",
@@ -64,14 +65,26 @@ export const textStyles = tv({
       inherit: "",
     },
     color: {
-      none: "",
-      primary: ["[--text-color:var(--color-brand-primary-text)]"],
-      neutral: ["[--text-color:var(--color-brand-neutral-text)]"],
-      danger: ["[--text-color:var(--color-brand-danger-text)]"],
-      success: ["[--text-color:var(--color-brand-success-text)]"],
-      warning: ["[--text-color:var(--color-brand-warning-text)]"],
-      info: ["[--text-color:var(--color-brand-info-text)]"],
-    } satisfies ColorMap,
+      unset: "",
+      primary: [
+        "text-[color:var(--text-color)] [--text-color:var(--color-brand-primary-text)]",
+      ],
+      neutral: [
+        "text-[color:var(--text-color)] [--text-color:var(--color-brand-neutral-text)]",
+      ],
+      danger: [
+        "text-[color:var(--text-color)] [--text-color:var(--color-brand-danger-text)]",
+      ],
+      success: [
+        "text-[color:var(--text-color)] [--text-color:var(--color-brand-success-text)]",
+      ],
+      warning: [
+        "text-[color:var(--text-color)] [--text-color:var(--color-brand-warning-text)]",
+      ],
+      info: [
+        "text-[color:var(--text-color)] [--text-color:var(--color-brand-info-text)]",
+      ],
+    },
   },
   defaultVariants: {},
 });
@@ -96,10 +109,10 @@ export const TypographyInheritContext = createContext(false);
 
 export type TextVariants = VariantProps<typeof textStyles>;
 
-interface OwnTextProps {
+type OwnTextProps = {
   color?: Exclude<TextVariants["color"], "none"> | "inherit";
   size?: TextVariants["paragraph"];
-}
+};
 
 export type TextProps = AriaTextProps & OwnTextProps;
 export function Text({
@@ -108,8 +121,8 @@ export function Text({
   color = "neutral",
   ...props
 }: TextProps /**
- * we are remapping the color prop from "none" to "inherit" to make it clearer that we want to inherit the parent's color
- * instead of "none" which would mean that we want to use the default browser color
+ * We are remapping the color prop from "none" to "inherit" to make it clearer that we want to inherit the parent's color
+ * instead of "none" which would mean that we want to use the default browser color.
  */ & { color?: Exclude<TextVariants["color"], "none"> | "inherit" }) {
   const isNested = useContext(_TextNestedContext);
   const shouldInheritColor = color === "inherit";
@@ -131,8 +144,8 @@ export function Text({
           className,
           textStyles({
             paragraph: size,
-            color: shouldInheritColor ? "none" : color,
-          })
+            color: shouldInheritColor ? "unset" : color,
+          }),
         )}
       />
     </_TextNestedContext.Provider>
@@ -143,7 +156,7 @@ export { Text as Paragraph };
 export function TextLink({
   className,
   color = "neutral",
-  size = "md",
+  size = "sm",
   ...props
 }: LinkProps & OwnTextProps) {
   const isColor = typeof color === "string";
@@ -156,13 +169,13 @@ export function TextLink({
       {...props}
       className={clsx(
         className,
-        "underline",
+        "hover:underline",
         textStyles({
           paragraph: size,
-          color: typeof color === "string" ? "none" : color,
+          color: typeof color === "string" ? "unset" : color,
         }),
         //
-        colorStyle
+        colorStyle,
       )}
     />
   );
@@ -179,18 +192,21 @@ export function TextButton({
   return (
     <AriaButton
       {...props}
-      className={clsx(
-        className,
-        // Inherit text styles
-        textStyles({
+      className={composeRenderProps(className, (resolvedClassName) => {
+        return textStyles({
           paragraph: shouldInherit ? undefined : size,
           color: shouldInherit ? undefined : color,
-        }),
-        // Base
-        "relative isolate gap-x-2 focus:outline-none cursor-pointer ",
-        // Forced colors
-        "forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]"
-      )}
+          className: [
+            resolvedClassName,
+            // Base
+            "relative isolate cursor-pointer gap-x-2 focus:outline-none",
+            // Hover
+            "hover:opacity-70",
+            // Forced colors
+            "forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]",
+          ],
+        });
+      })}
     />
   );
 }
@@ -204,7 +220,7 @@ export function Strong({
       {...props}
       className={clsx(
         className,
-        "font-medium text-brand-neutral-text dark:text-white"
+        "text-brand-neutral-text font-medium dark:text-white",
       )}
     />
   );
@@ -219,7 +235,7 @@ export function Code({
       {...props}
       className={clsx(
         className,
-        "rounded border border-brand-neutral-text/10 bg-brand-neutral-text/[2.5%] px-0.5 text-sm font-medium text-brand-neutral-text sm:text-[0.8125rem] dark:border-white/20 dark:bg-white/5 dark:text-white"
+        "border-brand-neutral-text/10 bg-brand-neutral-text/[2.5%] text-brand-neutral-text rounded border px-0.5 text-sm font-medium sm:text-[0.8125rem] dark:border-white/20 dark:bg-white/5 dark:text-white",
       )}
     />
   );
@@ -242,14 +258,14 @@ export function Title({
       {...props}
       {...mergeProps(
         { slot: hasSlot ? "title" : undefined },
-        { slot: props.slot }
+        { slot: props.slot },
       )}
       data-slot="title"
       className={clsx(
         className,
         "font-semibold text-balance",
         //
-        textStyles({ color, title: size })
+        textStyles({ color, title: size }),
       )}
     />
   );
@@ -272,7 +288,7 @@ export function MetricText({
         className,
         "font-semibold text-balance",
         //
-        textStyles({ color, metric: size })
+        textStyles({ color, metric: size }),
       )}
     />
   );

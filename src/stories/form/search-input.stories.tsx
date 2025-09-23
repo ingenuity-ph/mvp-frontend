@@ -1,14 +1,14 @@
 /* eslint-disable import/no-default-export */
+import { fn } from "storybook/test";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "@/components/ui/button";
 import { SearchField, SearchInput } from "@/components/ui/input";
 import { Group } from "@/components/ui/utils";
-import { MagnifyingGlassIcon } from "@phosphor-icons/react";
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
-  title: "Form/SearchInput",
+  title: "Form/Search Input",
   component: SearchInput,
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
@@ -25,7 +25,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Default: Story = {
   args: {
     "aria-label": "Search",
@@ -41,9 +40,7 @@ export const Disabled: Story = {
 
 export const WithLabel: Story = {
   args: {},
-  render: () => {
-    return <SearchField label="Search for a user" />;
-  },
+  render: () => <SearchField label="Search for a user" />,
 };
 
 export const WithDescription: Story = {
@@ -58,10 +55,11 @@ export const WithDescription: Story = {
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const WithinAForm: Story = {
   render: () => {
     return (
-      <form className="bg-danger-300">
+      <form>
         <Group adjoined className="group inline-flex items-center">
           <SearchInput
             adjoined="right"

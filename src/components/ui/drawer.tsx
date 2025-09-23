@@ -1,142 +1,146 @@
-import type React from "react";
 import {
   ButtonContext,
   DEFAULT_SLOT,
   Dialog as AriaDialog,
-  type DialogProps as AriaDialogProps,
   Modal as AriaModal,
   ModalOverlay as AriaModalOverlay,
-  type ModalOverlayProps as AriaModalOverlayProps,
 } from "react-aria-components";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "./utils";
+import { XIcon } from "@phosphor-icons/react";
+import { Button } from "./button";
+import type { Inset } from "./constants";
+import { type DialogProps, dialogStyles } from "./dialog";
+import { cn, createStyles, type VariantProps } from "./utils";
 
-const drawerStyles = tv({
+const drawerStyles = createStyles({
+  base: "",
+  slots: {
+    overlay: dialogStyles.slots.overlay,
+    dialog: dialogStyles.slots.dialog,
+    root: "fixed isolate inset-0 w-screen overflow-y-auto pt-6 sm:pt-0",
+    container: "",
+    modal: "",
+  },
   variants: {
-    size: {
-      xs: "w-xs",
-      sm: "w-sm",
-      md: "w-md",
-      lg: "w-lg",
-      xl: "w-xl",
-      "2xl": "w-2xl",
-      "3xl": "w-3xl",
-      "4xl": "w-4xl",
-      "5xl": "w-5xl",
-      full: "w-full",
-    },
+    ...dialogStyles.variants,
     position: {
-      top: "grid-rows-[1fr_auto] sm:grid-rows-[auto_3fr_1fr]",
-      right:
-        "grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_3fr] sm:justify-items-end",
-      bottom: "grid-rows-[1fr_auto] sm:grid-rows-[1fr_3fr_auto]",
-      left: "grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_3fr] sm:justify-items-start",
+      right: {
+        modal: "col-start-[-1]",
+        container: [
+          "grid grid-cols-[auto_var(--dialog-size)] sm:justify-items-end",
+        ],
+      },
+      left: {
+        container:
+          "grid min-h-full h-full grid-cols-[var(--dialog-size)_auto] sm:justify-items-start",
+      },
     },
     inset: {
-      top: "data-[inset*=top]:pt-0",
-      right: "data-[inset*=right]:pr-0",
-      bottom: "data-[inset*=bottom]:pb-0",
-      left: "data-[inset*=left]:pl-0",
-      all: "p-0",
-      none: "",
+      top: { container: ["data-[inset*=top]:pt-0"] },
+      right: { container: ["data-[inset*=right]:pr-0"] },
+      bottom: { container: ["data-[inset*=bottom]:pb-0"] },
+      left: { container: ["data-[inset*=left]:pl-0"] },
+      unset: { container: "" },
+    },
+    animate: {
+      true: { base: "", overlay: dialogStyles.variants.animate.true.overlay },
+      false: { base: "", overlay: "" },
     },
   },
+  compoundVariants: [
+    {
+      position: "left",
+      animate: true,
+      className: {
+        modal: [
+          "entering:animate-in entering:slide-in-from-left-10 entering:durtion-200 entering:ease-out",
+          //
+          "exiting:fade-out exiting:animate-out exiting:duration-200 exiting:ease-in exiting:slide-out-to-left-10",
+        ],
+      },
+    },
+    {
+      position: "right",
+      animate: true,
+      className: {
+        modal: [
+          "entering:animate-in entering:fade-in entering:slide-in-from-right-10 entering:durtion-200 entering:ease-out",
+          //
+          "exiting:animate-out exiting:fade-out exiting:slide-out-to-right-10 exiting:duration-200 exiting:ease-in",
+        ],
+      },
+    },
+  ],
   defaultVariants: {
-    size: "lg",
-    inset: "none",
+    position: "left",
+    inset: "unset",
+    animate: true,
   },
 });
 
-export type Position = "top" | "right" | "bottom" | "left";
+/**
+ * Internal.
+ *
+ * @internal
+ */
+const matchMultipleInset = (
+  insets: Exclude<DrawerProps["inset"], undefined>,
+) => {
+  const resolvedInset = Array.isArray(insets) ? insets : [insets];
 
-const positionAnimation: Record<Position, Array<string>> = {
-  top: [
-    // Animations
-    "entering:animate-in entering:fade-in entering:slide-in-from-top-2 exiting:animate-out exiting:fade-out exiting:slide-out-to-top-2",
-  ],
-  right: [
-    // Animations
-    "entering:animate-in entering:fade-in entering:slide-in-from-right-4 exiting:animate-out exiting:fade-out exiting:slide-out-to-right-2",
-  ],
-  bottom: [
-    // Animations
-    "entering:animate-in entering:fade-in entering:slide-in-from-bottom-2 exiting:animate-out exiting:fade-out exiting:slide-out-to-bottom-2",
-  ],
-  left: [
-    // Animations
-    "entering:animate-in entering:slide-in-from-left-2 exiting:animate-out exiting:fade-out exiting:slide-out-to-left-2",
-  ],
+  return resolvedInset.map(
+    (inset) => drawerStyles.variants.inset[inset].container,
+  );
 };
 
 type DrawerVariants = VariantProps<typeof drawerStyles>;
 
-export type DrawerProps = {
-  children: React.ReactNode;
-} & Omit<DrawerVariants, "inset"> & {
-    inset?: DrawerVariants["inset"] | Array<DrawerVariants["inset"]>;
-  } & AriaModalOverlayProps &
-  Pick<AriaDialogProps, "role">;
-
-const matchMultipleInset = (insets: Array<DrawerVariants["inset"]>) => {
-  return cn(
-    insets.map((inset) => (inset ? drawerStyles.variants.inset[inset] : ""))
-  );
+type OwnProps = Omit<DrawerVariants, "inset"> & {
+  inset?: Inset | Array<Inset>;
 };
+export type DrawerProps = DialogProps & OwnProps;
 
 export function Drawer({
-  size = "sm",
-  position = "right",
-  inset = "none",
+  size = "lg",
+  position = "left",
+  inset = "unset",
   isDismissable = true,
   role,
   className,
   children,
+  onClose: onCloseHandler,
   ...props
 }: DrawerProps) {
-  const insetStyle = Array.isArray(inset)
-    ? matchMultipleInset(inset)
-    : drawerStyles.variants.inset[inset];
+  const { overlay, root, container, dialog, modal } = drawerStyles({
+    size,
+    position,
+  });
+  const insetStyles = matchMultipleInset(inset);
 
   return (
     <AriaModalOverlay
       {...props}
       isDismissable={isDismissable}
-      className={cn([
-        "fixed inset-0 flex w-screen justify-center overflow-y-auto bg-neutral-950/25 px-2 py-2 focus:outline-0 sm:px-6 sm:py-8 lg:px-8 lg:py-16 dark:bg-neutral-950/65",
-        // Enter Animation
-        "entering:opacity-100 entering:duration-100 entering:ease-out opacity-0",
-        // Exit Animation
-        "exiting:opacity-0 exiting:duration-100 exiting:ease-in opacity-100",
-      ])}
+      className={overlay()}
+      onOpenChange={(isOpen) => {
+        props.onOpenChange?.(isOpen);
+        if (!isOpen) {
+          onCloseHandler?.();
+        }
+      }}
     >
       {({ state }) => {
         return (
-          <div
-            className={cn([
-              "fixed inset-0 w-screen overflow-hidden sm:pt-0",
-              size === "full" ? "" : "pt-6",
-            ])}
-          >
+          <div className={root()}>
             <div
-              data-inset={Array.isArray(inset) ? inset.join(" ") : inset}
-              className={cn([
-                // Base
-                "grid h-full min-h-full sm:p-4",
-                // Inset
-                insetStyle,
-                // Position
-                drawerStyles.variants.position[position],
-              ])}
+              data-inset={inset}
+              className={container({
+                className: [
+                  // Layout
+                  insetStyles,
+                ],
+              })}
             >
-              <AriaModal
-                className={cn([
-                  drawerStyles.variants.size[size],
-                  // Base
-                  "row-span-full min-w-0",
-                  // Animation
-                  positionAnimation[position],
-                ])}
-              >
+              <AriaModal className={modal()}>
                 <ButtonContext.Provider
                   value={{
                     slots: {
@@ -151,14 +155,30 @@ export function Drawer({
                 >
                   <AriaDialog
                     role={role}
-                    aria-label="Sidebar"
-                    className={cn(
-                      className,
-                      drawerStyles.variants.size[size],
-                      // Base
-                      "bg-surface-background sm:rounded-surface rounded-t-surface h-full min-w-0 overflow-y-auto p-[var(--gutter,var(--spacing-surface))] ring-1 shadow-lg ring-neutral-950/10 outline-none sm:mb-auto dark:ring-white/10 forced-colors:outline"
-                    )}
+                    className={dialog({
+                      className: cn([
+                        "h-(--visual-viewport-height)",
+                        //
+                        className,
+                      ]),
+                    })}
                   >
+                    {isDismissable && (
+                      <span
+                        className={cn([
+                          "pr-surface pt-surface absolute top-0 right-0 flex",
+                        ])}
+                      >
+                        <Button
+                          slot="close"
+                          color="neutral"
+                          variant="plain"
+                          aria-label="Close Dialog"
+                        >
+                          <XIcon />
+                        </Button>
+                      </span>
+                    )}
                     {children}
                   </AriaDialog>
                 </ButtonContext.Provider>

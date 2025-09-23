@@ -1,15 +1,17 @@
 // Sentry initialization should be imported first!
-import "../instrumentation.ts";
+// eslint-disable-next-line simple-import-sort/imports
+import { initializeInstrumentation } from "../instrumentation.ts";
 import "./styles.css";
 import { StrictMode } from "react";
 // eslint-disable-next-line @typescript-eslint/naming-convention
-import { createRouter, RouterProvider } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
-import { queryClient } from "./libs/query/query-client.tsx";
-import reportWebVitals from "./reportWebVitals.ts";
+import * as Sentry from "@sentry/react";
+import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { ConsoleStrategy, PostHogStrategy } from "./libs/analytics";
 // Import the generated route tree
 import { AnalyticsProvider } from "./libs/analytics/analytics-provider.tsx";
-import { ConsoleStrategy, PostHogStrategy } from "./libs/analytics/index.ts";
+import { queryClient } from "./libs/query/query-client.tsx";
+import reportWebVitals from "./reportWebVitals.ts";
 import { routeTree } from "./routeTree.gen";
 
 // Create a new router instance
@@ -22,11 +24,15 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
 });
 
+// Initialize instrumentation
+initializeInstrumentation(router);
+
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
-  interface Register {
+  // @ts-expect-error
+  type Register = {
     router: typeof router;
-  }
+  };
 }
 
 // Render the app
@@ -35,18 +41,28 @@ const createAnalyticsClient = () => {
   if (import.meta.env.DEV) {
     return new ConsoleStrategy();
   }
+
   return new PostHogStrategy();
 };
 
 if (rootElement && !rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
+  const root = ReactDOM.createRoot(rootElement, {
+    // Callback called when an error is thrown and not caught by an ErrorBoundary.
+    onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
+      console.warn("Uncaught error", error, errorInfo.componentStack);
+    }),
+    // Callback called when React catches an error in an ErrorBoundary.
+    onCaughtError: Sentry.reactErrorHandler(),
+    // Callback called when React automatically recovers from errors.
+    onRecoverableError: Sentry.reactErrorHandler(),
+  });
 
   root.render(
     <StrictMode>
       <AnalyticsProvider strategy={createAnalyticsClient()}>
         <RouterProvider router={router} />
       </AnalyticsProvider>
-    </StrictMode>
+    </StrictMode>,
   );
 }
 

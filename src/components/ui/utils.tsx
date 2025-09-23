@@ -18,44 +18,44 @@ import {
   useContextProps,
   type useSlottedContext as useAriaSlottedContext,
 } from "react-aria-components";
-import { defaultConfig, tv } from "tailwind-variants";
+import { tv } from "tailwind-variants/lite";
+
+export type { VariantProps } from "tailwind-variants/lite";
+export { tv as createStyles };
 
 export const baseStyleConfig = tv({
+  base: "",
+  slots: { default: "" },
   variants: {
     margin: {
-      default: "",
-      none: "",
+      default: [""],
+      unset: [""],
     },
     border: {
-      default: "",
-      none: "",
+      default: [""],
+      unset: [""],
     },
     padding: {
-      default: "",
-      none: "",
+      default: [""],
+      unset: [""],
     },
     radius: {
-      default: "",
-      none: "",
+      default: [""],
+      unset: [""],
     },
   },
   defaultVariants: {
-    margin: "default",
-    border: "default",
-    padding: "default",
-    radius: "default",
+    margin: "unset",
+    border: "unset",
+    padding: "unset",
+    radius: "unset",
   },
 });
-
-/**
- * DISABLE TW MERGE to prevent foot gun.
- */
-defaultConfig.twMerge = false;
 
 export const cn = (...classes: Array<ClassValue>) => clsx(classes);
 
 export const focusRing = tv({
-  base: "outline outline-0 outline-offset-2 outline-blue-600 focus-visible:outline-2 dark:outline-blue-500 forced-colors:outline-[Highlight]",
+  base: "outline outline-0 outline-offset-2 data-focusable:focus-visible:outline-2 data-focusable:outline-info-500 forced-colors:outline-[Highlight]",
 });
 
 /**
@@ -67,13 +67,14 @@ export function EnhancerGroup({
   ...props
 }: ComponentPropsWithoutRef<"div">) {
   return (
-    <div
+    <Group
       {...props}
+      role="presentation"
       className={clsx([
         // Base
         "inline-flex gap-x-2",
         // Icon
-        "[&_[data-slot=icon]]:size-5 [&_[data-slot=icon]]:shrink-0 [&_[data-slot=icon]]:sm:size-4",
+        "*:data-[slot=icon]:size-5 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:sm:size-4",
         //
         className,
       ])}
@@ -98,13 +99,13 @@ export const Group = React.forwardRef<HTMLDivElement, GroupProps>(
     return (
       <AriaGroup
         ref={ref}
-        {...groupProps}
         data-slot="group"
+        {...groupProps}
         data-adjoined={adjoined ? "" : undefined}
         data-orientation={orientation}
       />
     );
-  }
+  },
 );
 
 /**
@@ -157,7 +158,7 @@ export function removeDataAttributes<T>(props: T): T {
 // Override forwardRef types so generics work.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare function forwardRef<T, P = {}>(
-  render: (props: P, ref: React.Ref<T>) => React.ReactElement | null
+  render: (props: P, ref: React.Ref<T>) => React.ReactElement | null,
 ): (props: P & React.RefAttributes<T>) => React.ReactElement | null;
 
 export type forwardRefType = typeof forwardRef;
@@ -169,7 +170,7 @@ type SlottedContextValue<T> = Parameters<typeof useAriaSlottedContext<T>>[0];
  */
 export function useSlottedContextExists<T>(
   context: SlottedContextValue<T>,
-  slot?: string | null
+  slot?: string | null,
 ): boolean {
   const ctx = useContext(context);
 
@@ -187,32 +188,36 @@ export function useSlottedContextExists<T>(
 }
 
 /**
- * https://github.com/chakra-ui/ark/blob/main/packages/react/src/utils/create-split-props.ts
+ * Https://github.com/chakra-ui/ark/blob/main/packages/react/src/utils/create-split-props.ts.
  */
 type EnsureKeys<
-  ExpectedKeys extends (keyof Target)[],
+  ExpectedKeys extends Array<keyof Target>,
   Target,
 > = keyof Target extends ExpectedKeys[number]
   ? unknown
   : `Missing required keys: ${Exclude<keyof Target, ExpectedKeys[number]> & string}`;
 
 export function createSplitProps<Target>() {
-  return <Keys extends (keyof Target)[], Props extends Target = Target>(
+  return <Keys extends Array<keyof Target>, Props extends Target = Target>(
     props: Props,
-    keys: Keys & EnsureKeys<Keys, Target>
-  ) =>
-    (keys as string[]).reduce<
+    keys: Keys & EnsureKeys<Keys, Target>,
+  ) => {
+    return (keys as Array<string>).reduce<
       [Target, Omit<Props, Extract<(typeof keys)[number], string>>]
     >(
       (previousValue, currentValue) => {
         const [target, source] = previousValue;
         const key = currentValue as keyof Target & keyof typeof source;
+
         if (source[key] !== undefined) {
           target[key] = source[key];
         }
+        // eslint-disable-next-line no-restricted-syntax/noDeleteOperator, @typescript-eslint/no-dynamic-delete
         delete source[key];
+
         return [target, source];
       },
-      [{} as Target, { ...props }]
+      [{} as Target, { ...props }],
     );
+  };
 }

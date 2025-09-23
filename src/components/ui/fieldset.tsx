@@ -1,4 +1,3 @@
-import { mergeProps, useId } from "@react-aria/utils";
 import {
   type ComponentPropsWithoutRef,
   createContext,
@@ -6,18 +5,19 @@ import {
 } from "react";
 import { type AriaFieldProps, useField, useObjectRef } from "react-aria";
 import {
-  Group as AriaGroup,
-  type GroupProps as AriaGroupProps,
-  Label as AriaLabel,
-  LabelContext as AriaLabelContext,
-  type LabelProps as AriaLabelProps,
-  Text as AriaText,
-  type TextProps as AriaTextProps,
   type ContextValue,
   DEFAULT_SLOT,
+  Group as AriaGroup,
+  type GroupProps as AriaGroupProps,
+  Keyboard as AriaKeyboard,
+  Label as AriaLabel,
+  LabelContext as AriaLabelContext,
   LabelContext,
+  type LabelProps as AriaLabelProps,
   Provider,
+  Text as AriaText,
   TextContext,
+  type TextProps as AriaTextProps,
   useContextProps,
   useSlottedContext,
 } from "react-aria-components";
@@ -28,8 +28,9 @@ import {
   type UseControllerProps,
   type UseControllerReturn,
 } from "react-hook-form";
+import { mergeProps, useId } from "@react-aria/utils";
 import { textStyles, type TextVariants } from "./text";
-import { cn } from "./utils";
+import { cn, createSplitProps } from "./utils";
 
 export function Fieldset({
   className,
@@ -64,7 +65,7 @@ export function Fieldset({
         data-slot="fieldset"
         className={cn(
           className,
-          "[&>*+[data-slot=control]]:mt-6 [&>[data-slot=description]]:mt-1"
+          "[&>*+[data-slot=control]]:mt-6 [&>[data-slot=description]]:mt-1",
         )}
       />
     </Provider>
@@ -85,7 +86,7 @@ export function Legend({
         //
         textStyles({ label: "sm", color: "neutral" }),
         //
-        "font-semibold data-[disabled]:opacity-50"
+        "font-semibold data-[disabled]:opacity-50",
       )}
     />
   );
@@ -146,16 +147,15 @@ export type FieldProps = Omit<
  *
  * @example InputField that integrates a `label` and `description`
  */
-export interface ComposedFieldProps {
+export type ComposedFieldProps = {
   label?: React.ReactNode;
   description?: React.ReactNode;
-}
-export type WithComposedFieldControlProps<
-  TBaseProps extends object,
+};
+
+type ComposedControlledFieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = ComposedFieldProps &
-  TBaseProps &
   Partial<
     Pick<
       UseControllerProps<TFieldValues, TName>,
@@ -168,24 +168,32 @@ export type WithComposedFieldControlProps<
       >["defaultValue"];
     }
   >;
+export type WithComposedFieldControlProps<
+  TBaseProps,
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = TBaseProps & ComposedControlledFieldProps<TFieldValues, TName>;
+
 /**
  * Helper to split the props of a `FieldControl` component.
  */
-// export function splitComposedFieldControlProps<
-//   TFieldValues extends FieldValues,
-//   TName extends FieldPath<TFieldValues>,
-// >(props: any) {
-//   return createSplitProps<
-//     WithComposedFieldControlProps<{}, TFieldValues, TName>
-//   >()(props, [
-//     "control",
-//     "field",
-//     "defaultFieldValue",
-//     "label",
-//     "description",
-//     "shouldUnregister",
-//   ]);
-// }
+export function splitComposedFieldControlProps<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+  TProps,
+>(props: WithComposedFieldControlProps<TProps, TFieldValues, TName>) {
+  return createSplitProps<ComposedControlledFieldProps<TFieldValues, TName>>()(
+    props,
+    [
+      "control",
+      "field",
+      "defaultFieldValue",
+      "label",
+      "description",
+      "shouldUnregister",
+    ],
+  );
+}
 
 export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
   function HeadlessField({ isDisabled, isInvalid, ...props }, ref) {
@@ -230,7 +238,7 @@ export const HeadlessField = forwardRef<HTMLDivElement, FieldProps>(
         />
       </Provider>
     );
-  }
+  },
 );
 
 export const fieldLayoutStyles = [
@@ -331,7 +339,7 @@ export const HeadlessLabel = forwardRef<HTMLLabelElement, AriaLabelProps>(
         data-slot="label"
       />
     );
-  }
+  },
 );
 
 export const Label = forwardRef<
@@ -352,24 +360,25 @@ export const Label = forwardRef<
         // Base
         "select-none group-data-disabled:opacity-50",
         // Inherit text styles
-        textStyles({ color, label: size })
+        textStyles({ color, label: size }),
       )}
     />
   );
 });
 
-export function Description({ className, ...props }: AriaTextProps) {
+type DescriptionProps = AriaTextProps;
+export function Description({ className, ...props }: DescriptionProps) {
   return (
     <AriaText
       data-slot="description"
       slot="description"
       {...props}
       className={cn(
-        "block text-brand-neutral group-data-disabled:opacity-50 dark:text-brand-neutral-subtle",
+        "text-brand-neutral block group-data-disabled:opacity-50",
         // Inherit text styles
-        textStyles({ color: "none", paragraph: "sm" }),
+        textStyles({ color: "unset", paragraph: "sm" }),
         //
-        className
+        className,
       )}
     />
   );
@@ -386,8 +395,44 @@ export function ErrorMessage({
       {...props}
       className={cn(
         className,
-        "inline-block text-base/6 text-danger-600 data-[disabled]:opacity-50 sm:text-sm/6 dark:text-danger-500"
+        "text-danger-600 dark:text-danger-500 inline-block text-base/6 data-[disabled]:opacity-50 sm:text-sm/6",
       )}
     />
+  );
+}
+
+export function KeyboardShorcut({
+  keys,
+  className,
+  ...props
+}: { keys: string | Array<string>; className?: string } & Omit<
+  ComponentPropsWithoutRef<"div">,
+  "className"
+>) {
+  return (
+    <AriaKeyboard
+      {...props}
+      data-slot="kbd"
+      className={cn(className, "flex justify-self-end")}
+    >
+      {
+        // eslint-disable-next-line unicorn/prefer-spread
+        (Array.isArray(keys) ? keys : keys.split("")).map((char, index) => {
+          return (
+            <kbd
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+              className={cn([
+                "min-w-[2ch] text-center font-sans text-neutral-400 capitalize group-data-focus:text-white forced-colors:group-data-focus:text-[HighlightText]",
+                // Make sure key names that are longer than one character (like "Tab") have extra space
+                index > 0 && char.length > 1 && "pl-1",
+              ])}
+            >
+              {char}
+            </kbd>
+          );
+        })
+      }
+    </AriaKeyboard>
   );
 }

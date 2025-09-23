@@ -29,7 +29,7 @@ import {
 } from "react-aria-components";
 import { useToggleState } from "react-stately";
 import { filterDOMProps, mergeRefs, useObjectRef } from "@react-aria/utils";
-import type { ColorMap, ThemeColors } from "./constants";
+import type { ThemeColors } from "./constants";
 import {
   type ComposedFieldProps,
   Description,
@@ -68,6 +68,7 @@ const base = [
 ];
 
 const colors = {
+  unset: "",
   primary:
     "[--checkbox-check:var(--color-brand-primary-inverse)] [--checkbox-checked-bg:var(--color-brand-primary)] [--checkbox-checked-border:var(--color-brand-primary-border)]",
   neutral:
@@ -79,9 +80,7 @@ const colors = {
   success:
     "[--checkbox-check:var(--color-brand-success-inverse)] [--checkbox-checked-bg:var(--color-brand-success)] [--checkbox-checked-border:var(--color-brand-success-border)]",
   info: "[--checkbox-check:var(--color-brand-info-inverse)] [--checkbox-checked-bg:var(--color-brand-info)] [--checkbox-checked-border:var(--color-brand-info-border)]",
-} as ColorMap;
-
-type Color = ThemeColors;
+};
 
 export function CheckboxGroup({ className, ...props }: AriaCheckboxGroupProps) {
   return (
@@ -91,9 +90,9 @@ export function CheckboxGroup({ className, ...props }: AriaCheckboxGroupProps) {
       className={clsx(
         className,
         // Basic groups
-        "space-y-3 group",
+        "group space-y-3",
         // With descriptions
-        "has-[[data-slot=description]]:space-y-6 has-data-[slot=description]:**:data-[slot=label]:font-medium"
+        "has-[[data-slot=description]]:space-y-6 has-data-[slot=description]:**:data-[slot=label]:font-medium",
       )}
     />
   );
@@ -137,7 +136,7 @@ export function CheckboxField({
   ...props
 }: Omit<AriaCheckboxProps, "children" | "className"> &
   Omit<FieldProps, "children"> &
-  ComposedFieldProps & { color?: Color }) {
+  ComposedFieldProps & { color?: ThemeColors }) {
   return (
     <HeadlessCheckboxField
       {...props}
@@ -153,7 +152,7 @@ export function CheckboxField({
 export function CheckboxMark({
   color,
   ...props
-}: ComponentPropsWithoutRef<"span"> & { color: Color }) {
+}: ComponentPropsWithoutRef<"span"> & { color: ThemeColors }) {
   return (
     <span {...props} className={clsx([props.className, base, colors[color]])}>
       <svg
@@ -187,8 +186,8 @@ export function CheckboxMark({
  * So we do not have to create invalid html markup(double `labels`).
  */
 export const Checkbox = forwardRef(function Checkbox(
-  props: AriaCheckboxProps & { color?: Color },
-  ref: ForwardedRef<HTMLLabelElement>
+  props: AriaCheckboxProps & { color?: ThemeColors },
+  ref: ForwardedRef<HTMLLabelElement>,
 ) {
   const { color = "neutral", ...racProps } = props;
   const { inputRef: userProvidedInputRef = null } = props;
@@ -201,7 +200,7 @@ export const Checkbox = forwardRef(function Checkbox(
   const fieldControl = useSlottedContext(FieldControllerContext)?.field;
 
   const inputRef = useObjectRef(
-    mergeRefs(userProvidedInputRef, props.inputRef ?? null)
+    mergeRefs(userProvidedInputRef, props.inputRef ?? null),
   );
   const groupState = useContext(CheckboxGroupStateContext);
 
@@ -234,7 +233,7 @@ export const Checkbox = forwardRef(function Checkbox(
             typeof props.children === "function" ? true : props.children,
         },
         groupState,
-        inputRef
+        inputRef,
       )
     : // eslint-disable-next-line react-hooks/rules-of-hooks
       useCheckbox(
@@ -251,7 +250,7 @@ export const Checkbox = forwardRef(function Checkbox(
         },
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useToggleState(props),
-        inputRef
+        inputRef,
       );
 
   const { isFocused, isFocusVisible, focusProps } = useFocusRing();
@@ -285,12 +284,12 @@ export const Checkbox = forwardRef(function Checkbox(
       data-rac=""
       className={clsx(
         props.className,
-        "group relative inline-flex focus:outline-none"
+        "group relative inline-flex focus:outline-none",
       )}
     >
       <CheckboxMark color={color} />
       <input
-        className="opacity-0 absolute inset-0 size-full"
+        className="absolute inset-0 size-full opacity-0"
         {...mergeProps(inputProps, focusProps)}
         ref={inputRef}
       />
@@ -300,7 +299,7 @@ export const Checkbox = forwardRef(function Checkbox(
 
 export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
   props: AriaCheckboxProps,
-  ref: ForwardedRef<HTMLLabelElement>
+  ref: ForwardedRef<HTMLLabelElement>,
 ) {
   const { inputRef: userProvidedInputRef = null } = props;
 
@@ -313,7 +312,7 @@ export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
   const controller = useSlottedContext(FieldControllerContext);
 
   const inputRef = useObjectRef(
-    mergeRefs(userProvidedInputRef, props.inputRef ?? null)
+    mergeRefs(userProvidedInputRef, props.inputRef ?? null),
   );
   const groupState = useContext(CheckboxGroupStateContext);
 
@@ -345,7 +344,7 @@ export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
             typeof props.children === "function" ? true : props.children,
         },
         groupState,
-        inputRef
+        inputRef,
       )
     : // eslint-disable-next-line react-hooks/rules-of-hooks
       useCheckbox(
@@ -367,10 +366,10 @@ export const CheckboxOverlay = forwardRef(function CheckboxOverlay(
                   onChange: controller.field.onChange,
                   isSelected: controller.field.value,
                 } satisfies AriaCheckboxProps)
-              : Object.freeze({})
-          )
+              : Object.freeze({}),
+          ),
         ),
-        inputRef
+        inputRef,
       );
 
   const { isFocused, isFocusVisible, focusProps } = useFocusRing();

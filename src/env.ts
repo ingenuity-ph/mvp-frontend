@@ -16,6 +16,8 @@ export const env = createEnv({
     VITE_PUBLIC_POSTHOG_KEY: z.string().optional(),
     VITE_PUBLIC_POSTHOG_HOST: z.string().optional(),
     VITE_SENTRY_DSN: z.string().optional(),
+    VITE_SENTRY_ORG: z.string().optional(),
+    VITE_SENTRY_PROJECT: z.string().optional(),
   },
 
   /**

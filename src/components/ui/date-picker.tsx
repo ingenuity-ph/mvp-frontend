@@ -1,4 +1,3 @@
-import { type DateValue, mergeProps } from "react-aria";
 import {
   DateInput,
   DatePicker as AriaDatePicker,
@@ -6,16 +5,17 @@ import {
   DateRangePicker as AriaDateRangePicker,
   type DateRangePickerProps as AriaDateRangePickerProps,
   DateSegment,
+  type DateValue,
   Group,
 } from "react-aria-components";
 import type { FieldPath, FieldValues } from "react-hook-form";
-import type { VariantProps } from "tailwind-variants";
 import { z } from "zod";
 import {
   getLocalTimeZone,
   parseAbsoluteToLocal,
 } from "@internationalized/date";
 import { CalendarBlankIcon } from "@phosphor-icons/react";
+import { mergeProps } from "@react-aria/utils";
 import { Button } from "./button";
 import { Calendar, RangeCalendar } from "./calendar";
 import {
@@ -29,7 +29,7 @@ import {
   useFieldProps,
   type WithFieldControlProps,
 } from "./fieldset";
-import { inputGroupStyles, inputStyles, matchMultipleAdjoined } from "./input";
+import { composedInputStyles, type ControlOwnProps } from "./input";
 import { PopoverDialog } from "./popover";
 import { cn } from "./utils";
 
@@ -66,9 +66,7 @@ const parseToDateRange = <T extends DateValue>(value: unknown) => {
 type OwnProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = Partial<{
-  adjoined: VariantProps<typeof inputStyles>["adjoined"];
-}> &
+> = ControlOwnProps &
   ComposedFieldProps &
   Partial<WithFieldControlProps<TFieldValues, TName>>;
 
@@ -94,11 +92,8 @@ export function DatePickerField<
   const fieldControl = controller?.field;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const fieldErrorMessage = controller?.fieldState?.error?.message;
-
   const field = useFieldProps();
-  const adjoinedStyles = Array.isArray(adjoined)
-    ? matchMultipleAdjoined(adjoined)
-    : inputStyles.variants.adjoined[adjoined ?? "none"];
+  const styles = composedInputStyles({ adjoined });
 
   if (control && fieldName) {
     return (
@@ -122,56 +117,23 @@ export function DatePickerField<
         value: parseToDate(fieldControl?.value),
         onChange: (value: DateValue | null) => {
           fieldControl?.onChange(
-            value?.toDate(getLocalTimeZone()).toISOString()
+            value?.toDate(getLocalTimeZone()).toISOString(),
           );
         },
       })}
       className={cn([className, fieldLayoutStyles])}
     >
-      {
-        // eslint-disable-next-line @eslint-react/no-leaked-conditional-rendering
-        label && <Label>{label}</Label>
-      }
-      <div
-        data-slot="control"
-        className={cn("group", inputStyles().root(), inputStyles({ adjoined }))}
-      >
+      {label ? <Label>{label}</Label> : null}
+      <div data-slot="control" className={styles.root({ className: "group" })}>
         <Group
           aria-labelledby={field?.id}
           aria-describedby={field?.["aria-describedby"]}
-          className={cn([
-            // Basic layout
-            "relative flex rounded-[var(--radius-control)]",
-            // Horizontal Padding - moved the horizontal padding here to handle enhancers
-            "px-[calc(theme(spacing[3.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)]",
-            // Border
-            "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
-            // Background color
-            "bg-transparent dark:bg-white/5",
-            // Invalid state
-            "group-data-[invalid]:border-danger-500 group-data-[invalid]:hover:border-danger-500 dark:group-data-[invalid]:border-danger-500 dark:group-data-[invalid]:hover:border-danger-500",
-            // Disabled state
-            "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
-            // Adjoined
-            adjoinedStyles,
-          ])}
+          className={styles.container()}
         >
-          <DateInput
-            className={cn([
-              // Layout
-              "block w-full appearance-none bg-transparent",
-              // Typography
-              "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
-              // Hide default focus styles
-              "focus-within:outline-none focus:outline-none focus-visible:outline-none",
-              // Vertical Padding - we only apply the vertical padding to the input itself to have consistent dimensions
-              // when the padding is applied on the wrapper the padding does not collapse properly
-              "py-[calc(theme(spacing[2.5])-1px)] sm:py-[calc(theme(spacing[1.5])-1px)]",
-            ])}
-          >
+          <DateInput className={styles.input()}>
             {(segment) => <DateSegment segment={segment} />}
           </DateInput>
-          <span data-slot="enhancer" className={cn(inputGroupStyles().end())}>
+          <span data-slot="enhancer" className={styles.enhancerEnd()}>
             <Button
               data-slot="action"
               size="sm"
@@ -188,7 +150,6 @@ export function DatePickerField<
       {fieldErrorMessage ? (
         <ErrorMessage>{fieldErrorMessage}</ErrorMessage>
       ) : null}
-
       <PopoverDialog>
         <Calendar />
       </PopoverDialog>
@@ -214,9 +175,7 @@ export function DateRangePickerField<
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const fieldErrorMessage = controller?.fieldState?.error?.message;
 
-  const adjoinedStyles = Array.isArray(adjoined)
-    ? matchMultipleAdjoined(adjoined)
-    : inputStyles.variants.adjoined[adjoined ?? "none"];
+  const styles = composedInputStyles({ adjoined });
 
   if (control && fieldName) {
     return (
@@ -248,64 +207,18 @@ export function DateRangePickerField<
       className={cn([className, fieldLayoutStyles])}
     >
       {label ? <Label>{label}</Label> : null}
-      <div
-        data-slot="control"
-        className={cn("group", inputStyles().root(), inputStyles({ adjoined }))}
-      >
-        <Group
-          className={cn([
-            // Basic layout
-            "relative flex rounded-[var(--radius-control)]",
-            // Horizontal Padding - moved the horizontal padding here to handle enhancers
-            "px-[calc(theme(spacing[3.5])-1px)] sm:px-[calc(theme(spacing[3])-1px)]",
-            // Border
-            "border-control-border border has-[[data-hovered]]:border-neutral-950/20 dark:border-white/10 dark:has-[[data-hovered]]:border-white/20",
-            // Background color
-            "bg-transparent dark:bg-white/5",
-            // Invalid state
-            "group-data-[invalid]:border-danger-500 group-data-[invalid]:hover:border-danger-500 dark:group-data-[invalid]:border-danger-500 dark:group-data-[invalid]:hover:border-danger-500",
-            // Disabled state
-            "disabled:border-neutral-950/20 disabled:dark:border-white/15 disabled:dark:bg-white/[2.5%] dark:hover:disabled:border-white/15",
-            // Adjoined
-            adjoinedStyles,
-          ])}
-        >
+      <div data-slot="control" className={styles.root({ className: "group" })}>
+        <Group className={styles.container()}>
           <div className="flex flex-1 items-center gap-x-2">
-            <DateInput
-              slot="start"
-              className={cn([
-                // Layout
-                "block appearance-none bg-transparent",
-                // Typography
-                "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
-                // Hide default focus styles
-                "focus-within:outline-none focus:outline-none focus-visible:outline-none",
-                // Vertical Padding - we only apply the vertical padding to the input itself to have consistent dimensions
-                // when the padding is applied on the wrapper the padding does not collapse properly
-                "py-[calc(theme(spacing[2.5])-1px)] sm:py-[calc(theme(spacing[1.5])-1px)]",
-              ])}
-            >
+            <DateInput slot="start" className={styles.input()}>
               {(segment) => <DateSegment segment={segment} />}
             </DateInput>
             <span>-</span>
-            <DateInput
-              slot="end"
-              className={cn([
-                // Layout
-                "block appearance-none bg-transparent",
-                // Typography
-                "text-base/6 text-neutral-950 placeholder:text-neutral-500 sm:text-sm/6 dark:text-white",
-                // Hide default focus styles
-                "focus-within:outline-none focus:outline-none focus-visible:outline-none",
-                // Vertical Padding - we only apply the vertical padding to the input itself to have consistent dimensions
-                // when the padding is applied on the wrapper the padding does not collapse properly
-                "py-[calc(theme(spacing[2.5])-1px)] sm:py-[calc(theme(spacing[1.5])-1px)]",
-              ])}
-            >
+            <DateInput slot="end" className={styles.input()}>
               {(segment) => <DateSegment segment={segment} />}
             </DateInput>
           </div>
-          <span data-slot="enhancer" className={cn(inputGroupStyles().end())}>
+          <span data-slot="enhancer" className={styles.enhancerEnd()}>
             <Button
               data-slot="action"
               size="sm"

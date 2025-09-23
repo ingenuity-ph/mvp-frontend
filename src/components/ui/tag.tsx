@@ -1,77 +1,106 @@
-import React, { type Ref } from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { Button, TouchTarget, type ButtonProps } from "./button";
-import type { ColorMap } from "./constants";
+import {
+  Tag as AriaTag,
+  TagGroup as AriaTagGroup,
+  type TagGroupProps as AriaTagGroupProps,
+  TagList as AriaTagList,
+  type TagListProps as AriaTagListProps,
+  type TagProps as AriaTagProps,
+} from "react-aria-components";
+import { tv, type VariantProps } from "tailwind-variants/lite";
+import { XIcon } from "@phosphor-icons/react";
+import { Button } from "./button";
 import { cn } from "./utils";
 
-const tagStyles = tv({
+export const tagStyles = tv({
+  base: [
+    "inline-flex items-center gap-x-1.5 rounded-control px-1.5 py-0.5 text-sm/5 font-medium sm:text-xs/5 forced-colors:outline",
+    //
+    "forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]",
+    // Icon
+    "[&_[data-slot=icon]]:-mx-0.5 [&_[data-slot=icon]]:shrink-0 [&_[data-slot=icon]]:text-[--btn-icon] [&_[data-slot=icon]]:size-3",
+  ],
   variants: {
     color: {
-      none: "",
+      unset: "",
       primary: [
-        "bg-brand-primary-muted text-brand-primary-text group-data-[hovered]:bg-primary-500/25 dark:bg-primary-500/10 dark:text-primary-400 dark:group-data-[hovered]:bg-primary-500/20",
+        //
+        "not-selected:bg-brand-primary-muted not-selected:text-brand-primary-text not-selected:hover:bg-brand-primary/25",
+        // Selected
+        "selected:bg-brand-primary-bold selected:text-brand-primary-inverse selected:hover:bg-brand-primary-bold/90",
       ],
       neutral: [
-        "bg-brand-neutral-muted text-brand-neutral-text group-data-[hovered]:bg-neutral-500/25 dark:bg-neutral-500/10 dark:text-neutral-400 dark:group-data-[hovered]:bg-neutral-500/20",
+        "not-selected:bg-brand-neutral-muted not-selected:text-brand-neutral-text not-selected:hover:bg-brand-neutral/25",
+        // Selected
+        "selected:bg-brand-neutral-bold selected:text-brand-neutral-inverse selected:hover:bg-brand-neutral-bold/90",
       ],
       danger: [
-        "bg-brand-danger-muted text-brand-danger-text group-data-[hovered]:bg-danger-500/25 dark:bg-danger-500/10 dark:text-danger-400 dark:group-data-[hovered]:bg-danger-500/20",
+        "not-selected:bg-brand-danger-muted not-selected:text-brand-danger-text not-selected:hover:bg-brand-danger/25",
+        // Selected
+        "selected:bg-brand-danger-bold selected:text-brand-danger-inverse selected:hover:bg-brand-danger-bold/90",
       ],
       warning: [
-        "bg-brand-warning-muted text-brand-warning-text group-data-[hovered]:bg-warning-500/25 dark:bg-warning-500/10 dark:text-warning-400 dark:group-data-[hovered]:bg-warning-500/20",
+        "not-selected:bg-brand-warning-muted not-selected:text-brand-warning-text not-selected:hover:bg-brand-warning/25",
+        // Selected
+        "selected:bg-brand-warning-bold selected:text-brand-warning-inverse selected:hover:bg-brand-warning-bold/90",
       ],
       success: [
-        "bg-brand-success-muted text-brand-success-text group-data-[hovered]:bg-success-500/25 dark:bg-success-500/10 dark:text-success-400 dark:group-data-[hovered]:bg-success-500/20",
+        "not-selected:bg-brand-success-muted not-selected:text-brand-success-text not-selected:hover:bg-brand-success/25",
+        // Selected
+        "selected:bg-brand-success-bold selected:text-brand-success-inverse selected:hover:bg-brand-success-bold/90",
       ],
       info: [
-        "bg-brand-info-muted text-brand-info-text group-data-[hovered]:bg-info-500/25 dark:bg-info-500/10 dark:text-info-400 dark:group-data-[hovered]:bg-info-500/20",
+        "not-selected:bg-brand-info-muted not-selected:text-brand-info-text not-selected:hover:bg-brand-info/25",
+        // Selected
+        "selected:bg-brand-info-bold selected:text-brand-info-inverse selected:hover:bg-brand-info-bold/90",
       ],
-    } satisfies ColorMap,
+    },
   },
 });
 
 type TagVariants = VariantProps<typeof tagStyles>;
-type TagProps = TagVariants;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+type _OwnProps = TagVariants;
+type TagProps = _OwnProps & AriaTagProps;
+
+export function TagGroup(props: AriaTagGroupProps) {
+  return <AriaTagGroup {...props} />;
+}
+
+export function TagList<T extends object>(props: AriaTagListProps<T>) {
+  return <AriaTagList data-slot="control" {...props} />;
+}
 
 export function Tag({
   color = "neutral",
   className,
+  children,
   ...props
-}: TagProps & React.ComponentPropsWithoutRef<"span">) {
+}: TagProps) {
   return (
-    <span
+    <AriaTag
       {...props}
       className={cn(
         className,
-        "inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-0.5 text-sm/5 font-medium sm:text-xs/5 forced-colors:outline",
-        // Icon
-        "forced-colors:[--btn-icon:ButtonText] forced-colors:data-[hovered]:[--btn-icon:ButtonText] [&_[data-slot=icon]]:-mx-0.5 [&_[data-slot=icon]]:my-0.5 [&_[data-slot=icon]]:size-5 [&_[data-slot=icon]]:shrink-0 [&_[data-slot=icon]]:text-[--btn-icon] [&_[data-slot=icon]]:sm:my-1 [&_[data-slot=icon]]:sm:size-4",
         //
-        tagStyles({ color })
+        tagStyles({ color }),
       )}
-    />
+    >
+      {(renderProps) => {
+        return (
+          <>
+            {typeof children === "function" ? children(renderProps) : children}
+            {renderProps.allowsRemoving && (
+              <Button
+                slot="remove"
+                variant="unstyled"
+                className="hover:opacity-50"
+              >
+                <XIcon className="size-2" />
+              </Button>
+            )}
+          </>
+        );
+      }}
+    </AriaTag>
   );
 }
-
-export const TagButton = React.forwardRef(function TagButton(
-  { color = "neutral", className, children, ...props }: TagProps & ButtonProps,
-  ref: React.ForwardedRef<HTMLElement>
-) {
-  const classes = cn(
-    className,
-    "group relative inline-flex rounded-md focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 focus:outline-none"
-  );
-
-  return (
-    <Button
-      {...props}
-      variant="unstyled"
-      className={classes}
-      ref={ref as Ref<HTMLButtonElement>}
-    >
-      <TouchTarget>
-        <Tag color={color}>{children}</Tag>
-      </TouchTarget>
-    </Button>
-  );
-});

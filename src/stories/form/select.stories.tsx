@@ -1,6 +1,17 @@
 /* eslint-disable import/no-default-export */
+import { ChartPolarIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Description, HeadlessField, Label } from "@/components/ui/fieldset";
+import { Divider } from "@/components/ui/divider";
+import {
+  Description,
+  Field,
+  FieldGroup,
+  Fieldset,
+  HeadlessField,
+  Label,
+  Legend,
+} from "@/components/ui/fieldset";
+import { Input } from "@/components/ui/input";
 import { Option, Select, SelectField } from "@/components/ui/select";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
@@ -110,6 +121,89 @@ export const Disabled: Story = {
   },
   args: {
     children: null,
+  },
+};
+
+export const Invalid: Story = {
+  args: {
+    children: null,
+  },
+  render: () => {
+    return (
+      <Field isInvalid>
+        <Label className="shrink-0">Full name</Label>
+        <Select>
+          <Option textValue="active">Active</Option>
+          <Option textValue="paused">Paused</Option>
+          <Option textValue="delayed">Delayed</Option>
+          <Option textValue="canceled">Canceled</Option>
+        </Select>
+      </Field>
+    );
+  },
+};
+
+export const WithEnhancer: Story = {
+  args: {
+    children: null,
+  },
+  render: () => {
+    return (
+      <Field>
+        <Label className="shrink-0">Full name</Label>
+        <Select startEnhancer={<ChartPolarIcon />}>
+          <Option textValue="active">Active</Option>
+          <Option textValue="paused">Paused</Option>
+          <Option textValue="delayed">Delayed</Option>
+          <Option textValue="canceled">Canceled</Option>
+        </Select>
+      </Field>
+    );
+  },
+};
+
+export const Adjoined: Story = {
+  args: { children: null },
+  render: () => {
+    return (
+      <div>
+        <form>
+          <FieldGroup>
+            <FieldGroup>
+              <Fieldset>
+                <Legend>Card details</Legend>
+                <div className="mt-2">
+                  <Input
+                    type="text"
+                    placeholder="Card number"
+                    aria-label="Card number"
+                    adjoined="bottom"
+                  />
+                  <Divider inset="unset" />
+                  <div className="flex">
+                    <Select
+                      placeholder="Month"
+                      aria-label="Expiration Month"
+                      adjoined={["top", "right"]}
+                    >
+                      <Option>1</Option>
+                    </Select>
+                    <Divider inset="unset" orientation="vertical" />
+                    <Select
+                      placeholder="Year"
+                      aria-label="Expiration Year"
+                      adjoined={["top", "left"]}
+                    >
+                      <Option>2025</Option>
+                    </Select>
+                  </div>
+                </div>
+              </Fieldset>
+            </FieldGroup>
+          </FieldGroup>
+        </form>
+      </div>
+    );
   },
 };
 

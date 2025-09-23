@@ -19,8 +19,10 @@ import { textStyles } from "./text";
 import { cn } from "./utils";
 import { Header } from "./view";
 
-export interface CalendarProps<T extends DateValue>
-  extends Omit<AriaCalendarProps<T>, "visibleDuration"> {}
+export type CalendarProps<T extends DateValue> = {} & Omit<
+  AriaCalendarProps<T>,
+  "visibleDuration"
+>;
 
 export function Calendar<T extends DateValue>({
   className,
@@ -48,7 +50,7 @@ export function Calendar<T extends DateValue>({
                   "disabled:text-brand-neutral-subtle disabled:forced-colors:text-[GrayText]",
                   date.compare(now) === 0 &&
                     "after:bg-brand-primary after:focus-visible:bg-brand-primary-50 selected:after:bg-brand-primary-50 after:pointer-events-none after:absolute after:start-1/2 after:bottom-1 after:z-10 after:size-[3px] after:-translate-x-1/2 after:rounded-full",
-                  className
+                  className,
                 )}
               />
             );
@@ -101,7 +103,7 @@ export function RangeCalendar<T extends DateValue>({
                           "disabled:text-brand-neutral-subtle disabled:forced-colors:text-[GrayText]",
                           date.compare(now) === 0 &&
                             "after:bg-brand-primary after:focus-visible:bg-brand-primary-50 selected:after:bg-brand-primary-50 after:pointer-events-none after:absolute after:start-1/2 after:bottom-1 after:z-10 after:size-[3px] after:-translate-x-1/2 after:rounded-full",
-                          className
+                          className,
                         )}
                       />
                     );
@@ -109,7 +111,7 @@ export function RangeCalendar<T extends DateValue>({
                 </CalendarGridBody>
               </CalendarGrid>
             );
-          }
+          },
         )}
       </div>
     </AriaRangeCalendar>
@@ -154,7 +156,7 @@ export function CalendarGridHeader() {
     <AriaCalendarGridHeader>
       {(day) => {
         return (
-          <CalendarHeaderCell className="text-xs font-semibold text-brand-neutral">
+          <CalendarHeaderCell className="text-brand-neutral text-xs font-semibold">
             {day}
           </CalendarHeaderCell>
         );

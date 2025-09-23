@@ -12,7 +12,7 @@ export const Content = forwardRef<
 });
 
 /**
- * Header represents a header within a Spectrum container.
+ * Header represents a header within a container.
  */
 export const Header = forwardRef<
   HTMLDivElement,
@@ -22,7 +22,7 @@ export const Header = forwardRef<
 });
 
 /**
- * Header represents a header within a Spectrum container.
+ * Header represents a header within a container.
  */
 export const Footer = forwardRef<
   HTMLDivElement,

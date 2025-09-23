@@ -12,7 +12,7 @@ export function Navbar({
       {...props}
       className={cn(
         className,
-        "flex flex-1 items-center gap-4 bg-white py-2.5"
+        "flex flex-1 items-center gap-4 bg-white py-2.5",
       )}
     />
   );
@@ -26,7 +26,7 @@ export function NavbarDivider({
     <div
       aria-hidden="true"
       {...props}
-      className={cn(className, "h-6 w-px bg-neutral-950/10 dark:bg-white/10")}
+      className={cn(className, "h-6 w-px bg-neutral-950/10")}
     />
   );
 }
@@ -62,13 +62,13 @@ export const NavbarItem = React.forwardRef(function NavbarItem(
   }: {
     current?: boolean;
   } & ButtonProps,
-  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>
+  ref: React.ForwardedRef<HTMLAnchorElement | HTMLButtonElement>,
 ) {
   const matchRoute = useMatchRoute();
 
   const classes = cn(
     // Base
-    "relative flex min-w-0 items-center gap-3 rounded-control p-2 text-left text-base/6 font-medium text-neutral-950 sm:text-sm/5",
+    "rounded-control relative flex min-w-0 items-center gap-3 p-2 text-left text-base/6 font-medium text-neutral-950 sm:text-sm/5",
     // Leading icon/icon-only
     "*:data-[slot=icon]:size-6 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:fill-neutral-500 sm:*:data-[slot=icon]:size-5",
     // Trailing icon (down chevron or similar)
@@ -82,7 +82,7 @@ export const NavbarItem = React.forwardRef(function NavbarItem(
     // Dark mode
     "dark:text-white dark:*:data-[slot=icon]:fill-neutral-400",
     "dark:hover:bg-white/5 dark:hover:*:data-[slot=icon]:fill-white",
-    "dark:pressed:bg-white/5 dark:pressed:*:data-[slot=icon]:fill-white"
+    "dark:pressed:bg-white/5 dark:pressed:*:data-[slot=icon]:fill-white",
   );
 
   const isActive =

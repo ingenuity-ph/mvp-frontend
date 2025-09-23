@@ -6,6 +6,7 @@ import {
   CheckboxGroup,
 } from "@/components/ui/checkbox";
 import { HeadlessField, Label } from "@/components/ui/fieldset";
+import { TextLink } from "@/components/ui/text";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -77,7 +78,11 @@ export const CustomColor: Story = {
 
 export const DefaultCheckedState: Story = {
   args: {
-    label: "Accept the terms and conditions",
+    label: (
+      <>
+        Accept the <TextLink to=".">terms and conditions</TextLink>
+      </>
+    ),
     description: "You must accept the terms and conditions to continue.",
     defaultSelected: true,
   },
@@ -96,11 +101,13 @@ export const MultipleCheckboxes: Story = {
     return (
       <CheckboxGroup>
         <CheckboxField
+          name="forbid"
           value="forbid"
           label="Show on events page"
           description="Make this event visible on your profile."
         />
         <CheckboxField
+          name="allow_embedding"
           value="allow_embedding"
           label="Allow embedding"
           description="Allow others to embed your event details on their own site."
