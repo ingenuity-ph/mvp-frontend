@@ -9,7 +9,6 @@ import {
   GearIcon,
   GridFourIcon,
   HouseIcon,
-  InfoIcon,
   LifebuoyIcon,
   LightbulbIcon,
   MagnifyingGlassIcon,
@@ -25,11 +24,10 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Banner } from "@/components/ui/banner";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsiblePanel } from "@/components/ui/collapsible";
 import { Divider } from "@/components/ui/divider";
-import { Description, Label } from "@/components/ui/fieldset";
+import { Label } from "@/components/ui/fieldset";
 import { Link } from "@/components/ui/link";
 import { Menu, MenuItem } from "@/components/ui/menu";
 import {
@@ -44,9 +42,7 @@ import {
   SidebarSection,
   SidebarSpacer,
 } from "@/components/ui/sidebar";
-import { Code } from "@/components/ui/text";
 import { Group } from "@/components/ui/utils";
-import { Content } from "@/components/ui/view";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -55,6 +51,11 @@ const meta = {
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
     layout: "padded",
+    docs: {
+      description: {
+        component: "A flexible sidebar component that supports headers, body sections, and footers. Can be composed with various navigation patterns including collapsible items, grouped sections, and user menus. Built on React Aria Components for full accessibility.",
+      },
+    },
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof Sidebar>;
@@ -63,24 +64,16 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "A fully-featured sidebar with header, body, and footer sections. Includes team switching, search functionality, main navigation, and user profile menu. This represents the most comprehensive sidebar layout pattern with all available components.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Complete Sidebar
-            </Label>
-            <Description>
-              A fully-featured sidebar with header, body, and footer sections.
-              Includes team switching, search functionality, main navigation,
-              and user profile menu. This represents the most comprehensive
-              sidebar layout pattern with all available components.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarHeader>
@@ -215,32 +208,22 @@ export const Default: Story = {
               </SidebarFooter>
             </Sidebar>
           </div>
-        </div>
       </div>
     );
   },
 };
 
 export const Basic: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "A minimal sidebar containing only the SidebarBody with navigation items. This is the simplest sidebar implementation, perfect for applications that need clean, straightforward navigation without additional header or footer content.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Basic Sidebar
-            </Label>
-            <Description>
-              A minimal sidebar containing only the <Code>SidebarBody</Code>{" "}
-              with navigation items. This is the simplest sidebar
-              implementation, perfect for applications that need clean,
-              straightforward navigation without additional header or footer
-              content.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarBody>
@@ -269,31 +252,22 @@ export const Basic: Story = {
               </SidebarBody>
             </Sidebar>
           </div>
-        </div>
       </div>
     );
   },
 };
 
 export const WithLogo: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "A basic sidebar enhanced with a brand logo at the top. The logo is placed within the SidebarBody and serves as a clickable home link. This pattern provides brand recognition while maintaining clean navigation structure.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Sidebar with Logo
-            </Label>
-            <Description>
-              A basic sidebar enhanced with a brand logo at the top. The logo is
-              placed within the <Code>SidebarBody</Code> and serves as a
-              clickable home link. This pattern provides brand recognition while
-              maintaining clean navigation structure.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarBody>
@@ -332,30 +306,21 @@ export const WithLogo: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 
 export const ActiveState: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Demonstrates how sidebar items appear when they represent the current page or active state. Use the current prop on SidebarItem to indicate the user's current location in the application.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Active State
-            </Label>
-            <Description>
-              Demonstrates how sidebar items appear when they represent the
-              current page or active state. Use the <Code>current</Code> prop on{" "}
-              <Code>SidebarItem</Code> to indicate the user&rsquo;s current
-              location in the application.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarBody>
@@ -394,30 +359,21 @@ export const ActiveState: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 
 export const StickyHeader: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "A sidebar with a SidebarHeader containing team switching and quick actions, plus a scrollable body with navigation items. The header remains visible while the body content scrolls, perfect for long navigation lists.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Sticky Header
-            </Label>
-            <Description>
-              A sidebar with a <Code>SidebarHeader</Code> containing team
-              switching and quick actions, plus a scrollable body with
-              navigation items. The header remains visible while the body
-              content scrolls, perfect for long navigation lists.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarHeader>
@@ -493,30 +449,20 @@ export const StickyHeader: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 export const StickyFooter: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "A sidebar with both SidebarHeader and SidebarFooter sections. The footer contains non-navigation items like support links that remain accessible at the bottom while the body content scrolls. Perfect for persistent utility actions.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Sticky Footer
-            </Label>
-            <Description>
-              A sidebar with both <Code>SidebarHeader</Code> and{" "}
-              <Code>SidebarFooter</Code> sections. The footer contains
-              non-navigation items like support links that remain accessible at
-              the bottom while the body content scrolls. Perfect for persistent
-              utility actions.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarHeader>
@@ -602,34 +548,21 @@ export const StickyFooter: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 
 export const CollapsibleItems: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Advanced sidebar featuring collapsible navigation sections with context menus. Uses Group and Heading to structure complex triggers that combine expandable navigation with additional actions. The CollapsiblePanel applies bleed and gapless to remove default spacing, then uses px-5 to properly indent sub-items within the sidebar's visual hierarchy. Ideal for hierarchical navigation requiring per-section actions.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Collapsible Navigation
-            </Label>
-            <Description>
-              Advanced sidebar featuring collapsible navigation sections with
-              context menus. Uses <Code>Group</Code> and <Code>Heading</Code> to
-              structure complex triggers that combine expandable navigation with
-              additional actions. The <Code>CollapsiblePanel</Code> applies{" "}
-              <Code>bleed</Code> and <Code>gapless</Code> to remove default
-              spacing, then uses <Code>px-5</Code> to properly indent sub-items
-              within the sidebar&rsquo;s visual hierarchy. Ideal for
-              hierarchical navigation requiring per-section actions.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarHeader>
@@ -737,32 +670,21 @@ export const CollapsibleItems: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 
 export const GroupedNavigation: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Demonstrates organizing navigation items into logical sections using multiple SidebarSection components with SidebarHeading labels. This pattern helps categorize navigation items, making it easier for users to find related functionality. Essential for applications with many navigation options.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Grouped Navigation
-            </Label>
-            <Description>
-              Demonstrates organizing navigation items into logical sections
-              using multiple <Code>SidebarSection</Code> components with{" "}
-              <Code>SidebarHeading</Code> labels. This pattern helps categorize
-              navigation items, making it easier for users to find related
-              functionality. Essential for applications with many navigation
-              options.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarBody>
@@ -821,31 +743,21 @@ export const GroupedNavigation: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 
 export const IconOnly: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "A compact sidebar displaying only icons without labels, perfect for space-constrained layouts or secondary navigation. Uses proper aria-label attributes for accessibility and tooltip support through the title attribute. Ideal for applications where screen real estate is premium.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Icon-Only Sidebar
-            </Label>
-            <Description>
-              A compact sidebar displaying only icons without labels, perfect
-              for space-constrained layouts or secondary navigation. Uses proper
-              aria-label attributes for accessibility and tooltip support
-              through the <Code>title</Code> attribute. Ideal for applications
-              where screen real estate is premium.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-16 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarBody>
@@ -879,32 +791,21 @@ export const IconOnly: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 
 export const MultiLevelNested: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Advanced sidebar demonstrating deep hierarchical navigation with multiple nested collapsible levels, notification badges, and mixed interactive elements. Features Badge components for counters, nested Collapsible sections for sub-categories, and proper indentation hierarchy. Perfect for complex applications with extensive content organization.",
+      },
+    },
+  },
   render: () => {
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Multi-Level Nested Navigation
-            </Label>
-            <Description>
-              Advanced sidebar demonstrating deep hierarchical navigation with
-              multiple nested collapsible levels, notification badges, and mixed
-              interactive elements. Features <Code>Badge</Code> components for
-              counters, nested <Code>Collapsible</Code> sections for
-              sub-categories, and proper indentation hierarchy. Perfect for
-              complex applications with extensive content organization.
-            </Description>
-          </Content>
-        </Banner>
-        <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
+      <div className="-mx-6 flex min-w-[300px] items-start justify-center overflow-hidden border-y border-neutral-200 bg-white sm:mx-0 sm:max-w-full sm:rounded-lg sm:border dark:border-white/10 dark:bg-neutral-900">
           <div className="h-152 w-full">
             <Sidebar className="h-full w-64 border-r border-neutral-950/5 bg-zinc-100 dark:bg-neutral-950">
               <SidebarHeader>
@@ -1012,12 +913,18 @@ export const MultiLevelNested: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
     );
   },
 };
 
 export const DynamicWithState: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Demonstrates a stateful sidebar that responds to application state changes. Features dynamic notification counters, conditional sections based on feature flags, loading states, and real-time updates. Uses React state to showcase how sidebars can adapt to changing application conditions and user permissions.",
+      },
+    },
+  },
   render: () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [notificationCount, setNotificationCount] = useState(3);
@@ -1027,22 +934,7 @@ export const DynamicWithState: Story = {
     const [hasBetaFeature, setHasBetaFeature] = useState(true);
 
     return (
-      <div className="space-y-surface">
-        <Banner>
-          <InfoIcon />
-          <Content>
-            <Label color="unset" className="font-semibold">
-              Dynamic Sidebar with State
-            </Label>
-            <Description>
-              Demonstrates a stateful sidebar that responds to application state
-              changes. Features dynamic notification counters, conditional
-              sections based on feature flags, loading states, and real-time
-              updates. Uses React state to showcase how sidebars can adapt to
-              changing application conditions and user permissions.
-            </Description>
-          </Content>
-        </Banner>
+      <>
         <div className="mb-4 flex gap-2">
           <Button
             variant="outline"
@@ -1176,7 +1068,7 @@ export const DynamicWithState: Story = {
             </Sidebar>
           </div>
         </div>
-      </div>
+      </>
     );
   },
 };

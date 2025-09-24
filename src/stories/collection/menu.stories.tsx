@@ -21,7 +21,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
 import { Description, KeyboardShorcut, Label } from "@/components/ui/fieldset";
-import { Menu, MenuItem, MenuSection, MenuTrigger } from "@/components/ui/menu";
+import {
+  Menu,
+  MenuItem,
+  MenuItemLink,
+  MenuSection,
+  MenuTrigger,
+} from "@/components/ui/menu";
 import { Header } from "@/components/ui/view";
 
 const meta = {
@@ -77,10 +83,10 @@ export const WithIcons: Story = {
           Actions
         </Button>
         <Menu>
-          <MenuItem id="bookmark">
+          <MenuItemLink to="." id="bookmark">
             <BookmarkSimpleIcon />
             <Label>Bookmark</Label>
-          </MenuItem>
+          </MenuItemLink>
           <MenuItem id="download">
             <DownloadIcon />
             <Label>Download</Label>

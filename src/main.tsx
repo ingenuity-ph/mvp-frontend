@@ -8,11 +8,11 @@ import ReactDOM from "react-dom/client";
 import * as Sentry from "@sentry/react";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { ConsoleStrategy, PostHogStrategy } from "./libs/analytics";
-// Import the generated route tree
 import { AnalyticsProvider } from "./libs/analytics/analytics-provider.tsx";
 import { queryClient } from "./libs/query/query-client.tsx";
 import reportWebVitals from "./reportWebVitals.ts";
-import { routeTree } from "./routeTree.gen";
+// Import the generated route tree
+import { routeTree } from "./routeTree.gen.ts";
 
 // Create a new router instance
 const router = createRouter({
@@ -24,16 +24,16 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
 });
 
-// Initialize instrumentation
-initializeInstrumentation(router);
-
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
-  // @ts-expect-error
-  type Register = {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface Register {
     router: typeof router;
-  };
+  }
 }
+
+// Initialize instrumentation
+initializeInstrumentation(router);
 
 // Render the app
 const rootElement = document.querySelector("#app");
@@ -45,7 +45,7 @@ const createAnalyticsClient = () => {
   return new PostHogStrategy();
 };
 
-if (rootElement && !rootElement.innerHTML) {
+if (rootElement !== null) {
   const root = ReactDOM.createRoot(rootElement, {
     // Callback called when an error is thrown and not caught by an ErrorBoundary.
     onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {

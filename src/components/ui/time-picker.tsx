@@ -69,9 +69,8 @@ export function TimePickerField<
 
   if (control && fieldName) {
     return (
-      <FieldControl control={control} field={fieldName}>
+      <FieldControl control={control} field={fieldName} className={className}>
         <TimePickerField
-          className={className}
           label={label}
           description={description}
           {...props}

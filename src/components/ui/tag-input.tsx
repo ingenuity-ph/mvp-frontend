@@ -177,6 +177,7 @@ export function TagInputField<
   field,
   disabled,
   defaultFieldValue,
+  className,
   ...props
 }: WithComposedFieldControlProps<TagInputProps, TControl, TFieldName>) {
   if (control && field) {
@@ -186,6 +187,7 @@ export function TagInputField<
         field={field}
         isDisabled={disabled}
         defaultValue={defaultFieldValue}
+        className={className}
       >
         {label ? <Label>{label}</Label> : null}
         <TagInput {...props} />
@@ -195,7 +197,7 @@ export function TagInputField<
   }
 
   return (
-    <Field isDisabled={disabled}>
+    <Field isDisabled={disabled} className={className}>
       {label ? <Label>{label}</Label> : null}
       <TagInput disabled={disabled} {...props} />
       {description ? <Description>{description}</Description> : null}

@@ -8,6 +8,7 @@ import {
   type MenuSectionProps as AriaMenuSectionProps,
 } from "react-aria-components";
 import type { VariantProps } from "tailwind-variants/lite";
+import { createLink } from "@tanstack/react-router";
 import { pickerStyles } from "./picker";
 import {
   type PassThroughPopoverProps,
@@ -84,6 +85,7 @@ export function MenuItem<T extends object>({
     />
   );
 }
+export const MenuItemLink = createLink(AriaMenuItem);
 
 export function MenuSection<T extends object>({
   className,

@@ -37,9 +37,9 @@ export const Default: Story = {
 export const WithContent: Story = {
   render: () => {
     return (
-      <Card>
+      <Card className="w-xl">
         <Divider>
-          <Button>Show More</Button>
+          <Button variant="plain">Show More</Button>
         </Divider>
       </Card>
     );

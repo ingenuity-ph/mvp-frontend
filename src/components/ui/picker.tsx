@@ -8,6 +8,27 @@ import {
 import { tv } from "tailwind-variants/lite";
 import { textStyles } from "./text";
 
+/**
+ * Picker utility for building collection components.
+ *
+ * This file provides styling utilities and components for building dropdown menus,
+ * select boxes, comboboxes, and other collection-based UI components. It should not
+ * be used directly as a standalone component, but rather as a foundation for creating
+ * more specific collection components.
+ *
+ * Key features:
+ * - Consistent styling across all collection components
+ * - Support for various color variants (primary, neutral, danger, etc.)
+ * - Accessible grid layout with subgrid support
+ * - Built-in support for icons, avatars, labels, and descriptions
+ * - Responsive design with mobile-first approach.
+ *
+ * Usage:
+ * Import `pickerStyles` and `Option` to build custom collection components like
+ * Select, Combobox, Menu, etc. The styles are designed to work with React Aria's
+ * collection components (ListBox, Menu, ComboBox, etc.).
+ */
+
 export const pickerStyles = tv({
   base: "",
   slots: {

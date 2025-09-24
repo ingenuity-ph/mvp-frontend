@@ -1,6 +1,6 @@
 import {
-  type ComponentPropsWithoutRef,
   createContext,
+  type FC,
   type ForwardedRef,
   forwardRef,
   useContext,
@@ -147,28 +147,40 @@ export const Pagination = forwardRef(function Pagination(
   );
 });
 
-type ArrayItem<T> = T extends Array<infer U> ? U : never;
 // eslint-disable-next-line no-restricted-syntax/noClasses
 class PaginationNode extends CollectionNode<unknown> {
   static readonly type = "item";
 }
+type PaginationPageRendererProps = {
+  /**
+   * The main type is plucked from zag. We need a way to
+   * sync this they might update the API.
+   */
+  page:
+    | {
+        type: "ellipsis";
+        id: string;
+        index: number;
+      }
+    | {
+        type: "page";
+        value: number;
+        id: string;
+        index: number;
+      };
+};
 
 export const PaginationPage = UNSTABLE_createLeafComponent(
   PaginationNode,
   function PaginationPage(
-    {
-      page,
-      ...props
-    }: ComponentPropsWithoutRef<"li"> & {
-      page: ArrayItem<pagination.Api["pages"]>;
-    },
+    { page }: PaginationPageRendererProps,
     ref: ForwardedRef<HTMLLIElement>,
   ) {
     const api = usePagination();
     const styles = composeButtonStyles("outline", {});
 
     return (
-      <li ref={ref} {...props}>
+      <li ref={ref} className="flex shrink-0">
         {match({
           type: page.type,
           value: page.type === "page" ? page.value : null,
@@ -177,21 +189,34 @@ export const PaginationPage = UNSTABLE_createLeafComponent(
             return (
               <Link
                 {...api.getItemProps(page as pagination.ItemProps)}
-                className={cn(styles, "shrink-0")}
+                className={cn(styles, "min-w-[2.25rem]")}
                 to="."
               >
                 {value}
               </Link>
             );
           })
-          .with({ type: "ellipsis" }, () => <Text>...</Text>)
+          .with({ type: "ellipsis" }, () => {
+            return (
+              <Text
+                elementType="span"
+                {...api.getEllipsisProps({ index: page.index })}
+              >
+                ...
+              </Text>
+            );
+          })
           .otherwise(() => null)}
       </li>
     );
   },
 );
 
-export function PaginationPages() {
+export function PaginationPages({
+  renderPage: PageRenderer = PaginationPage,
+}: {
+  renderPage?: FC<PaginationPageRendererProps>;
+}) {
   const api = usePagination();
   const { CollectionRoot } = useContext(CollectionRendererContext);
 
@@ -201,11 +226,19 @@ export function PaginationPages() {
         <Collection
           items={api.pages.map((v, i) => {
             return v.type === "ellipsis"
-              ? { ...v, id: `ellipsis-${i}` }
-              : { ...v, id: v.value };
+              ? ({
+                  ...v,
+                  id: `ellipsis-${i}`,
+                  index: i,
+                } satisfies PaginationPageRendererProps["page"])
+              : ({
+                  ...v,
+                  id: `${v.value}`,
+                  index: i,
+                } satisfies PaginationPageRendererProps["page"]);
           })}
         >
-          {(item) => <PaginationPage page={item} />}
+          {(item) => <PageRenderer page={item} />}
         </Collection>
       }
     >

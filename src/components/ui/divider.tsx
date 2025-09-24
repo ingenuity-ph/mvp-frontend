@@ -12,13 +12,13 @@ const dividerStyles = tv({
     // styles for when the divider haa children
     content: [
       // CSS Variables
-      "[--child-position:50%] [--gap:theme(spacing.1)]",
+      "[--child-position:50%] [--divider-gap:--spacing(2)]",
       // Base
       "relative flex items-center border-0 text-center whitespace-nowrap",
       // :before border styles
-      "before:relative before:[margin-inline-end:min(var(--child-position)*999,var(--gap))] before:basis-[var(--child-position)] before:[block-size:1px] dark:before:border-white/5",
+      "before:relative before:[margin-inline-end:min(var(--child-position)*999,var(--divider-gap))] before:basis-[var(--child-position)] before:[block-size:1px] before:bg-surface-border",
       // :after border styles
-      "after:relative after:[margin-inline-start:min((100%-var(--child-position))*999,var(--gap))] after:basis-[calc(100%-var(--child-position))] after:[block-size:1px] dark:before:border-white/5",
+      "after:relative after:[margin-inline-start:min((100%-var(--child-position))*999,var(--divider-gap))] after:basis-[calc(100%-var(--child-position))] after:[block-size:1px] after:bg-surface-border",
     ],
     // placeholder for "no content" so that we can manage the classnames
     default: "",
@@ -28,23 +28,24 @@ const dividerStyles = tv({
       vertical: {
         content: "",
         // default: "block shrink-0 list-none self-stretch border-l",
-        default: "block shrink-0 list-none border-l",
+        default:
+          "block shrink-0 list-none border-0 [inline-size:1px] bg-[color:var(--divider-color)]",
       },
       horizontal: {
         content: "",
         default:
-          "block shrink-0 list-none self-stretch border-t [block-size:1px]",
+          "block shrink-0 list-none self-stretch border-t border-[color:var(--divider-color)] [block-size:1px]",
       },
     },
     subtle: {
       true: {
         content:
           "before:border-brand-neutral-subtle after:border-brand-neutral-subtle",
-        default: "border-brand-neutral-subtle",
+        default: "[--divider-color:var(--color-surface-border)]",
       },
       false: {
-        content: "before:border-surface-border after:border-surface-border",
-        default: "border-surface-border",
+        content: "before:surface-border after:surface-border",
+        default: "[--divider-color:var(--color-surface-border)]",
       },
     },
     inset: {
@@ -57,7 +58,7 @@ const dividerStyles = tv({
     },
   },
   defaultVariants: {
-    inset: "context",
+    inset: "unset",
     orientation: "horizontal",
     subtle: false,
   },
@@ -87,14 +88,50 @@ export function Divider({
   });
 
   if (orientation === "vertical") {
+    if (hasChildren) {
+      const {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        elementType,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        slot,
+        ...nativeSpanProps
+      } = props;
+
+      return (
+        <span
+          {...nativeSpanProps}
+          data-slot="divider"
+          className={content({ className })}
+        />
+      );
+    }
+
     return (
       <AriaSeparator
         data-slot="divider"
         {...props}
-        className={cn([
-          base(),
-          hasChildren ? content({ className }) : defaultSlot({ className }),
-        ])}
+        className={cn([base(), defaultSlot({ className })])}
+      />
+    );
+  }
+
+  if (hasChildren) {
+    const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      elementType,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      slot,
+      ...nativeSpanProps
+    } = props;
+
+    return (
+      <span
+        {...nativeSpanProps}
+        data-slot="divider"
+        className={content({ className })}
+        style={{
+          unicodeBidi: "isolate",
+        }}
       />
     );
   }
@@ -103,10 +140,7 @@ export function Divider({
     <AriaSeparator
       data-slot="divider"
       {...props}
-      className={cn([
-        base(),
-        hasChildren ? content({ className }) : defaultSlot({ className }),
-      ])}
+      className={cn([base(), defaultSlot({ className })])}
       style={{
         unicodeBidi: "isolate",
       }}

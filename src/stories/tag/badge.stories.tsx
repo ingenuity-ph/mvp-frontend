@@ -29,9 +29,10 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Badges are small supplemental elements that highlight feature information or promotions within a user flow. Badge content should generally be 3 words or less. The main difference between badges and tags is that badges are informational only, while tags are actionable."
-      }
-    }
+        story:
+          "Badges are small supplemental elements that highlight feature information or promotions within a user flow. Badge content should generally be 3 words or less. The main difference between badges and tags is that badges are informational only, while tags are actionable.",
+      },
+    },
   },
   render: () => {
     return (
@@ -52,9 +53,10 @@ export const BadgePlacement: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Badges can be positioned in 8 different locations around their target element using the `placement` prop. Choose from `topLeft`, `top`, `topRight`, `bottomLeft`, `bottom`, `bottomRight`, `left`, or `right`. Click the buttons below to see how each placement affects the badge position."
-      }
-    }
+        story:
+          "Badges can be positioned in 8 different locations around their target element using the `placement` prop. Choose from `topLeft`, `top`, `topRight`, `bottomLeft`, `bottom`, `bottomRight`, `left`, or `right`. Click the buttons below to see how each placement affects the badge position.",
+      },
+    },
   },
   render: () => {
     const [activePlacement, setActivePlacement] =
@@ -96,9 +98,10 @@ export const HintDot: Story = {
   parameters: {
     docs: {
       description: {
-        story: "`HintDot` is a subtle nudging badge that points out something new or important. It's typically used as a small dot indicator anchored to entry points, icons, or navigation elements to draw attention without being intrusive. When using `type='hintDot'`, the badge will always default to one placement only, regardless of the `placement` prop value."
-      }
-    }
+        story:
+          "`HintDot` is a subtle nudging badge that points out something new or important. It's typically used as a small dot indicator anchored to entry points, icons, or navigation elements to draw attention without being intrusive. When using `type='hintDot'`, the badge will always default to one placement only, regardless of the `placement` prop value.",
+      },
+    },
   },
   render: () => {
     return (
@@ -106,8 +109,8 @@ export const HintDot: Story = {
         <Card>
           <Title>New Feature Available</Title>
           <Description>
-            This card demonstrates how hint dots subtly indicate new or
-            updated content without overwhelming the user interface.
+            This card demonstrates how hint dots subtly indicate new or updated
+            content without overwhelming the user interface.
           </Description>
         </Card>
       </Badge>
@@ -118,13 +121,14 @@ export const NotificationCircle: Story = {
   parameters: {
     docs: {
       description: {
-        story: "`NotificationCircle` badges are perfect for displaying counts, status indicators, or small icons. They automatically format numbers above 9 as '9+' to maintain visual consistency. Use them for notification counts, status indicators, or completion states."
-      }
-    }
+        story:
+          "`NotificationCircle` badges are perfect for displaying counts, status indicators, or small icons. They automatically format numbers above 9 as '9+' to maintain visual consistency. Use them for notification counts, status indicators, or completion states.",
+      },
+    },
   },
   render: () => {
     return (
-      <div className="gap-surface grid grid-cols-1 md:grid-cols-2">
+      <div className="gap-surface-gutter grid grid-cols-1 md:grid-cols-2">
         <Badge
           content={<CheckIcon className="size-2.5" />}
           type="notificationCircle"
@@ -134,8 +138,8 @@ export const NotificationCircle: Story = {
           <Card className="h-full">
             <Title>Task Completed</Title>
             <Description>
-              This example shows a notification circle with an icon to
-              indicate completion status.
+              This example shows a notification circle with an icon to indicate
+              completion status.
             </Description>
           </Card>
         </Badge>
@@ -143,8 +147,8 @@ export const NotificationCircle: Story = {
           <Card>
             <Title>Unread Messages</Title>
             <Description>
-              This example shows a notification circle with a count to
-              indicate the number of unread items.
+              This example shows a notification circle with a count to indicate
+              the number of unread items.
             </Description>
           </Card>
         </Badge>

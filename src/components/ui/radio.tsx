@@ -227,8 +227,8 @@ export function RadioField({
 } & Omit<FieldProps, "children" | "className"> &
   ComposedFieldProps) {
   return (
-    <RadioLayout {...props}>
-      <Radio value={value} className={className} color={color} />
+    <RadioLayout {...props} className={className}>
+      <Radio value={value} color={color} />
       {label ? <Label>{label}</Label> : null}
       {description ? <Description>{description}</Description> : null}
     </RadioLayout>

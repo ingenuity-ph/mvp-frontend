@@ -202,7 +202,7 @@ export function Dialog({
                     {isDismissable && (
                       <span
                         className={cn([
-                          "pr-surface pt-surface absolute top-0 right-0 flex",
+                          "pr-surface-gutter pt-surface-gutter absolute top-0 right-0 flex",
                         ])}
                       >
                         <Button

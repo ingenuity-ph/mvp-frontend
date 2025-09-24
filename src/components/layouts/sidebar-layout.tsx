@@ -3,6 +3,7 @@ import { type ComponentPropsWithoutRef, useState } from "react";
 import { ListIcon } from "@phosphor-icons/react";
 import { Drawer } from "../ui/drawer";
 import { NavbarItem } from "../ui/navbar";
+import { SurfaceInset } from "../ui/surface";
 import { cn } from "../ui/utils";
 
 function MobileSidebar({
@@ -13,14 +14,14 @@ function MobileSidebar({
   return (
     <Drawer
       isOpen={open}
-      position="left"
+      size="xs"
       onOpenChange={(open) => {
         if (!open) {
           close();
         }
       }}
     >
-      {children}
+      <SurfaceInset inset={["left", "right"]}>{children}</SurfaceInset>
     </Drawer>
   );
 }

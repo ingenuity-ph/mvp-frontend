@@ -170,6 +170,7 @@ export function ComboboxField<
   field,
   isDisabled,
   defaultFieldValue,
+  className,
   ...props
 }: WithComposedFieldControlProps<ComboBoxProps<T>, TControl, TFieldName>) {
   if (control && field) {
@@ -179,6 +180,7 @@ export function ComboboxField<
         field={field}
         isDisabled={isDisabled}
         defaultValue={defaultFieldValue}
+        className={className}
       >
         {label ? <Label>{label}</Label> : null}
         <Combobox {...props} />
@@ -188,7 +190,7 @@ export function ComboboxField<
   }
 
   return (
-    <Field isDisabled={isDisabled}>
+    <Field isDisabled={isDisabled} className={className}>
       {label ? <Label>{label}</Label> : null}
       <Combobox isDisabled={isDisabled} {...props} />
       {description ? <Description>{description}</Description> : null}

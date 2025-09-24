@@ -85,7 +85,13 @@ export function TabPanel({
       className={cn(
         props.className,
         // Inherit surface styles
-        surfaceStyles({ color: "unset", border: "unset", bleed, gapless }),
+        surfaceStyles({
+          color: "unset",
+          border: "unset",
+          density: "compact",
+          bleed,
+          gapless,
+        }),
       )}
     />
   );

@@ -27,9 +27,7 @@ function MobileSidebar({
         }
       }}
     >
-      {/* <SurfaceOverflow inset="all" offset="none"> */}
       {children}
-      {/* </SurfaceOverflow> */}
     </Drawer>
   );
 }

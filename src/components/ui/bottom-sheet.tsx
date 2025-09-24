@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ButtonContext, DEFAULT_SLOT, Provider } from "react-aria-components";
 import { type DialogProps, Drawer as Vaul } from "vaul";
-import { X } from "@phosphor-icons/react";
+import { XIcon } from "@phosphor-icons/react";
 import { Button } from "./button";
 import { cn } from "./utils";
 
@@ -62,7 +62,7 @@ export function BottomSheet({
           >
             <div
               className={cn([
-                "rounded-t-surface gap-surface relative flex max-h-screen flex-col bg-white p-[var(--gutter,var(--spacing-surface))]",
+                "rounded-t-surface gap-surface-gutter relative flex max-h-screen flex-col bg-white p-[var(--gutter,var(--spacing-surface))]",
                 //
                 fullscreen && "h-screen",
                 //
@@ -70,16 +70,14 @@ export function BottomSheet({
               ])}
             >
               {dismissible && (
-                <span className="right-surface absolute top-2 flex">
+                <span className="right-surface-gutter absolute top-2 flex">
                   <Button
                     slot="close"
                     color="neutral"
                     variant="plain"
-                    className="h-9.5"
-                    inset="right"
                     aria-label="Close Dialog"
                   >
-                    <X />
+                    <XIcon />
                   </Button>
                 </span>
               )}

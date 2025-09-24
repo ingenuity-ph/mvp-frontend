@@ -102,8 +102,8 @@ function RouteComponent() {
 
   return (
     <div className="p-4">
-      <div className="gap-surface grid">
-        <div className="gap-surface mt-1 grid sm:grid-cols-2 md:grid-cols-3">
+      <div className="gap-surface-gutter grid">
+        <div className="gap-surface-gutter mt-1 grid sm:grid-cols-2 md:grid-cols-3">
           <Card className="items-center justify-center">
             <div className="grid grid-cols-3 gap-2">
               {themeColors.map((color) => {

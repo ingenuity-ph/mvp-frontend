@@ -42,7 +42,7 @@ const ALLOWED_SPECIAL_CHARACTERS = [
  */
 function buildSchema(config: PasswordSettings) {
   const baseSchema = z.object({
-    email: z.string().email(),
+    email: z.email(),
     confirmPassword: z.string(),
     password: z.string(),
   });
@@ -64,28 +64,28 @@ function buildSchema(config: PasswordSettings) {
   // Apply minimum length constraint if specified
   passwordSchema = passwordSchema.min(
     minLength,
-    `Password must be at least ${minLength} characters long.`
+    `Password must be at least ${minLength} characters long.`,
   );
 
   // Conditionally add regex for required character types
   if (requireLowercase) {
     passwordSchema = passwordSchema.regex(
       /[a-z]/,
-      "Password must contain at least one lowercase letter."
+      "Password must contain at least one lowercase letter.",
     );
   }
 
   if (requireUppercase) {
     passwordSchema = passwordSchema.regex(
       /[A-Z]/,
-      "Password must contain at least one uppercase letter."
+      "Password must contain at least one uppercase letter.",
     );
   }
 
   if (requireNumbers) {
     passwordSchema = passwordSchema.regex(
       /\d/,
-      "Password must contain at least one number."
+      "Password must contain at least one number.",
     );
   }
 
@@ -93,10 +93,10 @@ function buildSchema(config: PasswordSettings) {
     passwordSchema = passwordSchema.regex(
       new RegExp(
         ALLOWED_SPECIAL_CHARACTERS.map((str) =>
-          str.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")
-        ).join("|")
+          str.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+        ).join("|"),
       ),
-      "Password must contain at least one symbol."
+      "Password must contain at least one symbol.",
     );
   }
 
@@ -201,7 +201,7 @@ function SignUpForm() {
     },
     (err) => {
       console.error(err);
-    }
+    },
   );
 
   const rootError = form.formState.errors.root?.message;
@@ -253,7 +253,7 @@ function SignUpForm() {
       </Button>
       <Text>
         Don’t have an account?{" "}
-        <TextLink href="/login">
+        <TextLink to="/login">
           <Strong>Sign In</Strong>
         </TextLink>
       </Text>

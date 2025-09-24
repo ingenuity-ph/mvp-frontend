@@ -1,4 +1,6 @@
 /* eslint-disable import/no-default-export */
+import { DialogTrigger } from "react-aria-components";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Description, FieldGroup } from "@/components/ui/fieldset";
@@ -6,8 +8,6 @@ import { InputField } from "@/components/ui/input";
 import { SurfaceActions } from "@/components/ui/surface";
 import { Title } from "@/components/ui/text";
 import { Content, Footer, Header } from "@/components/ui/view";
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { DialogTrigger } from "react-aria-components";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {

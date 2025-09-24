@@ -97,9 +97,8 @@ export function DatePickerField<
 
   if (control && fieldName) {
     return (
-      <FieldControl control={control} field={fieldName}>
+      <FieldControl control={control} field={fieldName} className={className}>
         <DatePickerField
-          className={className}
           label={label}
           description={description}
           {...props}
@@ -179,9 +178,8 @@ export function DateRangePickerField<
 
   if (control && fieldName) {
     return (
-      <FieldControl control={control} field={fieldName}>
+      <FieldControl control={control} field={fieldName} className={className}>
         <DateRangePickerField
-          className={className}
           label={label}
           description={description}
           {...props}

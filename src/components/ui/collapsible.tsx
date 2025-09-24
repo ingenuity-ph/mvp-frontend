@@ -32,7 +32,7 @@ export function CollapsibleTrigger({
   ...props
 }: ButtonProps) {
   return (
-    <Heading>
+    <Heading className="group-expanded/disclosure:border-surface-border border-b group-not-data-expanded/disclosure:border-transparent">
       <Button
         variant="plain"
         {...props}
@@ -105,7 +105,12 @@ export function CollapsiblePanel({
         ref={contentRef}
         className={cn([
           //
-          surfaceStyles({ bleed, gapless, border: "unset" }),
+          surfaceStyles({
+            bleed,
+            gapless,
+            density: "compact",
+            border: "unset",
+          }),
         ])}
       >
         {children}
@@ -114,6 +119,13 @@ export function CollapsiblePanel({
   );
 }
 
-export function Accordion(props: AriaDisclosureGroupProps) {
-  return <AriaDisclosureGroup {...props} />;
+export function Accordion({ className, ...props }: AriaDisclosureGroupProps) {
+  return (
+    <AriaDisclosureGroup
+      {...props}
+      className={composeRenderProps(className, (resolvedClassname) =>
+        cn(resolvedClassname, "w-full"),
+      )}
+    />
+  );
 }

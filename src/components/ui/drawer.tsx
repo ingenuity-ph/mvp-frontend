@@ -16,9 +16,9 @@ const drawerStyles = createStyles({
   slots: {
     overlay: dialogStyles.slots.overlay,
     dialog: dialogStyles.slots.dialog,
-    root: "fixed isolate inset-0 w-screen overflow-y-auto pt-6 sm:pt-0",
+    root: "fixed isolate inset-0 w-screen overflow-y-auto",
     container: "",
-    modal: "",
+    modal: "w-full",
   },
   variants: {
     ...dialogStyles.variants,
@@ -166,7 +166,7 @@ export function Drawer({
                     {isDismissable && (
                       <span
                         className={cn([
-                          "pr-surface pt-surface absolute top-0 right-0 flex",
+                          "pr-surface-gutter pt-surface-gutter absolute top-0 right-0 flex",
                         ])}
                       >
                         <Button

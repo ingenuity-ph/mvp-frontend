@@ -7,14 +7,16 @@ import {
   composeRenderProps,
   Heading,
   type HeadingProps,
+  Link as AriaLink,
+  type LinkProps as AriaLinkProps,
   Text as AriaText,
   TextContext,
   type TextProps as AriaTextProps,
 } from "react-aria-components";
 import { tv, type VariantProps } from "tailwind-variants/lite";
+import { createLink } from "@tanstack/react-router";
 import type { ThemeColors } from "./constants";
-import { Link, type LinkProps } from "./link";
-import { useSlottedContextExists } from "./utils";
+import { cn, useSlottedContextExists } from "./utils";
 
 export const textStyles = tv({
   base: "",
@@ -153,33 +155,37 @@ export function Text({
 }
 export { Text as Paragraph };
 
-export function TextLink({
-  className,
+function TextLinkWrapper({
   color = "neutral",
   size = "sm",
+  className,
   ...props
-}: LinkProps & OwnTextProps) {
+}: OwnTextProps & AriaLinkProps) {
   const isColor = typeof color === "string";
   const colorStyle = isColor
     ? textStyles.variants.color[color as ThemeColors]
     : color;
 
   return (
-    <Link
+    <AriaLink
       {...props}
-      className={clsx(
-        className,
-        "hover:underline",
-        textStyles({
-          paragraph: size,
-          color: typeof color === "string" ? "unset" : color,
-        }),
-        //
-        colorStyle,
-      )}
+      className={composeRenderProps(className, (resolvedClassName) => {
+        return cn(
+          resolvedClassName,
+          //
+          "hover:underline",
+          textStyles({
+            paragraph: size,
+            color: typeof color === "string" ? "unset" : color,
+          }),
+          //
+          colorStyle,
+        );
+      })}
     />
   );
 }
+export const TextLink = createLink(TextLinkWrapper);
 
 export function TextButton({
   className,

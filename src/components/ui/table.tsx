@@ -7,7 +7,6 @@ import {
   Column as AriaColumn,
   type ColumnProps as AriaColumnProps,
   composeRenderProps,
-  type LinkProps,
   Row as AriaRow,
   type RowProps as AriaRowProps,
   Table as AriaTable,
@@ -130,13 +129,10 @@ export function TableColumn({
   );
 }
 
-const TableRowContext = createContext<
-  {
-    target?: string;
-    title?: string;
-  } & Pick<LinkProps, "href" | "routerOptions">
->({
-  href: undefined,
+const TableRowContext = createContext<{
+  target?: string;
+  title?: string;
+}>({
   target: undefined,
   title: undefined,
 });

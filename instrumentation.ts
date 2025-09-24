@@ -1,5 +1,6 @@
-import { env } from "@/env";
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import * as Sentry from "@sentry/react";
+import { env } from "@/env";
 
 export const initializeInstrumentation = (router: any) => {
   return Sentry.init({

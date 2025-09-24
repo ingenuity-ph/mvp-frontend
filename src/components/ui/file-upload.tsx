@@ -2,6 +2,7 @@ import {
   type ComponentPropsWithoutRef,
   createContext,
   type PropsWithoutRef,
+  useContext,
   useEffect,
   useId,
   useState,
@@ -223,7 +224,7 @@ export function FileUploadField<
 ) {
   const [composedFeldProps, fileUploadProps] =
     splitComposedFieldControlProps(props);
-  const { label, description, ...fieldControlProps } = composedFeldProps;
+  const { label, description, className, ...fieldControlProps } = composedFeldProps;
 
   if (fieldControlProps.control && fieldControlProps.field) {
     return (
@@ -231,6 +232,7 @@ export function FileUploadField<
         {...fieldControlProps}
         field={fieldControlProps.field}
         control={fieldControlProps.control}
+        className={className}
       >
         {label ? <Label>{label}</Label> : null}
         <FileUpload {...fileUploadProps} />
@@ -240,7 +242,7 @@ export function FileUploadField<
   }
 
   return (
-    <Field>
+    <Field className={className}>
       {label ? <Label>{label}</Label> : null}
       <FileUpload {...fileUploadProps} />
       {description ? <Description>{description}</Description> : null}
@@ -257,6 +259,7 @@ export function AcceptedFiles({
 
   return (
     <GridList
+      selectionMode="none"
       {...mergeProps(api.getItemGroupProps(), props)}
       aria-label="Files Selected"
       data-empty={api.acceptedFiles.length === 0 || undefined}
@@ -276,6 +279,12 @@ export function AcceptedFiles({
   );
 }
 
+/**
+ * @internal
+ * Dummy context so we can check presence
+ */
+const DropzoneContext = createContext(null);
+
 export function Dropzone({
   children,
   className,
@@ -288,22 +297,25 @@ export function Dropzone({
   const api = useSlottedContext(FileUploadContext)!;
 
   return (
-    <div data-slot="upload-container" className={className}>
-      <div {...api.getDropzoneProps()} data-rac>
-        <input
-          {...api.getHiddenInputProps()}
-          aria-label={field?.["aria-label"]}
-          aria-describedby={field?.["aria-describedby"]}
-          aria-labelledby={field?.["aria-labelledby"]}
-        />
+    <DropzoneContext.Provider value={null}>
+      <div data-slot="upload-container" className={className}>
+        <div {...api.getDropzoneProps()} data-rac>
+          <input
+            {...api.getHiddenInputProps()}
+            aria-label={field?.["aria-label"]}
+            aria-describedby={field?.["aria-describedby"]}
+            aria-labelledby={field?.["aria-labelledby"]}
+          />
+        </div>
+        {children}
       </div>
-      {children}
-    </div>
+    </DropzoneContext.Provider>
   );
 }
 
 export function FileTrigger({ children }: { children: React.ReactNode }) {
   const isWithinHandler = Boolean(useSlottedContext(FileUploadContext));
+  const isWithinDropzone = Boolean(useContext(DropzoneContext));
 
   if (!isWithinHandler) {
     return (
@@ -311,6 +323,10 @@ export function FileTrigger({ children }: { children: React.ReactNode }) {
         <Dropzone className="contents">{children}</Dropzone>
       </HeadlessFileUpload>
     );
+  }
+
+  if (!isWithinDropzone) {
+    return <Dropzone className="contents">{children}</Dropzone>;
   }
 
   return children;

@@ -278,7 +278,7 @@ export const Nested: Story = {
               <Collapsible>
                 <CollapsibleTrigger>{item.title}</CollapsibleTrigger>
                 <CollapsiblePanel>
-                  <Accordion className="divide-surface-border divide-y">
+                  <Accordion className="">
                     <Collection items={item.children}>
                       {(nestedItem) => {
                         return (

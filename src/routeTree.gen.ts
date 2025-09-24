@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as PreviewImport } from './routes/preview'
 import { Route as LogoutImport } from './routes/logout'
+import { Route as LayoutPreviewImport } from './routes/layout-preview'
 import { Route as unauthenticatedRouteImport } from './routes/(unauthenticated)/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as unauthenticatedResetPasswordImport } from './routes/(unauthenticated)/reset-password'
@@ -32,6 +33,12 @@ const PreviewRoute = PreviewImport.update({
 const LogoutRoute = LogoutImport.update({
   id: '/logout',
   path: '/logout',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LayoutPreviewRoute = LayoutPreviewImport.update({
+  id: '/layout-preview',
+  path: '/layout-preview',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -94,6 +101,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof unauthenticatedRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/layout-preview': {
+      id: '/layout-preview'
+      path: '/layout-preview'
+      fullPath: '/layout-preview'
+      preLoaderRoute: typeof LayoutPreviewImport
       parentRoute: typeof rootRoute
     }
     '/logout': {
@@ -169,6 +183,7 @@ const unauthenticatedRouteRouteWithChildren =
 
 export interface FileRoutesByFullPath {
   '/': typeof unauthenticatedRouteRouteWithChildren
+  '/layout-preview': typeof LayoutPreviewRoute
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
   '/home': typeof authenticatedHomeRoute
@@ -180,6 +195,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof unauthenticatedRouteRouteWithChildren
+  '/layout-preview': typeof LayoutPreviewRoute
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
   '/home': typeof authenticatedHomeRoute
@@ -193,6 +209,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/(unauthenticated)': typeof unauthenticatedRouteRouteWithChildren
+  '/layout-preview': typeof LayoutPreviewRoute
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
   '/(authenticated)/home': typeof authenticatedHomeRoute
@@ -206,6 +223,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/layout-preview'
     | '/logout'
     | '/preview'
     | '/home'
@@ -216,6 +234,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/layout-preview'
     | '/logout'
     | '/preview'
     | '/home'
@@ -227,6 +246,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/(unauthenticated)'
+    | '/layout-preview'
     | '/logout'
     | '/preview'
     | '/(authenticated)/home'
@@ -240,6 +260,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   unauthenticatedRouteRoute: typeof unauthenticatedRouteRouteWithChildren
+  LayoutPreviewRoute: typeof LayoutPreviewRoute
   LogoutRoute: typeof LogoutRoute
   PreviewRoute: typeof PreviewRoute
   authenticatedHomeRoute: typeof authenticatedHomeRoute
@@ -248,6 +269,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   unauthenticatedRouteRoute: unauthenticatedRouteRouteWithChildren,
+  LayoutPreviewRoute: LayoutPreviewRoute,
   LogoutRoute: LogoutRoute,
   PreviewRoute: PreviewRoute,
   authenticatedHomeRoute: authenticatedHomeRoute,
@@ -265,6 +287,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/(unauthenticated)",
+        "/layout-preview",
         "/logout",
         "/preview",
         "/(authenticated)/home"
@@ -281,6 +304,9 @@ export const routeTree = rootRoute
         "/(unauthenticated)/register",
         "/(unauthenticated)/reset-password"
       ]
+    },
+    "/layout-preview": {
+      "filePath": "layout-preview.tsx"
     },
     "/logout": {
       "filePath": "logout.tsx"

@@ -3,7 +3,6 @@ import { mergeProps } from "react-aria";
 import {
   Button,
   ListBox,
-  Popover,
   Select as AriaSelect,
   type SelectProps as AriaSelectProps,
   SelectValue,
@@ -27,6 +26,7 @@ import {
   type ControlOwnProps,
 } from "./input";
 import { pickerStyles } from "./picker";
+import { Popover } from "./popover";
 import { textStyles } from "./text";
 import { cn, type forwardRefType } from "./utils";
 
@@ -136,7 +136,7 @@ function SelectInternal<T extends object>(
             </span>
           )}
         </Button>
-        <Popover>
+        <Popover bleed>
           <ListBox
             items={items}
             className={pickerStyles().list({ className: "max-h-64" })}
@@ -162,6 +162,7 @@ export function SelectField<
   field,
   defaultSelectedKey,
   disabled,
+  className,
   ...props
 }: SelectProps<T> &
   ComposedFieldProps &
@@ -173,6 +174,7 @@ export function SelectField<
         field={field}
         isDisabled={disabled}
         defaultValue={defaultSelectedKey}
+        className={className}
       >
         <Field>
           {label ? <Label>{label}</Label> : null}
@@ -184,7 +186,7 @@ export function SelectField<
   }
 
   return (
-    <Field isDisabled={disabled}>
+    <Field isDisabled={disabled} className={className}>
       {label ? <Label>{label}</Label> : null}
       <Select {...props} />
       {description ? <Description>{description}</Description> : null}

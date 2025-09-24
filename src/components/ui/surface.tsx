@@ -16,10 +16,10 @@ const surfaceStyles = createStyles({
     "[&>[data-slot=header]+[data-slot=content]]:mt-4",
     "[&>[data-slot=content]+[data-slot=footer]]:mt-8",
     // Variables that insets inherit to work properly
-    // "[--inset-padding-top:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
-    // "[--inset-padding-right:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
-    // "[--inset-padding-bottom:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
-    // "[--inset-padding-left:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
+    "[--inset-padding-top:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
+    "[--inset-padding-right:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
+    "[--inset-padding-bottom:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
+    "[--inset-padding-left:calc(var(--spacing-surface-gutter)-var(--spacing-surface-border))]",
   ],
   variants: {
     border: {
@@ -133,13 +133,24 @@ const insetStyles = createStyles({
     inset: {
       top: [
         "[--margin-top-override:calc(var(--margin-top)-var(--inset-padding-top-calc))]",
+        // Radius
+        "rounded-tr-(--inset-border-radius) rounded-tl-(--inset-border-radius)",
       ],
       right: [
         "[--margin-right-override:calc(var(--margin-right)-var(--inset-padding-right-calc))]",
+        // Radius
+        "rounded-tr-(--inset-border-radius)",
       ],
-      bottom:
+      bottom: [
         "[--margin-bottom-override:calc(var(--margin-bottom)-var(--inset-padding-bottom-calc))]",
-      left: "[--margin-left-override:calc(var(--margin-left)-var(--inset-padding-left-calc))]",
+        // Radius
+        "rounded-br-(--inset-border-radius) rounded-bl-(--inset-border-radius)",
+      ],
+      left: [
+        "[--margin-left-override:calc(var(--margin-left)-var(--inset-padding-left-calc))]",
+        // Radius
+        "rounded-bl-(--inset-border-radius)",
+      ],
       unset: [""],
     },
   },
