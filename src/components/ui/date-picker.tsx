@@ -98,11 +98,7 @@ export function DatePickerField<
   if (control && fieldName) {
     return (
       <FieldControl control={control} field={fieldName} className={className}>
-        <DatePickerField
-          label={label}
-          description={description}
-          {...props}
-        />
+        <DatePickerField label={label} description={description} {...props} />
       </FieldControl>
     );
   }
@@ -149,7 +145,7 @@ export function DatePickerField<
       {fieldErrorMessage ? (
         <ErrorMessage>{fieldErrorMessage}</ErrorMessage>
       ) : null}
-      <PopoverDialog>
+      <PopoverDialog density="compact">
         <Calendar />
       </PopoverDialog>
     </AriaDatePicker>
@@ -233,7 +229,7 @@ export function DateRangePickerField<
       {fieldErrorMessage ? (
         <ErrorMessage>{fieldErrorMessage}</ErrorMessage>
       ) : null}
-      <PopoverDialog>
+      <PopoverDialog density="compact">
         <RangeCalendar />
       </PopoverDialog>
     </AriaDateRangePicker>

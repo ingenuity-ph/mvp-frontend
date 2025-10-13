@@ -263,10 +263,10 @@ export function Field({ className, ...props }: FieldProps) {
 export type WithFieldControlProps<
   T extends FieldValues = FieldValues,
   TName extends FieldPath<T> = FieldPath<T>,
-> = Pick<
-  UseControllerProps<T, TName>,
-  "control" | "defaultValue" | "disabled"
-> & { field: TName };
+> = Pick<UseControllerProps<T, TName>, "control" | "disabled"> & {
+  field: TName;
+  defaultFieldValue?: UseControllerProps<T, TName>["defaultValue"];
+};
 /**
  * Component to integrate forms with React Hook Form.
  */
@@ -282,7 +282,7 @@ export function FieldControl<
   shouldUnregister = false,
   defaultFieldValue,
   ...props
-}: FieldProps &
+}: Omit<FieldProps, "defaultValue" | "defaultChecked"> &
   Pick<UseControllerProps<T, TName>, "control" | "shouldUnregister"> & {
     field: TName;
     defaultFieldValue?: UseControllerProps<T, TName>["defaultValue"];

@@ -108,7 +108,7 @@ export function TextareaField<
   control,
   field,
   disabled,
-  defaultValue,
+  defaultFieldValue,
   className,
   ...props
 }: TextAreaProps &
@@ -120,7 +120,7 @@ export function TextareaField<
         control={control}
         field={field}
         isDisabled={disabled}
-        defaultValue={defaultValue}
+        defaultFieldValue={defaultFieldValue}
         className={className}
       >
         <TextareaField {...props} label={label} description={description} />

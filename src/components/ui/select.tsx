@@ -160,11 +160,15 @@ export function SelectField<
   description,
   control,
   field,
-  defaultSelectedKey,
+  defaultFieldValue,
   disabled,
   className,
   ...props
-}: SelectProps<T> &
+}: /**
+ * Removing `defaultValue` since this is a field wrapped component and the
+ * field controller handles the values updates.
+ */
+Omit<SelectProps<T>, "defaultValue"> &
   ComposedFieldProps &
   Partial<WithFieldControlProps<TControl, TFieldName>>) {
   if (control && field) {
@@ -173,12 +177,12 @@ export function SelectField<
         control={control}
         field={field}
         isDisabled={disabled}
-        defaultValue={defaultSelectedKey}
+        defaultFieldValue={defaultFieldValue}
         className={className}
       >
         <Field>
           {label ? <Label>{label}</Label> : null}
-          <Select {...props} defaultSelectedKey={defaultSelectedKey} />
+          <Select {...props} />
           {description ? <Description>{description}</Description> : null}
         </Field>
       </FieldControl>

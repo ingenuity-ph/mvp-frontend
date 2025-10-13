@@ -222,9 +222,9 @@ export function FileUploadField<
     TFieldName
   >,
 ) {
-  const [composedFeldProps, fileUploadProps] =
+  const [composedFeldProps, { className, ...fileUploadProps }] =
     splitComposedFieldControlProps(props);
-  const { label, description, className, ...fieldControlProps } = composedFeldProps;
+  const { label, description, ...fieldControlProps } = composedFeldProps;
 
   if (fieldControlProps.control && fieldControlProps.field) {
     return (

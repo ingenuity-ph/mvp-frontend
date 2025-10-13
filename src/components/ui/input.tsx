@@ -386,7 +386,7 @@ export function InputField<
         control={control}
         field={field}
         isDisabled={disabled}
-        defaultValue={defaultFieldValue}
+        defaultFieldValue={defaultFieldValue}
         className={className}
       >
         {label ? <Label>{label}</Label> : null}
@@ -447,7 +447,7 @@ export function PasswordInputField<
   control,
   field,
   disabled,
-  defaultValue,
+  defaultFieldValue,
   ...props
 }: WithComposedFieldControlProps<InputProps, TControl, TFieldName>) {
   if (control && field) {
@@ -456,7 +456,7 @@ export function PasswordInputField<
         control={control}
         field={field}
         isDisabled={disabled}
-        defaultValue={defaultValue}
+        defaultFieldValue={defaultFieldValue}
         className={className}
       >
         {label ? <Label>{label}</Label> : null}

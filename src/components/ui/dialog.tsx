@@ -13,6 +13,8 @@ import { Button } from "./button";
 import { surfaceStyles } from "./surface";
 import { cn, createStyles, type VariantProps } from "./utils";
 
+export { DialogTrigger } from "react-aria-components";
+
 export const dialogStyles = createStyles({
   base: "",
   slots: {

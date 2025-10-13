@@ -9,7 +9,7 @@ const descriptionListStyles = tv({
     root: [
       "group",
       // Layout, use a different layout when a there are items that are grouped
-      "grid has-data-[slot=group]:grid-cols-[repeat(var(--cols,2),minmax(0,1fr))]",
+      "grid has-not-data-[slot=group]:grid-cols-1 has-not-data-[slot=group]:sm:grid-cols-[min(50%,--spacing(80))_auto] has-data-[slot=group]:grid-cols-[repeat(var(--cols,2),minmax(0,1fr))]",
     ],
     term: [
       // Typography
@@ -61,7 +61,7 @@ export function DescriptionGroup({
       {...props}
       data-orientation={orientation}
       data-component="description-group"
-      className={cn([className, "group/dl"])}
+      className={cn([className, "group/dl-group"])}
     />
   );
 }
