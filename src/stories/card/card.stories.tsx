@@ -1,9 +1,12 @@
 /* eslint-disable import/no-default-export */
+import { CaretLineRightIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Description } from "@/components/ui/fieldset";
-import { SurfaceInset } from "@/components/ui/surface";
-import { Title } from "@/components/ui/text";
+import { Divider } from "@/components/ui/divider";
+import { Description, Label } from "@/components/ui/fieldset";
+import { SurfaceActions, SurfaceInset } from "@/components/ui/surface";
+import { MetricText, Text, Title } from "@/components/ui/text";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -18,6 +21,30 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+const metrics = [
+  {
+    name: "Monthly recurring revenue",
+    value: "$34.1K",
+    change: "+6.1%",
+    changeType: "positive",
+    href: "#",
+  },
+  {
+    name: "Users",
+    value: "500.1K",
+    change: "+19.2%",
+    changeType: "positive",
+    href: "#",
+  },
+  {
+    name: "User growth",
+    value: "11.3%",
+    change: "-1.2%",
+    changeType: "negative",
+    href: "#",
+  },
+];
 
 export const Default: Story = {
   render: () => {
@@ -59,19 +86,43 @@ export const SectionBleed: Story = {
             alt=""
           />
         </SurfaceInset>
-        {/* <SurfaceInset inset={["left"]}>
-          <Title>Example card</Title>
-          <Description>
-            Proin ut dui sed metus pharetra hend rerit vel non mi. Nulla ornare
-            faucibus ex, non facilisis nisl.
-          </Description>
-        </SurfaceInset> */}
         <Title>Example card</Title>
         <Description>
           Proin ut dui sed metus pharetra hend rerit vel non mi. Nulla ornare
           faucibus ex, non facilisis nisl.
         </Description>
       </Card>
+    );
+  },
+};
+
+export const MetricCards: Story = {
+  parameters: {
+    layout: "padded",
+  },
+  render: () => {
+    return (
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {metrics.map((item) => {
+          return (
+            <Card key={item.name}>
+              <div className="flex items-center justify-between">
+                <Label color="unset" className="text-neutral-400">
+                  {item.name}
+                </Label>
+                <Text color="success">{item.change}</Text>
+              </div>
+              <MetricText>{item.value}</MetricText>
+              <Divider inset="context" />
+              <SurfaceActions>
+                <Button>
+                  View More <CaretLineRightIcon />
+                </Button>
+              </SurfaceActions>
+            </Card>
+          );
+        })}
+      </div>
     );
   },
 };

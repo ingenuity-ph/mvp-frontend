@@ -61,6 +61,19 @@ export const TextAsDescription: Story = {
   },
 };
 
+export const Headings: Story = {
+  args: {
+    children: null,
+  },
+  render: () => {
+    return (
+      <div>
+        <Title className="font-bold">Shipping details</Title>
+        <Description>Overview</Description>
+      </div>
+    );
+  },
+};
 export const TextAsLabel: Story = {
   args: {
     children: null,
@@ -68,7 +81,7 @@ export const TextAsLabel: Story = {
   render: () => {
     return (
       <div>
-        <Label className="font-bold">Shipping details</Label>
+        <Label className="font-medium">Shipping details</Label>
         <Description>
           Without this your odds of getting your order are low.
         </Description>

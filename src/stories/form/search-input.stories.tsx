@@ -66,7 +66,7 @@ export const WithinAForm: Story = {
             placeholder="Search for a user"
             aria-label="Search"
           />
-          <Button aria-label="Search User">
+          <Button aria-label="Search User" adjoined="left" className="w-16">
             <MagnifyingGlassIcon />
           </Button>
         </Group>

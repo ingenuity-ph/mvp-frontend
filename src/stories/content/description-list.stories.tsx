@@ -15,7 +15,6 @@ import {
 import { Divider } from "@/components/ui/divider";
 import { Description, Label } from "@/components/ui/fieldset";
 import { Link } from "@/components/ui/link";
-import { Tag } from "@/components/ui/tag";
 import { EnhancerGroup, Group } from "@/components/ui/utils";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
@@ -242,7 +241,7 @@ export const WithInlineActions: Story = {
           <DescriptionTerm>Full name</DescriptionTerm>
           <DescriptionDetails className="flex items-center justify-between">
             <span>Margot Foster</span>
-            <Button variant="plain" size="sm">
+            <Button variant="plain" size="sm" inset={["top", "bottom"]}>
               <PencilSimpleIcon className="h-4 w-4" />
             </Button>
           </DescriptionDetails>
@@ -252,7 +251,7 @@ export const WithInlineActions: Story = {
             <Link to="." href="mailto:margotfoster@example.com">
               margotfoster@example.com
             </Link>
-            <Button variant="plain" size="sm">
+            <Button variant="plain" size="sm" inset={["top", "bottom"]}>
               <PencilSimpleIcon className="h-4 w-4" />
             </Button>
           </DescriptionDetails>
@@ -261,44 +260,19 @@ export const WithInlineActions: Story = {
           <DescriptionDetails className="flex items-center justify-between">
             <span>+1 (555) 123-4567</span>
             <div className="flex gap-1">
-              <Button variant="plain" size="sm">
+              <Button variant="plain" size="sm" inset={["top", "bottom"]}>
                 <PencilSimpleIcon className="h-4 w-4" />
               </Button>
-              <Button variant="plain" size="sm" color="danger">
+              <Button
+                variant="plain"
+                size="sm"
+                color="danger"
+                inset={["top", "bottom"]}
+              >
                 <TrashIcon className="h-4 w-4" />
               </Button>
             </div>
           </DescriptionDetails>
-        </DescriptionList>
-      </div>
-    );
-  },
-};
-
-export const Compact: Story = {
-  name: "Compact Layout",
-  render: () => {
-    return (
-      <div className="max-w-sm">
-        <DescriptionList className="[&>dd]:py-1 [&>dd]:text-sm [&>dt]:py-1 [&>dt]:text-xs">
-          <DescriptionTerm>Status</DescriptionTerm>
-          <DescriptionDetails>
-            <Tag color="success">Active</Tag>
-          </DescriptionDetails>
-
-          <DescriptionTerm>ID</DescriptionTerm>
-          <DescriptionDetails className="font-mono text-xs">
-            usr_1234567890
-          </DescriptionDetails>
-
-          <DescriptionTerm>Created</DescriptionTerm>
-          <DescriptionDetails>Jan 22, 2024</DescriptionDetails>
-
-          <DescriptionTerm>Last seen</DescriptionTerm>
-          <DescriptionDetails>2 hours ago</DescriptionDetails>
-
-          <DescriptionTerm>Role</DescriptionTerm>
-          <DescriptionDetails>Admin</DescriptionDetails>
         </DescriptionList>
       </div>
     );
