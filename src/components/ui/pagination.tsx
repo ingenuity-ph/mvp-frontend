@@ -9,12 +9,12 @@ import { useId } from "react-aria";
 import {
   ButtonContext,
   Collection,
+  CollectionBuilder,
   CollectionRendererContext,
   type ContextValue,
+  createLeafComponent,
   DEFAULT_SLOT,
   Provider,
-  UNSTABLE_CollectionBuilder,
-  UNSTABLE_createLeafComponent,
   useContextProps,
   useSlottedContext,
 } from "react-aria-components";
@@ -170,7 +170,7 @@ type PaginationPageRendererProps = {
       };
 };
 
-export const PaginationPage = UNSTABLE_createLeafComponent(
+export const PaginationPage = createLeafComponent(
   PaginationNode,
   function PaginationPage(
     { page }: PaginationPageRendererProps,
@@ -221,7 +221,7 @@ export function PaginationPages({
   const { CollectionRoot } = useContext(CollectionRendererContext);
 
   return (
-    <UNSTABLE_CollectionBuilder
+    <CollectionBuilder
       content={
         <Collection
           items={api.pages.map((v, i) => {
@@ -249,7 +249,7 @@ export function PaginationPages({
           </ol>
         );
       }}
-    </UNSTABLE_CollectionBuilder>
+    </CollectionBuilder>
   );
 }
 

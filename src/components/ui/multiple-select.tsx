@@ -1,357 +1,160 @@
 import {
   type CSSProperties,
   useCallback,
-  useEffect,
+  useContext,
   useRef,
   useState,
 } from "react";
-import { useFilter, VisuallyHidden } from "react-aria";
 import {
   Button as AriaButton,
-  ComboBox,
-  type ComboBoxProps as ComboBoxPrimitiveProps,
-  Input,
+  composeRenderProps,
   type Key,
   ListBox,
-  Popover,
+  Select as AriaSelect,
+  type SelectProps as AriaSelectProps,
+  SelectStateContext,
+  SelectValue as AriaSelectValue,
   Tag as AriaTag,
   TagGroup,
+  type TagGroupProps,
   TagList,
 } from "react-aria-components";
-import { useListData } from "react-stately";
+import type { FieldPath, FieldValues } from "react-hook-form";
 import { CaretDownIcon, XIcon } from "@phosphor-icons/react";
-import { useResizeObserver } from "@react-aria/utils";
+import { mergeProps, useResizeObserver } from "@react-aria/utils";
 import { Button } from "./button";
-import { Description, useFieldController, useFieldProps } from "./fieldset";
-import { composedInputStyles, type ControlOwnProps } from "./input";
+import {
+  Description,
+  Field,
+  FieldControl,
+  Label,
+  type WithComposedFieldControlProps,
+} from "./fieldset";
+import { ClearButton, composedInputStyles } from "./input";
 import { pickerStyles } from "./picker";
+import { Popover } from "./popover";
 import { cn } from "./utils";
 
-/**
- * EXPERIMENTAL CORE COMPONENT .
- */
-
-type SelectedKey = {
+type SelectedKeyShape = {
   id: Key;
-  name: string;
+  label: string;
   [key: string]: unknown;
 };
 
-export type SelectedValueRendererProps<T> = {
-  selectedKeys: T;
-  onRemove: (selectedKey: Key) => void;
+export type SelectedValueRendererProps<T extends SelectedKeyShape> = {
+  selectedKeys: Array<T>;
+  onRemove?: (selectedKey: Key) => void;
 };
 
-/**
- * @internal
- */
-type OwnProps = Omit<ControlOwnProps, "endEnhancer"> & {
-  placeholder?: string;
+type MultiSelectProps<T extends SelectedKeyShape> = Omit<
+  AriaSelectProps<T, "multiple">,
+  "children"
+> & {
+  isClearable?: boolean;
+  items?: Iterable<T>;
+  children: React.ReactNode | ((item: T) => React.ReactNode);
 };
-type MultipleSelectProps<T extends object> = Omit<
-  ComboBoxPrimitiveProps<T>,
-  | "children"
-  | "validate"
-  | "allowsEmptyCollection"
-  | "inputValue"
-  | "selectedKey"
-  | "className"
-  | "value"
-  | "onSelectionChange"
-  | "onInputChange"
-> &
-  OwnProps & {
-    items?: Array<T>;
-    onItemInserted?: (key: Key) => void;
-    onItemCleared?: (key: Key) => void;
-    renderEmptyState?: (inputValue: string) => React.ReactNode;
-    renderSelectedValue?: React.FC<SelectedValueRendererProps<T>>;
-    children: React.ReactNode | ((item: T) => React.ReactNode);
-    defaultSelectedKeys?: Array<Key>;
-  };
 
-export function MultipleSelect<T extends SelectedKey>({
+export function MultiSelect<T extends SelectedKeyShape>({
+  items,
+  isClearable,
   children,
-  items = [],
-  onItemCleared,
-  onItemInserted,
   className,
-  name,
-  placeholder = "Select an option",
-  adjoined: adjoinedConfig = "unset",
-  renderEmptyState,
-  // renderSelectedValue = SelectedKeysRenderer,
-  // renderSelectedValue,
-  startEnhancer,
   ...props
-}: MultipleSelectProps<T>) {
-  const field = useFieldProps();
-  /**
-   * EXPERIMENTAL
-   * Might cause unstability by wrapping in ref.
-   */
-  const fieldControl = useRef(useFieldController()?.field).current;
+}: MultiSelectProps<T>) {
+  const { root, container, enhancerEnd, input } = composedInputStyles();
+  const triggerRef = useRef<HTMLDivElement | null>(null);
 
-  const initialSelectedKeys = props.defaultSelectedKeys ?? [];
-
-  const selectedItems = useListData<T>({
-    initialItems: items.filter((item) => initialSelectedKeys.includes(item.id)),
-    initialSelectedKeys,
-  });
-
-  // Sync with external changes
-  useEffect(() => {
-    const updatedSelectedKeys = selectedItems.items.map((i) => i.id);
-
-    if (
-      JSON.stringify(fieldControl?.value) !==
-      JSON.stringify(updatedSelectedKeys)
-    ) {
-      fieldControl?.onChange(updatedSelectedKeys);
-    }
-  }, [selectedItems.items, fieldControl]);
-
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { contains } = useFilter({ sensitivity: "base" });
-  const selectedKeys = selectedItems.items.map((i) => i.id);
-
-  useEffect(() => {
-    fieldControl?.onChange(selectedItems.items.map((item) => item.id));
-  }, [selectedItems.items, fieldControl]);
-
-  const filter = useCallback(
-    (item: T, filterText: string) => {
-      return !selectedKeys.includes(item.id) && contains(item.name, filterText);
-    },
-    [contains, selectedKeys],
-  );
-
-  const accessibleList = useListData({
-    initialItems: items,
-    filter,
-  });
-
-  const [fieldState, setFieldState] = useState<{
-    selectedKey: Key | null;
-    inputValue: string;
-  }>({
-    selectedKey: null,
-    inputValue: "",
-  });
-
-  // const onRemove = (keys: Set<Key>) => {
-  //   const key = keys.values().next().value;
-
-  //   if (!key) {
-  //     return;
-  //   }
-
-  //   selectedItems.remove(key);
-  //   setFieldState({ inputValue: "", selectedKey: null });
-  //   onItemCleared?.(key);
-  //   fieldControl?.onChange(selectedItems.items.map((i) => i.id));
-  // };
-
-  const onSelectionChange = (id: Key | null) => {
-    if (!id) {
-      return;
-    }
-
-    const item = accessibleList.getItem(id);
-
-    if (!item || selectedKeys.includes(id)) {
-      return;
-    }
-
-    if (!selectedKeys.includes(id)) {
-      selectedItems.append(item);
-      setFieldState({
-        inputValue: "",
-        selectedKey: id,
-      });
-      onItemInserted?.(id);
-    }
-    accessibleList.setFilterText("");
-  };
-
-  const onInputChange = (value: string) => {
-    setFieldState((prev) => {
-      return {
-        inputValue: value,
-        selectedKey: value === "" ? null : prev.selectedKey,
-      };
-    });
-
-    accessibleList.setFilterText(value);
-  };
-
-  const popLast = useCallback(() => {
-    if (selectedItems.items.length === 0) {
-      return;
-    }
-
-    const endKey = selectedItems.items[selectedItems.items.length - 1];
-
-    if (endKey.id) {
-      selectedItems.remove(endKey.id);
-      onItemCleared?.(endKey.id);
-    }
-
-    setFieldState({
-      inputValue: "",
-      selectedKey: null,
-    });
-  }, [selectedItems, onItemCleared]);
-
-  const onKeyDownCapture = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Backspace" && fieldState.inputValue === "") {
-        popLast();
-      }
-    },
-    [popLast, fieldState.inputValue],
-  );
-
-  const controlRef = useRef<HTMLDivElement>(null);
   const [controlWidth, setControlWidth] = useState(0);
   const onResize = useCallback(() => {
-    if (controlRef.current) {
-      setControlWidth(controlRef.current.offsetWidth);
+    if (triggerRef.current) {
+      setControlWidth(triggerRef.current.offsetWidth);
     }
   }, []);
 
   useResizeObserver({
-    ref: controlRef,
+    ref: triggerRef,
     onResize,
   });
 
-  const { container, input, root, enhancerStart, enhancerEnd } =
-    composedInputStyles({
-      adjoined: adjoinedConfig,
-    });
-
   return (
-    <div
-      ref={controlRef}
-      data-slot="control"
-      data-disabled={props.isDisabled}
-      className={root({ className })}
-    >
-      <div className={container()}>
-        {Boolean(startEnhancer) && (
-          <div data-slot="enhancer" className={enhancerStart()}>
-            {startEnhancer}
-          </div>
+    <div data-slot="control" className="w-full">
+      <AriaSelect
+        {...props}
+        selectionMode="multiple"
+        className={composeRenderProps(className, (resolvedClassName) =>
+          root({ className: resolvedClassName }),
         )}
-        <SelectedKeysRenderer
-          selectedKeys={selectedItems.items}
-          onRemove={() => {
-            //
-          }}
-        />
-        <div>
-          <ComboBox
-            {...props}
-            allowsEmptyCollection
-            id={field?.id}
-            aria-labelledby={field?.["aria-labelledby"]}
-            aria-label="Available items"
-            className="group peer relative flex flex-1"
-            items={accessibleList.items}
-            selectedKey={fieldState.selectedKey}
-            inputValue={fieldState.inputValue}
-            onSelectionChange={onSelectionChange}
-            onInputChange={onInputChange}
-          >
-            <div className="flex items-center">
-              <Input
-                placeholder={placeholder}
-                className={input()}
-                onKeyDownCapture={onKeyDownCapture}
-                onBlur={() => {
-                  setFieldState({
-                    inputValue: "",
-                    selectedKey: null,
-                  });
-                  accessibleList.setFilterText("");
-                  fieldControl?.onBlur();
-                }}
-              />
-              <AriaButton>
-                <span data-slot="enhancer" className={cn(enhancerEnd())}>
-                  <CaretDownIcon />
-                </span>
-              </AriaButton>
-            </div>
-            <Popover
-              isNonModal
-              triggerRef={controlRef}
-              style={
-                { "--trigger-width": `${controlWidth}px` } as CSSProperties
+      >
+        <div ref={triggerRef} data-slot="trigger" className={container()}>
+          <AriaSelectValue className={input()}>
+            {({ selectedItems, isPlaceholder }) => {
+              if (isPlaceholder) {
+                return props.placeholder;
               }
-            >
-              <ListBox
-                items={items}
-                selectionMode="multiple"
-                renderEmptyState={() => {
-                  return renderEmptyState ? (
-                    renderEmptyState(fieldState.inputValue)
-                  ) : (
-                    <Description className="block p-3">
-                      {fieldState.inputValue ? (
-                        <>
-                          No results found for:{" "}
-                          <strong className="text-fg font-medium">
-                            {fieldState.inputValue}
-                          </strong>
-                        </>
-                      ) : (
-                        "No options"
-                      )}
-                    </Description>
-                  );
-                }}
-                className={cn([
-                  //
-                  pickerStyles().list({ className: "max-h-64" }),
-                ])}
-              >
-                {children}
-              </ListBox>
-            </Popover>
-          </ComboBox>
+
+              return (
+                <SelectedKeysRenderer
+                  selectedKeys={selectedItems as Array<T>}
+                />
+              );
+            }}
+          </AriaSelectValue>
+          {isClearable && <ClearButton />}
+          <AriaButton>
+            <span data-slot="enhancer" className={cn(enhancerEnd())}>
+              <CaretDownIcon />
+            </span>
+          </AriaButton>
         </div>
-      </div>
-      {name && (
-        <VisuallyHidden>
-          <input
-            hidden
-            readOnly
-            name={name}
-            value={selectedItems.items.map((i) => i.id).join(",")}
-          />
-        </VisuallyHidden>
-      )}
+        <Popover
+          bleed
+          triggerRef={triggerRef}
+          style={{ "--trigger-width": `${controlWidth}px` } as CSSProperties}
+        >
+          <ListBox
+            items={items}
+            className={pickerStyles().list({ className: "max-h-64" })}
+          >
+            {children}
+          </ListBox>
+        </Popover>
+      </AriaSelect>
     </div>
   );
 }
 
-function SelectedKeysRenderer<T extends Array<SelectedKey>>({
+function SelectedKeysRenderer<T extends SelectedKeyShape>({
   selectedKeys,
 }: SelectedValueRendererProps<T>) {
+  const state = useContext(SelectStateContext);
+
   return (
     <TagGroup
       aria-label="Selected items"
       className="group has-[data-empty]:hidden"
-      // onRemove={onRemove}
+      {...mergeProps(
+        {
+          onRemove: (keysToRemove) => {
+            const currentValue = state?.value;
+            const keysArray = [...keysToRemove];
+
+            if (Array.isArray(currentValue)) {
+              // Since `Select` values are always the `ids` we just coerce this.
+              state?.setValue(
+                currentValue.filter((v) => !keysArray.includes(v)),
+              );
+            }
+          },
+        } as Partial<TagGroupProps>,
+        {},
+      )}
     >
       <TagList
         items={selectedKeys}
         className={cn(
           //
           "inline-flex flex-wrap gap-2 pr-2 empty:hidden",
-          //
-          "my-[calc(theme(spacing[2.5])-1px)] sm:my-[calc(theme(spacing[1.5])-1px)]",
         )}
       >
         {(item) => {
@@ -364,7 +167,7 @@ function SelectedKeysRenderer<T extends Array<SelectedKey>>({
                 "bg-neutral-600/10 text-neutral-700 group-data-hovered:bg-neutral-600/20 dark:bg-white/5 dark:text-neutral-400 dark:group-data-hovered:bg-white/10",
               ])}
             >
-              <span>{item.name}</span>
+              <span>{item.label}</span>
               <Button
                 variant="unstyled"
                 slot="remove"
@@ -377,5 +180,53 @@ function SelectedKeysRenderer<T extends Array<SelectedKey>>({
         }}
       </TagList>
     </TagGroup>
+  );
+}
+
+type MultiSelectFieldProps<T extends SelectedKeyShape> = Omit<
+  MultiSelectProps<T>,
+  "className"
+> & { className?: string };
+
+export function MultiSelectField<
+  T extends SelectedKeyShape,
+  TControl extends FieldValues = FieldValues,
+  TFieldName extends FieldPath<TControl> = FieldPath<TControl>,
+>({
+  label,
+  description,
+  control,
+  field,
+  isDisabled,
+  defaultFieldValue,
+  className,
+  ...props
+}: WithComposedFieldControlProps<
+  MultiSelectFieldProps<T>,
+  TControl,
+  TFieldName
+>) {
+  if (control && field) {
+    return (
+      <FieldControl
+        control={control}
+        field={field}
+        isDisabled={isDisabled}
+        defaultValue={defaultFieldValue}
+        className={className}
+      >
+        {label ? <Label>{label}</Label> : null}
+        <MultiSelect {...props} />
+        {description ? <Description>{description}</Description> : null}
+      </FieldControl>
+    );
+  }
+
+  return (
+    <Field isDisabled={isDisabled} className={className}>
+      {label ? <Label>{label}</Label> : null}
+      <MultiSelect isDisabled={isDisabled} {...props} />
+      {description ? <Description>{description}</Description> : null}
+    </Field>
   );
 }

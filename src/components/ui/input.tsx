@@ -272,23 +272,18 @@ const _BaseInput = forwardRef(function BaseInput(
   const fieldControl = controller?.field;
   const mergedRef = mergeRefs(objectRef, fieldControl?.ref);
 
-  const { container } = composedInputStyles({ adjoined });
+  const { container, enhancerStart, enhancerEnd, input } = composedInputStyles({
+    adjoined,
+  });
 
   return (
-    <div data-slot="input-container" className={cn([container()])}>
+    <div data-slot="input-container" className={container()}>
       {Boolean(startEnhancer) && (
-        <div
-          data-slot="enhancer"
-          className={cn([composedInputStyles().enhancerStart()])}
-        >
+        <div data-slot="enhancer" className={enhancerStart()}>
           {startEnhancer}
         </div>
       )}
-      <AriaInput
-        ref={mergedRef}
-        {...props}
-        className={cn([className, composedInputStyles().input()])}
-      />
+      <AriaInput ref={mergedRef} {...props} className={input({ className })} />
       {isClearable && (
         <ClearButton
           onClick={() => {
@@ -297,10 +292,7 @@ const _BaseInput = forwardRef(function BaseInput(
         />
       )}
       {Boolean(endEnhancer) && (
-        <span
-          data-slot="enhancer"
-          className={cn(composedInputStyles().enhancerEnd())}
-        >
+        <span data-slot="enhancer" className={enhancerEnd()}>
           {endEnhancer}
         </span>
       )}
