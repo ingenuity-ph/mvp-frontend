@@ -1,11 +1,12 @@
 import type { Wretch, WretchAddon } from "wretch";
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface AuthenticatedRequestAddon {
   /**
    * Sets the `credentials` option to `include` for requests requiring auth.
    */
   authenticate: <T extends AuthenticatedRequestAddon, C, R>(
-    this: T & Wretch<T, C, R>
+    this: T & Wretch<T, C, R>,
   ) => this;
 }
 

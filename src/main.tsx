@@ -1,12 +1,13 @@
 // Sentry initialization should be imported first!
 // eslint-disable-next-line simple-import-sort/imports
+import { StrictMode } from "react";
 import { initializeInstrumentation } from "../instrumentation.ts";
 import "./styles.css";
-import { StrictMode } from "react";
-// eslint-disable-next-line @typescript-eslint/naming-convention
-import ReactDOM from "react-dom/client";
+
 import * as Sentry from "@sentry/react";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+// eslint-disable-next-line @typescript-eslint/naming-convention
+import ReactDOM from "react-dom/client";
 import { ConsoleStrategy, PostHogStrategy } from "./libs/analytics";
 import { AnalyticsProvider } from "./libs/analytics/analytics-provider.tsx";
 import { queryClient } from "./libs/query/query-client.tsx";

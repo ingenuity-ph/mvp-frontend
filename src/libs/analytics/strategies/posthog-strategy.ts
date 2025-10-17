@@ -1,29 +1,33 @@
 /**
  * PostHog Analytics Strategy
- * Implements PostHog-specific optimizations while maintaining simple API
+ * Implements PostHog-specific optimizations while maintaining simple API.
  */
 
 import { posthog } from "posthog-js";
-import type { AnalyticsStrategy } from "../types";
 import { env } from "@/env";
+import type { AnalyticsStrategy } from "../types";
 
-export interface PostHogConfig {
+export type PostHogConfig = {
   apiKey: string;
   apiHost: string;
   debug?: boolean;
   capturePageViews?: boolean;
   captureExceptions?: boolean;
-}
+};
 
+// eslint-disable-next-line no-restricted-syntax/noClasses
 export class PostHogStrategy implements AnalyticsStrategy {
   readonly name = "posthog";
+  // eslint-disable-next-line no-restricted-syntax/noAccessModifiers
   private isInitialized = false;
 
   async initialize(config: PostHogConfig): Promise<void> {
     const posthogKey = env.VITE_PUBLIC_POSTHOG_KEY;
+
     if (!posthogKey || !env.VITE_PUBLIC_POSTHOG_HOST) {
       throw new Error("PostHog requires apiKey and apiHost");
     }
+
     return new Promise((resolve, reject) => {
       try {
         posthog.init(posthogKey, {
@@ -38,19 +42,23 @@ export class PostHogStrategy implements AnalyticsStrategy {
           },
         });
       } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         reject(error);
       }
     });
   }
 
   track(event: string, properties?: Record<string, any>): void {
-    if (!this.isReady()) return;
+    if (!this.isReady()) {
+      return;
+    }
 
     try {
       // PostHog optimization: handle special events
       if (event === "page viewed" || event === "pageview") {
         // Use PostHog's optimized $pageview event with automatic properties
         posthog.capture("$pageview", properties);
+
         return;
       }
 
@@ -62,7 +70,9 @@ export class PostHogStrategy implements AnalyticsStrategy {
   }
 
   identify(userId: string, properties?: Record<string, any>): void {
-    if (!this.isReady()) return;
+    if (!this.isReady()) {
+      return;
+    }
 
     try {
       posthog.identify(userId, properties);
@@ -72,7 +82,9 @@ export class PostHogStrategy implements AnalyticsStrategy {
   }
 
   clearIdentity(): void {
-    if (!this.isReady()) return;
+    if (!this.isReady()) {
+      return;
+    }
 
     try {
       posthog.reset();
@@ -82,9 +94,10 @@ export class PostHogStrategy implements AnalyticsStrategy {
   }
 
   isReady(): boolean {
-    return this.isInitialized && !!posthog;
+    return this.isInitialized && Boolean(posthog);
   }
 
+  // eslint-disable-next-line @regru/prefer-early-return/prefer-early-return
   cleanup(): void {
     if (this.isInitialized) {
       try {

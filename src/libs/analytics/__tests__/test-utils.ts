@@ -25,33 +25,6 @@ export const testData = {
 };
 
 /**
- * Simple mock strategy for testing
- */
-class TestMockStrategy {
-  readonly name = "test-mock";
-
-  initialize(): void {
-    // No-op
-  }
-
-  track(): void {
-    // No-op
-  }
-
-  identify(): void {
-    // No-op
-  }
-
-  clearIdentity(): void {
-    // No-op
-  }
-
-  isReady(): boolean {
-    return true;
-  }
-}
-
-/**
  * Create a mock analytics client with spied methods
  */
 export function createMockAnalytics() {
