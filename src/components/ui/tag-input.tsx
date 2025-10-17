@@ -186,7 +186,7 @@ export function TagInputField<
         control={control}
         field={field}
         isDisabled={disabled}
-        defaultValue={defaultFieldValue}
+        defaultFieldValue={defaultFieldValue}
         className={className}
       >
         {label ? <Label>{label}</Label> : null}

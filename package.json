@@ -18,7 +18,7 @@
     "@fontsource/inter": "^5.2.5",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^5.2.2",
-    "@internationalized/date": "^3.9.0",
+    "@internationalized/date": "^3.10.0",
     "@phosphor-icons/react": "^2.1.10",
     "@react-aria/collections": "^3.0.0",
     "@react-aria/utils": "^3.31.0",

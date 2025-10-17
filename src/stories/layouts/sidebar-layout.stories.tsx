@@ -348,7 +348,7 @@ export const Default: Story = {
                   aria-label="Region"
                   name="region"
                   placeholder="Region"
-                  defaultValue="Ontario"
+                  defaultFieldValue="Ontario"
                 >
                   <Option id="ph" textValue="Philippines">
                     <Label>Philippines</Label>
@@ -365,7 +365,7 @@ export const Default: Story = {
                   name="region"
                   placeholder="Region"
                   className="col-span-2"
-                  defaultValue="Ontario"
+                  defaultFieldValue="Ontario"
                 >
                   <Option id="ph" textValue="Philippines">
                     <Label>Philippines</Label>
@@ -387,7 +387,7 @@ export const Default: Story = {
                 <SelectField
                   aria-label="Currency"
                   name="currency"
-                  defaultValue="cad"
+                  defaultFieldValue="cad"
                 >
                   <Option textValue="cad" id="cad">
                     CAD - Canadian Dollar
