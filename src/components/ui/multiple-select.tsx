@@ -212,7 +212,7 @@ export function MultiSelectField<
         control={control}
         field={field}
         isDisabled={isDisabled}
-        defaultValue={defaultFieldValue}
+        defaultFieldValue={defaultFieldValue}
         className={className}
       >
         {label ? <Label>{label}</Label> : null}
