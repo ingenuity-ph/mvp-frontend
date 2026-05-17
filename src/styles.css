@@ -12,6 +12,12 @@
   }
   :root {
   }
+  html,
+  body,
+  #app {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 @utility surface-inset {

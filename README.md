@@ -87,6 +87,30 @@ VITE_PUBLIC_POSTHOG_HOST=
 
 > 📝 **Note**: Analytics work out of the box using console logging. You don't need to configure PostHog or other services initially. When you're ready for production analytics, ask your team lead for the appropriate credentials.
 
+### 🔐 Choosing an auth provider
+
+Pick one at project setup by editing `src/features/auth/provider.ts`. Both implementations conform to the same `AuthProvider` interface, so nothing else in the app changes.
+
+- **`apiAuthProvider`** (default) — Your own backend, cookie-based. Backend sets an `HttpOnly` session cookie; the frontend never sees a token.
+- **`cognitoAuthProvider`** — AWS Cognito via Amplify. Requires `VITE_COGNITO_POOL_ID`, `VITE_COGNITO_CLIENT_ID`, `VITE_COGNITO_DOMAIN`.
+
+If you use `apiAuthProvider`, your backend must implement the endpoints documented in `src/features/auth/providers/api-provider.ts` (login, logout, me, signup, password reset). Session cookie should be `HttpOnly` + `Secure` in production.
+
+#### Switching to `cognitoAuthProvider`
+
+1. Provision a Cognito user pool with an app client configured for `USER_PASSWORD_AUTH`.
+2. Fill in `VITE_COGNITO_POOL_ID` / `VITE_COGNITO_CLIENT_ID` / `VITE_COGNITO_DOMAIN`.
+3. In `src/features/auth/provider.ts`, replace `apiAuthProvider` with `cognitoAuthProvider`.
+
+### Component / Layout Previews
+
+The template ships with two component-showcase routes that are useful while developing the design system:
+
+- `/preview` — UI primitives (buttons, inputs, dialogs, etc.)
+- `/layout-preview` — full sidebar / navbar layout demo
+
+These routes are **dev-only**. They return 404 in any `vite build` output (staging or production), so you don't need to manually delete them before deploying.
+
 ### Step 6: Start Development
 
 ```bash

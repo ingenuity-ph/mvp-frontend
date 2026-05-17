@@ -1,5 +1,3 @@
-import { Amplify, type ResourcesConfig } from "aws-amplify";
-import { signUp } from "aws-amplify/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,117 +9,26 @@ import { Description, FieldGroup, Label } from "@/components/ui/fieldset";
 import { InputField, PasswordInputField } from "@/components/ui/input";
 import { Strong, Text, TextLink, Title } from "@/components/ui/text";
 import { Content } from "@/components/ui/view";
+import { buildPasswordSchema } from "@/features/auth/password-schema";
+import { authProvider } from "@/features/auth/provider";
 import { getErrorMessage } from "@/libs/query/query-error";
 
-type AuthConfig = NonNullable<ResourcesConfig["Auth"]>;
-type CognitoConfig = NonNullable<AuthConfig["Cognito"]>;
-type PasswordSettings = CognitoConfig["passwordFormat"];
-// Cognito does not allow a password length less then 8 characters
-const DEFAULT_COGNITO_PASSWORD_MIN_LENGTH = 8;
-
-/**
- * List of special characters that Cognito allows.
- *
- * Adapted from https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-policies.html.
- */
-// prettier-ignore
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const ALLOWED_SPECIAL_CHARACTERS = [
-    '^',  '$', '*', '.', '[', ']',
-    '{',  '}', '(', ')', '?', '"',
-    '!',  '@', '#', '%', '&', '/',
-    '\\', ',', '>', '<', "'", ':',
-    ';',  '|', '_', '~', '`', '=',
-    '+',  '-', ' '
-  ];
-
-// eslint-disable-next-line jsdoc/require-description
-/**
- * @param config - The password configuration from Cognito.
- * @returns A Zod string schema for password validation.
- */
-function buildSchema(config: PasswordSettings) {
-  const baseSchema = z.object({
-    email: z.email(),
-    confirmPassword: z.string(),
-    password: z.string(),
-  });
-
-  let passwordSchema = z.string();
-
-  const {
-    minLength = DEFAULT_COGNITO_PASSWORD_MIN_LENGTH,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    requireLowercase,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    requireNumbers,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    requireUppercase,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    requireSpecialCharacters,
-  } = config ?? {};
-
-  // Apply minimum length constraint if specified
-  passwordSchema = passwordSchema.min(
-    minLength,
-    `Password must be at least ${minLength} characters long.`,
-  );
-
-  // Conditionally add regex for required character types
-  if (requireLowercase) {
-    passwordSchema = passwordSchema.regex(
-      /[a-z]/,
-      "Password must contain at least one lowercase letter.",
-    );
-  }
-
-  if (requireUppercase) {
-    passwordSchema = passwordSchema.regex(
-      /[A-Z]/,
-      "Password must contain at least one uppercase letter.",
-    );
-  }
-
-  if (requireNumbers) {
-    passwordSchema = passwordSchema.regex(
-      /\d/,
-      "Password must contain at least one number.",
-    );
-  }
-
-  if (requireSpecialCharacters) {
-    passwordSchema = passwordSchema.regex(
-      new RegExp(
-        ALLOWED_SPECIAL_CHARACTERS.map((str) =>
-          str.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        ).join("|"),
-      ),
-      "Password must contain at least one symbol.",
-    );
-  }
-
-  return baseSchema
-    .extend({ password: passwordSchema })
+function buildFormSchema() {
+  return z
+    .object({
+      email: z.email(),
+      password: buildPasswordSchema(),
+      confirmPassword: z.string(),
+    })
     .refine((v) => v.password === v.confirmPassword, {
       message: "Passwords don't match",
-      path: ["confirmPassword"], // path of error
+      path: ["confirmPassword"],
     });
 }
 
-/**
- * TODO:
- * []-Handle use-case where sign in confirmation is outside app (e.g. Cognito send an email to user tha confirms their sign in).
- */
 export const Route = createFileRoute("/(unauthenticated)/register")({
   component: RouteComponent,
-  loader() {
-    const config = Amplify.getConfig();
-    const cliConfig = config.Auth?.Cognito;
-
-    return {
-      formSchema: buildSchema(cliConfig as PasswordSettings),
-    };
-  },
+  loader: () => ({ formSchema: buildFormSchema() }),
 });
 
 function RouteComponent() {
@@ -136,73 +43,39 @@ function SignUpForm() {
   const { formSchema } = Route.useLoaderData();
   const form = useForm({
     defaultValues: {
-      email: "mail@mail.com",
-      password: "Password1!",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
-
     resolver: zodResolver(formSchema),
   });
 
   const navigate = useNavigate();
 
-  const onSubmitHandler = form.handleSubmit(
-    async (data) => {
-      void navigate({
-        to: "/confirm-account",
-        search: {
-          email: data.email,
-        },
-      });
-      const result = await signUp({
-        username: data.email,
-        password: data.password,
-        options: {
-          userAttributes: {
-            email: data.email,
-          },
-        },
-      }).catch((error) => {
+  const onSubmitHandler = form.handleSubmit(async (data) => {
+    const result = await authProvider
+      .signUp({ email: data.email, password: data.password })
+      .catch((error) => {
         form.setError("root", { message: getErrorMessage(error) });
 
         return null;
       });
 
-      if (!result) {
-        return;
-      }
+    if (!result) {
+      return;
+    }
 
-      if (result.isSignUpComplete) {
-        return void navigate({ to: "/home" });
-      }
+    if (result.kind === "done") {
+      void navigate({ to: "/dashboard" });
 
-      switch (result.nextStep.signUpStep) {
-        case "COMPLETE_AUTO_SIGN_IN": {
-          // await autoSignIn();
-          break;
-        }
-        case "CONFIRM_SIGN_UP": {
-          void navigate({
-            to: "/confirm-account",
-            search: {
-              email: data.email,
-            },
-          });
-          break;
-        }
-        case "DONE": {
-          void navigate({ to: "/home" });
-          break;
-        }
-        default: {
-          // TODO: Handle default case
-          break;
-        }
-      }
-    },
-    (err) => {
-      console.error(err);
-    },
-  );
+      return;
+    }
+
+    void navigate({
+      to: "/confirm-account",
+      search: { email: result.username },
+    });
+  });
 
   const rootError = form.formState.errors.root?.message;
 
@@ -252,7 +125,7 @@ function SignUpForm() {
         Create Account
       </Button>
       <Text>
-        Don’t have an account?{" "}
+        Already have an account?{" "}
         <TextLink to="/login">
           <Strong>Sign In</Strong>
         </TextLink>

@@ -10,9 +10,11 @@ export const env = createEnv({
 
   client: {
     VITE_API_URL: z.string().min(1),
-    VITE_COGNITO_POOL_ID: z.string().min(1),
-    VITE_COGNITO_CLIENT_ID: z.string().min(1),
-    VITE_COGNITO_DOMAIN: z.string().min(1),
+    // Cognito values is only required if you switch the active auth provider in
+    // `src/features/auth/provider.ts` from `apiAuthProvider` to `cognitoAuthProvider`.
+    VITE_COGNITO_POOL_ID: z.string().optional(),
+    VITE_COGNITO_CLIENT_ID: z.string().optional(),
+    VITE_COGNITO_DOMAIN: z.string().optional(),
     VITE_PUBLIC_POSTHOG_KEY: z.string().optional(),
     VITE_PUBLIC_POSTHOG_HOST: z.string().optional(),
     VITE_SENTRY_DSN: z.string().optional(),
