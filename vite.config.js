@@ -61,6 +61,22 @@ export default defineConfig({
       },
     ],
   },
+  optimizeDeps: {
+    include: [
+      "@sentry/react",
+      "react-dom/client",
+      "web-vitals",
+      "@tanstack/react-query",
+      "@t3-oss/env-core",
+      "@tanstack/react-router-devtools",
+      "@tanstack/zod-adapter",
+      "posthog-js",
+      "aws-amplify",
+      "wretch",
+      "wretch/addons/formData",
+      "wretch/addons/queryString",
+    ],
+  },
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
