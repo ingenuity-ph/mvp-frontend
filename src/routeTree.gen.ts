@@ -14,13 +14,14 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as PreviewImport } from './routes/preview'
 import { Route as LogoutImport } from './routes/logout'
 import { Route as LayoutPreviewImport } from './routes/layout-preview'
+import { Route as HomeImport } from './routes/home'
 import { Route as unauthenticatedRouteImport } from './routes/(unauthenticated)/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as unauthenticatedResetPasswordImport } from './routes/(unauthenticated)/reset-password'
 import { Route as unauthenticatedRegisterImport } from './routes/(unauthenticated)/register'
 import { Route as unauthenticatedLoginImport } from './routes/(unauthenticated)/login'
 import { Route as unauthenticatedConfirmAccountImport } from './routes/(unauthenticated)/confirm-account'
-import { Route as authenticatedHomeImport } from './routes/(authenticated)/home'
+import { Route as authenticatedDashboardImport } from './routes/(authenticated)/dashboard'
 
 // Create/Update Routes
 
@@ -39,6 +40,12 @@ const LogoutRoute = LogoutImport.update({
 const LayoutPreviewRoute = LayoutPreviewImport.update({
   id: '/layout-preview',
   path: '/layout-preview',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HomeRoute = HomeImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -79,9 +86,9 @@ const unauthenticatedConfirmAccountRoute =
     getParentRoute: () => unauthenticatedRouteRoute,
   } as any)
 
-const authenticatedHomeRoute = authenticatedHomeImport.update({
-  id: '/(authenticated)/home',
-  path: '/home',
+const authenticatedDashboardRoute = authenticatedDashboardImport.update({
+  id: '/(authenticated)/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -101,6 +108,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof unauthenticatedRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeImport
       parentRoute: typeof rootRoute
     }
     '/layout-preview': {
@@ -124,11 +138,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PreviewImport
       parentRoute: typeof rootRoute
     }
-    '/(authenticated)/home': {
-      id: '/(authenticated)/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof authenticatedHomeImport
+    '/(authenticated)/dashboard': {
+      id: '/(authenticated)/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof authenticatedDashboardImport
       parentRoute: typeof rootRoute
     }
     '/(unauthenticated)/confirm-account': {
@@ -183,10 +197,11 @@ const unauthenticatedRouteRouteWithChildren =
 
 export interface FileRoutesByFullPath {
   '/': typeof unauthenticatedRouteRouteWithChildren
+  '/home': typeof HomeRoute
   '/layout-preview': typeof LayoutPreviewRoute
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
-  '/home': typeof authenticatedHomeRoute
+  '/dashboard': typeof authenticatedDashboardRoute
   '/confirm-account': typeof unauthenticatedConfirmAccountRoute
   '/login': typeof unauthenticatedLoginRoute
   '/register': typeof unauthenticatedRegisterRoute
@@ -195,10 +210,11 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof unauthenticatedRouteRouteWithChildren
+  '/home': typeof HomeRoute
   '/layout-preview': typeof LayoutPreviewRoute
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
-  '/home': typeof authenticatedHomeRoute
+  '/dashboard': typeof authenticatedDashboardRoute
   '/confirm-account': typeof unauthenticatedConfirmAccountRoute
   '/login': typeof unauthenticatedLoginRoute
   '/register': typeof unauthenticatedRegisterRoute
@@ -209,10 +225,11 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/(unauthenticated)': typeof unauthenticatedRouteRouteWithChildren
+  '/home': typeof HomeRoute
   '/layout-preview': typeof LayoutPreviewRoute
   '/logout': typeof LogoutRoute
   '/preview': typeof PreviewRoute
-  '/(authenticated)/home': typeof authenticatedHomeRoute
+  '/(authenticated)/dashboard': typeof authenticatedDashboardRoute
   '/(unauthenticated)/confirm-account': typeof unauthenticatedConfirmAccountRoute
   '/(unauthenticated)/login': typeof unauthenticatedLoginRoute
   '/(unauthenticated)/register': typeof unauthenticatedRegisterRoute
@@ -223,10 +240,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/home'
     | '/layout-preview'
     | '/logout'
     | '/preview'
-    | '/home'
+    | '/dashboard'
     | '/confirm-account'
     | '/login'
     | '/register'
@@ -234,10 +252,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/home'
     | '/layout-preview'
     | '/logout'
     | '/preview'
-    | '/home'
+    | '/dashboard'
     | '/confirm-account'
     | '/login'
     | '/register'
@@ -246,10 +265,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/(unauthenticated)'
+    | '/home'
     | '/layout-preview'
     | '/logout'
     | '/preview'
-    | '/(authenticated)/home'
+    | '/(authenticated)/dashboard'
     | '/(unauthenticated)/confirm-account'
     | '/(unauthenticated)/login'
     | '/(unauthenticated)/register'
@@ -260,19 +280,21 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   unauthenticatedRouteRoute: typeof unauthenticatedRouteRouteWithChildren
+  HomeRoute: typeof HomeRoute
   LayoutPreviewRoute: typeof LayoutPreviewRoute
   LogoutRoute: typeof LogoutRoute
   PreviewRoute: typeof PreviewRoute
-  authenticatedHomeRoute: typeof authenticatedHomeRoute
+  authenticatedDashboardRoute: typeof authenticatedDashboardRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   unauthenticatedRouteRoute: unauthenticatedRouteRouteWithChildren,
+  HomeRoute: HomeRoute,
   LayoutPreviewRoute: LayoutPreviewRoute,
   LogoutRoute: LogoutRoute,
   PreviewRoute: PreviewRoute,
-  authenticatedHomeRoute: authenticatedHomeRoute,
+  authenticatedDashboardRoute: authenticatedDashboardRoute,
 }
 
 export const routeTree = rootRoute
@@ -287,10 +309,11 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/(unauthenticated)",
+        "/home",
         "/layout-preview",
         "/logout",
         "/preview",
-        "/(authenticated)/home"
+        "/(authenticated)/dashboard"
       ]
     },
     "/": {
@@ -305,6 +328,9 @@ export const routeTree = rootRoute
         "/(unauthenticated)/reset-password"
       ]
     },
+    "/home": {
+      "filePath": "home.tsx"
+    },
     "/layout-preview": {
       "filePath": "layout-preview.tsx"
     },
@@ -314,8 +340,8 @@ export const routeTree = rootRoute
     "/preview": {
       "filePath": "preview.tsx"
     },
-    "/(authenticated)/home": {
-      "filePath": "(authenticated)/home.tsx"
+    "/(authenticated)/dashboard": {
+      "filePath": "(authenticated)/dashboard.tsx"
     },
     "/(unauthenticated)/confirm-account": {
       "filePath": "(unauthenticated)/confirm-account.tsx",

@@ -1,4 +1,3 @@
-import { autoSignIn, confirmSignUp, resendSignUpCode } from "aws-amplify/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,10 +11,11 @@ import { Title } from "@/components/ui/text";
 import { toaster } from "@/components/ui/toast";
 import { Content } from "@/components/ui/view";
 import { PinCodeInput } from "@/features/auth/components/PinInput";
+import { authProvider } from "@/features/auth/provider";
 import { getErrorMessage } from "@/libs/query/query-error";
 
 const searchParamsSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 });
 
 export const Route = createFileRoute("/(unauthenticated)/confirm-account")({
@@ -25,50 +25,22 @@ export const Route = createFileRoute("/(unauthenticated)/confirm-account")({
 
 const schema = z.object({
   code: z.string().min(1, "Required"),
-  email: z.string().email(),
+  email: z.email(),
 });
 
-/**
- * TODO: warning when navigating or closing tab.
- */
 function RouteComponent() {
   const { email } = Route.useSearch();
   const navigate = useNavigate();
 
   const form = useForm({
-    defaultValues: { email },
+    defaultValues: { email, code: "" },
     resolver: zodResolver(schema),
   });
+
   const onSubmitHandler = form.handleSubmit(async (data) => {
     try {
-      const result = await confirmSignUp({
-        confirmationCode: data.code,
-        username: data.email,
-      });
-
-      if (result.isSignUpComplete) {
-        return void navigate({ to: "/home" });
-      }
-      switch (result.nextStep.signUpStep) {
-        case "COMPLETE_AUTO_SIGN_IN": {
-          // TODO: Error handling handle response
-          await autoSignIn();
-
-          break;
-        }
-        case "CONFIRM_SIGN_UP": {
-          // void navigate({ to: "/home" });
-          break;
-        }
-        case "DONE": {
-          // TODO: Handle integration to authenticate with BE
-          return void navigate({ to: "/home" });
-        }
-        default: {
-          // TODO: Handle default
-          break;
-        }
-      }
+      await authProvider.confirmSignUp(data.email, data.code);
+      void navigate({ to: "/login" });
     } catch (error) {
       form.setError("root", { message: getErrorMessage(error) });
     }
@@ -82,7 +54,6 @@ function RouteComponent() {
         className="grid w-full max-w-sm grid-cols-1 gap-8"
         onSubmit={onSubmitHandler}
       >
-        <pre>{JSON.stringify(form.watch(), null, 2)}</pre>
         <span className="bg-brand-primary inline rounded px-3 pt-3 pb-2.5">
           <img
             src="https://www.ingenuity.ph/wp-content/uploads/2024/02/ingenuity-logo-2020_-light.png"
@@ -100,7 +71,7 @@ function RouteComponent() {
         {rootError !== undefined && (
           <Banner>
             <Content>
-              <Label>Login Error</Label>
+              <Label>Confirmation Error</Label>
               <Description>{rootError}</Description>
             </Content>
           </Banner>
@@ -125,10 +96,13 @@ function RouteComponent() {
             variant="plain"
             className="w-full"
             isDisabled={form.formState.isSubmitting}
-            onPress={() => {
-              // TODO: Error Handling
-              void resendSignUpCode({ username: email });
-              toaster("Code Sent");
+            onPress={async () => {
+              try {
+                await authProvider.resendSignUpCode(email);
+                toaster("Code Sent");
+              } catch (error) {
+                toaster(getErrorMessage(error));
+              }
             }}
           >
             Resend Code

@@ -8,8 +8,8 @@ import { env } from "@/env";
 import type { AnalyticsStrategy } from "../types";
 
 export type PostHogConfig = {
-  apiKey: string;
-  apiHost: string;
+  apiKey?: string;
+  apiHost?: string;
   debug?: boolean;
   capturePageViews?: boolean;
   captureExceptions?: boolean;
@@ -21,20 +21,22 @@ export class PostHogStrategy implements AnalyticsStrategy {
   // eslint-disable-next-line no-restricted-syntax/noAccessModifiers
   private isInitialized = false;
 
-  async initialize(config: PostHogConfig): Promise<void> {
+  async initialize(config: Record<string, unknown> = {}): Promise<void> {
     const posthogKey = env.VITE_PUBLIC_POSTHOG_KEY;
 
     if (!posthogKey || !env.VITE_PUBLIC_POSTHOG_HOST) {
       throw new Error("PostHog requires apiKey and apiHost");
     }
 
+    const phConfig = config as PostHogConfig;
+
     return new Promise((resolve, reject) => {
       try {
         posthog.init(posthogKey, {
           api_host: env.VITE_PUBLIC_POSTHOG_HOST,
-          debug: config.debug ?? import.meta.env.MODE === "development",
-          capture_pageview: config.capturePageViews ?? true,
-          capture_exceptions: config.captureExceptions ?? true, // This enables capturing exceptions using Error Tracking
+          debug: phConfig.debug ?? import.meta.env.MODE === "development",
+          capture_pageview: phConfig.capturePageViews ?? true,
+          capture_exceptions: phConfig.captureExceptions ?? true, // This enables capturing exceptions using Error Tracking
           enable_recording_console_log: true,
           loaded: () => {
             this.isInitialized = true;

@@ -1,4 +1,3 @@
-import { fetchAuthSession, resendSignUpCode, signIn } from "aws-amplify/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,79 +7,53 @@ import { Button } from "@/components/ui/button";
 import { InputField, PasswordInputField } from "@/components/ui/input";
 import { Link } from "@/components/ui/link";
 import { Text, TextLink, Title } from "@/components/ui/text";
-import { toaster } from "@/components/ui/toast";
-import { CognitoAuthService } from "@/features/auth/cognito/api/endpoints";
+import { authProvider } from "@/features/auth/provider";
 import { getErrorMessage } from "@/libs/query/query-error";
 import { MutationErrorBanner } from "@/libs/query/query-resolver";
 
-/**
- * TODO:
- * []-Handle use-case where sign in confirmation is outside app (e.g. Cognito send an email to user tha confirms their sign in).
- */
-
 const schema = z.object({
-  username: z.string(),
-  password: z.string(),
+  username: z.string().min(1, "Email is required."),
+  password: z.string().min(1, "Password is required."),
 });
 
 export function LoginFlowForm() {
   const navigate = useNavigate();
   const form = useForm({
     defaultValues: {
-      // TODO: Remove hardcoded value
-      username: "neil+congnitomvp@ingenuity.ph",
-      password: "Password1!",
+      username: "",
+      password: "",
     },
     resolver: zodResolver(schema),
   });
 
-  const validateToken = CognitoAuthService.validateToken.useMutation();
   const onSubmitHandler = form.handleSubmit(async (data) => {
-    const result = await signIn({
-      username: data.username,
-      password: data.password,
-    }).catch((error) => {
-      form.setError("root", { message: getErrorMessage(error) });
+    const result = await authProvider
+      .signIn({ username: data.username, password: data.password })
+      .catch((error) => {
+        form.setError("root", { message: getErrorMessage(error) });
 
       return null;
-    });
+      });
 
     if (!result) {
       return;
     }
-    const nextStep = result.nextStep.signInStep;
 
-    if (nextStep === "CONFIRM_SIGN_UP") {
-      await resendSignUpCode({ username: data.username });
+    if (result.kind === "confirmSignUp") {
+      await authProvider.resendSignUpCode(result.username);
       void navigate({
         to: "/confirm-account",
-        search: { email: data.username },
+        search: { email: result.username },
       });
-    } else if (nextStep === "DONE") {
-      //TODO: send to BE to validate and return as cookie
-      const session = await fetchAuthSession();
 
-      const token = session.tokens?.accessToken.toString();
-
-      if (token) {
-        validateToken.mutate(
-          { token },
-          {
-            onSuccess() {
-              void navigate({ to: "/home" });
-            },
-            onError(error) {
-              toaster(getErrorMessage(error));
-              form.setError("root", { message: getErrorMessage(error) });
-            },
-          },
-        );
-      }
+      return;
     }
+
+    void navigate({ to: "/dashboard" });
   });
 
   const rootError = form.formState.errors.root?.message;
-  const isLoading = validateToken.isPending || form.formState.isSubmitting;
+  const isLoading = form.formState.isSubmitting;
 
   return (
     <AuthLayout>

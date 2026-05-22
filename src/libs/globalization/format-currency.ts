@@ -42,8 +42,8 @@ export function formatCurrency(
   } = options;
 
   try {
-    // Validate locale by checking if it's a well-formed locale string
-    if (locale && Intl.getCanonicalLocales(locale).length === 0) {
+    // Validate locale
+    if (locale && Intl.NumberFormat.supportedLocalesOf(locale).length === 0) {
       throw new Error(`Invalid locale: ${locale}`);
     }
 

@@ -37,9 +37,11 @@ export function SidebarLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="relative isolate flex min-h-svh w-full bg-white max-lg:flex-col lg:bg-neutral-100 dark:bg-neutral-900 dark:lg:bg-neutral-950">
+    <div className="relative isolate flex h-svh w-full bg-white max-lg:min-h-svh max-lg:flex-col max-lg:overflow-visible lg:overflow-hidden dark:bg-neutral-900">
       {/* Sidebar on desktop */}
-      <div className="fixed inset-y-0 left-0 w-64 max-lg:hidden">{sidebar}</div>
+      <div className="fixed inset-y-0 left-0 w-64 bg-neutral-100 max-lg:hidden dark:bg-neutral-950">
+        {sidebar}
+      </div>
       {/* Sidebar on mobile */}
       <span className="lg:hidden">
         <MobileSidebar
@@ -68,7 +70,7 @@ export function SidebarLayout({
       </header>
 
       {/* Content */}
-      <main className="flex flex-1 flex-col lg:min-w-0 lg:pl-64">
+      <main className="flex flex-1 flex-col lg:min-w-0 lg:overflow-y-auto lg:pl-64">
         {children}
       </main>
     </div>

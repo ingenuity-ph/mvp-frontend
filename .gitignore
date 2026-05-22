@@ -5,7 +5,7 @@ dist-ssr
 *.local
 *.local.md
 
-.tsbuildinfo
+*.tsbuildinfo
 
 *storybook.log
 storybook-static

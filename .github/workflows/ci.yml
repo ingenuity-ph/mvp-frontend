@@ -32,8 +32,15 @@ jobs:
       - name: Type check
         run: yarn typecheck
 
+      - name: Install Playwright browsers
+        run: yarn playwright install --with-deps chromium
+
       - name: Run tests
+        env:
+          VITE_API_URL: http://localhost:8000
         run: yarn test --run --coverage
 
       - name: Build application
+        env:
+          VITE_API_URL: http://localhost:8000
         run: yarn build

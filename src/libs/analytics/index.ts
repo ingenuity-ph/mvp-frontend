@@ -1,26 +1,26 @@
 /**
  * Analytics Module
- * Simplified, flexible analytics with progressive type safety
+ * Simplified, flexible analytics with progressive type safety.
  */
 
 // Core types and interfaces
 export type {
   AnalyticsClient as AnalyticsClientCore,
-  AnalyticsStrategy,
   AnalyticsConfig,
-  AnalyticsEventMap,
   AnalyticsContextValue,
+  AnalyticsEventMap,
+  AnalyticsStrategy,
 } from "./types";
 
 // Strategy implementations
 export {
-  PostHogStrategy,
-  type PostHogConfig,
-} from "./strategies/posthog-strategy";
-export {
-  ConsoleStrategy,
   type ConsoleConfig,
+  ConsoleStrategy,
 } from "./strategies/console-strategy";
+export {
+  type PostHogConfig,
+  PostHogStrategy,
+} from "./strategies/posthog-strategy";
 
 // Core client
 export { AnalyticsClient } from "./analytics-client";

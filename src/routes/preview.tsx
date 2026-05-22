@@ -9,7 +9,7 @@ import {
   StarIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Calendar, RangeCalendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
@@ -51,6 +51,17 @@ import { cn, Group } from "@/components/ui/utils";
 import { Content, Footer, Header } from "@/components/ui/view";
 
 export const Route = createFileRoute("/preview")({
+  /**
+   * Preview page, this is only available during local development.
+   * This is hidden in staging / production builds
+   * We set VITE build import.meta.env.DEV to false.
+   */
+  beforeLoad: () => {
+    if (!import.meta.env.DEV) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw notFound();
+    }
+  },
   component: RouteComponent,
 });
 

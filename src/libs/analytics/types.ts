@@ -1,10 +1,10 @@
 /**
  * Analytics Types and Interfaces
- * Simplified, flexible event tracking with progressive type safety
+ * Simplified, flexible event tracking with progressive type safety.
  */
 
 /**
- * Interface for typed analytics events
+ * Interface for typed analytics events.
  *
  * Teams can augment this interface to add type safety using PostHog's [object] [verb] format:
  *
@@ -31,25 +31,23 @@
 export interface AnalyticsEventMap {
   // Empty by default - teams can augment for type safety
 }
-
-export interface AnalyticsStrategy {
+export type AnalyticsStrategy = {
   readonly name: string;
-  initialize(config: Record<string, any>): Promise<void> | void;
-  track(event: string, properties?: Record<string, any>): void;
-  identify(userId: string, properties?: Record<string, any>): void;
-  clearIdentity(): void;
-  isReady(): boolean;
-  cleanup?(): void;
-}
+  initialize: (config: Record<string, unknown>) => Promise<void> | void;
+  track: (event: string, properties?: Record<string, unknown>) => void;
+  identify: (userId: string, properties?: Record<string, unknown>) => void;
+  clearIdentity: () => void;
+  isReady: () => boolean;
+  cleanup?: () => void;
+};
 
 // Main Analytics Client Interface
-export interface AnalyticsClient {
+export type AnalyticsClient = {
   /**
-   * Track user events and actions
+   * Track user events and actions.
    *
-   * @param event - Event name using PostHog's [object] [verb] format (e.g., 'user signed up', 'project created')
-   * @param properties - Optional event properties as key-value pairs
-   *
+   * @param event - Event name using PostHog's [object] [verb] format (e.g., 'user signed up', 'project created').
+   * @param properties - Optional event properties as key-value pairs.
    * @example
    * ```typescript
    * // PostHog recommended format: [object] [verb]
@@ -77,18 +75,19 @@ export interface AnalyticsClient {
    * - Use past tense for verbs: 'created' not 'create'
    * - Include context in properties: {location: 'header', text: 'Sign Up'}
    */
-  track<K extends keyof AnalyticsEventMap>(
-    event: K,
-    properties: AnalyticsEventMap[K]
-  ): void;
-  track(event: string, properties?: Record<string, any>): void;
+  track: {
+    <K extends keyof AnalyticsEventMap>(
+      event: K,
+      properties: AnalyticsEventMap[K],
+    ): void;
+    (event: string, properties?: Record<string, unknown>): void;
+  };
 
   /**
-   * Identify a user and set their properties
+   * Identify a user and set their properties.
    *
-   * @param userId - Unique identifier for the user
-   * @param properties - Optional user properties
-   *
+   * @param userId - Unique identifier for the user.
+   * @param properties - Optional user properties.
    * @example
    * ```typescript
    * // When user logs in or signs up
@@ -111,10 +110,10 @@ export interface AnalyticsClient {
    * - Don't include sensitive data (passwords, SSNs, etc.)
    * - Use snake_case for property keys for consistency
    */
-  identify(userId: string, properties?: Record<string, any>): void;
+  identify: (userId: string, properties?: Record<string, unknown>) => void;
 
   /**
-   * Clear the current user identity and session data
+   * Clear the current user identity and session data.
    *
    * @example
    * ```typescript
@@ -131,14 +130,14 @@ export interface AnalyticsClient {
    * - Ensures clean session boundaries
    * - Consider tracking 'user logged out' event after clearing identity
    */
-  clearIdentity(): void;
-}
+  clearIdentity: () => void;
+};
 
 // Generic Configuration
-export interface AnalyticsConfig {
+export type AnalyticsConfig = {
   enabled: boolean;
   debug: boolean;
-}
+};
 
 // Context Value
 export type AnalyticsContextValue = AnalyticsClient;
